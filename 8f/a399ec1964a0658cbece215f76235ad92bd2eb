@@ -1,0 +1,26 @@
+Package.swift
+  s_39ee5e7086f9e6::t_d472ad7f3e693f 17-20
+Sources/HoldMyLid/Resources/Assets.xcassets/Contents.json
+  s_39ee5e7086f9e6::t_244709dd0a83f9 1-6
+Sources/HoldMyLid/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json
+  s_39ee5e7086f9e6::t_244709dd0a83f9 1-18
+Scripts/build-app.sh
+  s_39ee5e7086f9e6::t_d472ad7f3e693f 16,21,25-35,59-60
+  s_39ee5e7086f9e6::t_578f067b4c0ceb 58,61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "8fa399ec1964a0658cbece215f76235ad92bd2eb",
+  "prompts": {},
+  "sessions": {
+    "s_39ee5e7086f9e6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f57a3-c6c9-7f83-8358-613225695d3e",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
