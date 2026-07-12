@@ -20,7 +20,19 @@ History stays on the Mac. Wake My Mac records timestamps, wake reasons, agent na
 
 Download the latest DMG from [Releases](https://github.com/DeepanshuMishraa/wake-my-mac/releases).
 
-The app is currently not Developer ID signed or notarized. Release downloads are independently verified by Sparkle using EdDSA signatures.
+## Not Developer Signed
+
+Wake My Mac is not Developer ID signed or notarized at the moment. macOS may refuse to open it or move it to the Trash.
+
+## Remove the Quarantine Attribute
+
+Only do this if you downloaded Wake My Mac from this repository and trust the file. Move the app to `/Applications`, then run:
+
+```sh
+xattr -dr com.apple.quarantine "/Applications/Wake My Mac.app"
+```
+
+Open the app normally after the command finishes.
 
 ## Build
 
@@ -36,12 +48,6 @@ Run the test suite with:
 ```sh
 swift test
 ```
-
-## Releases
-
-Publish a GitHub Release with a tag such as `V0.0.1`. The release workflow runs the tests, builds the app, creates a DMG, signs it for Sparkle, generates the appcast, and attaches both assets to the release.
-
-The repository must define `SPARKLE_PUBLIC_ED_KEY` and `SPARKLE_PRIVATE_KEY` as Actions secrets before publishing.
 
 ## Notes
 
