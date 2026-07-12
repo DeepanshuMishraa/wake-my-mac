@@ -1,0 +1,26 @@
+Scripts/build-app.sh
+  s_39ee5e7086f9e6::t_8761f221c93410 10-11
+Sources/HoldMyLid/UpdateService.swift
+  s_39ee5e7086f9e6::t_8761f221c93410 17,22-25
+.github/workflows/release.yml
+  s_39ee5e7086f9e6::t_8761f221c93410 53-54
+Sources/HoldMyLid/PopoverView.swift
+  s_39ee5e7086f9e6::t_8761f221c93410 144-147
+  s_39ee5e7086f9e6::t_31d7f179f73b43 141-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "e63a9932bdd20f4bf2ad47dd0ca2139270bac7bf",
+  "prompts": {},
+  "sessions": {
+    "s_39ee5e7086f9e6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f57a3-c6c9-7f83-8358-613225695d3e",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
