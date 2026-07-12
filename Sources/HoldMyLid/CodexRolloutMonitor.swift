@@ -109,7 +109,6 @@ final class CodexRolloutMonitor {
             var lines = text.split(separator: "\n", omittingEmptySubsequences: true)
             if state.offset - UInt64(completeData.count) > 0, !text.hasPrefix("{") { lines = Array(lines.dropFirst()) }
             let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
             for line in lines {
                 guard let event = try? decoder.decode(RolloutEvent.self, from: Data(line.utf8)), event.type == "event_msg" else { continue }
                 switch event.payload.type {
@@ -117,18 +116,25 @@ final class CodexRolloutMonitor {
                 case "task_complete", "turn_aborted": state.status = .idle
                 default: continue
                 }
-                state.updated = event.timestamp ?? Date()
+                state.updated = event.timestamp.flatMap(Self.parseTimestamp) ?? Date()
             }
             files[path] = state
         } catch {
             files[path] = state
         }
     }
+
+    private static func parseTimestamp(_ value: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) { return date }
+        return ISO8601DateFormatter().date(from: value)
+    }
 }
 
 private struct RolloutEvent: Decodable {
     struct Payload: Decodable { let type: String }
-    let timestamp: Date?
+    let timestamp: String?
     let type: String
     let payload: Payload
 }
