@@ -14,6 +14,10 @@ let package = Package(
             name: "WatchMyMac",
             dependencies: ["Sparkle"],
             path: "Sources/HoldMyLid",
+            exclude: [
+                "Resources/AppIcon.png",
+                "Resources/Assets.xcassets"
+            ],
             resources: [
                 .copy("Resources/AgentIcons"),
                 .copy("Resources/Integrations")

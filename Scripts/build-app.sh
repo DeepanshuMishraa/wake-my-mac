@@ -13,14 +13,26 @@ APP_DIR="$ROOT/build/$APP_NAME.app"
 CONTENTS="$APP_DIR/Contents"
 MACOS="$CONTENTS/MacOS"
 RESOURCES="$CONTENTS/Resources"
+ASSET_OUTPUT="$ROOT/build/asset-output"
 
 cd "$ROOT"
 swift build -c release
 
-rm -rf "$APP_DIR"
+rm -rf "$APP_DIR" "$ASSET_OUTPUT"
 mkdir -p "$MACOS" "$RESOURCES"
 cp "$ROOT/.build/release/$EXECUTABLE_NAME" "$MACOS/$EXECUTABLE_NAME"
 cp -R "$ROOT/.build/release/WatchMyMac_WatchMyMac.bundle" "$RESOURCES/"
+mkdir -p "$ASSET_OUTPUT"
+xcrun actool \
+  "$ROOT/Sources/HoldMyLid/Resources/Assets.xcassets" \
+  --compile "$ASSET_OUTPUT" \
+  --platform macosx \
+  --minimum-deployment-target 14.0 \
+  --app-icon AppIcon \
+  --output-partial-info-plist "$ASSET_OUTPUT/asset-info.plist" \
+  >/dev/null
+cp "$ASSET_OUTPUT/AppIcon.icns" "$RESOURCES/AppIcon.icns"
+cp "$ASSET_OUTPUT/Assets.car" "$RESOURCES/Assets.car"
 
 SPARKLE_FRAMEWORK="$(find "$ROOT/.build" -type d -name Sparkle.framework -path '*release*' -print -quit)"
 if [[ -n "$SPARKLE_FRAMEWORK" ]]; then
@@ -43,6 +55,10 @@ cat > "$CONTENTS/Info.plist" <<PLIST
   <string>$APP_NAME</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
+  <key>CFBundleIconName</key>
+  <string>AppIcon</string>
   <key>CFBundleShortVersionString</key>
   <string>$APP_VERSION</string>
   <key>CFBundleVersion</key>
