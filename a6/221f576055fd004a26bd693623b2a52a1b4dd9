@@ -1,0 +1,19 @@
+Sources/HoldMyLid/DashboardView.swift
+  s_39ee5e7086f9e6::t_f8d2d71f8c3ad2 46-62,66,85-88,98,100-102,120,137,159,195-197,200-202,205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "a6221f576055fd004a26bd693623b2a52a1b4dd9",
+  "prompts": {},
+  "sessions": {
+    "s_39ee5e7086f9e6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f57a3-c6c9-7f83-8358-613225695d3e",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
