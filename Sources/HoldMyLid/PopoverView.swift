@@ -141,6 +141,13 @@ struct PopoverView: View {
             .buttonStyle(.plain)
 
             Button {
+                UpdateService.shared.checkForUpdates(nil)
+            } label: {
+                menuLine("Check for Updates…", shortcut: "")
+            }
+            .buttonStyle(.plain)
+
+            Button {
                 NSApp.terminate(nil)
             } label: {
                 menuLine("Quit Wake My Mac", shortcut: "⌘Q")

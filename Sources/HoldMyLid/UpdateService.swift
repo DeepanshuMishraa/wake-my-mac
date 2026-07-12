@@ -14,11 +14,15 @@ final class UpdateService: NSObject {
         if feedURL.isEmpty || publicKey.isEmpty {
             controller = nil
         } else {
-            controller = SPUStandardUpdaterController(
+            let updaterController = SPUStandardUpdaterController(
                 startingUpdater: true,
                 updaterDelegate: nil,
                 userDriverDelegate: nil
             )
+            controller = updaterController
+            if updaterController.updater.automaticallyChecksForUpdates {
+                updaterController.updater.checkForUpdatesInBackground()
+            }
         }
         super.init()
     }

@@ -49,10 +49,9 @@ jobs:
         shell: bash
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-          SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
         run: |
-          if [[ -z "$SPARKLE_PRIVATE_KEY" || -z "$SPARKLE_PUBLIC_ED_KEY" ]]; then
-            echo "Configure SPARKLE_PRIVATE_KEY and SPARKLE_PUBLIC_ED_KEY repository secrets before publishing releases." >&2
+          if [[ -z "$SPARKLE_PRIVATE_KEY" ]]; then
+            echo "Configure the SPARKLE_PRIVATE_KEY repository secret before publishing releases." >&2
             exit 1
           fi
 
@@ -64,7 +63,6 @@ jobs:
           APP_VERSION: ${{ steps.version.outputs.version }}
           BUILD_NUMBER: ${{ steps.version.outputs.build }}
           SPARKLE_FEED_URL: https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml
-          SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
         run: ./Scripts/build-app.sh
 
       - name: Create DMG
