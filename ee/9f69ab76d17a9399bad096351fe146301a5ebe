@@ -1,0 +1,19 @@
+Sources/HoldMyLid/CodexRolloutMonitor.swift
+  s_39ee5e7086f9e6::t_d284077274c4a2 119,126-132,137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "ee9f69ab76d17a9399bad096351fe146301a5ebe",
+  "prompts": {},
+  "sessions": {
+    "s_39ee5e7086f9e6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f57a3-c6c9-7f83-8358-613225695d3e",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
