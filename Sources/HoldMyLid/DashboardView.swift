@@ -43,10 +43,27 @@ struct DashboardView: View {
     }
 }
 
+private enum DashboardRange: Int, CaseIterable, Identifiable {
+    case today = 1
+    case week = 7
+    case month = 30
+
+    var id: Int { rawValue }
+    var title: String {
+        switch self {
+        case .today: "Today"
+        case .week: "7 Days"
+        case .month: "30 Days"
+        }
+    }
+    var context: String { self == .today ? "today" : "last \(rawValue) days" }
+    var axisStride: Int { self == .today ? 1 : (self == .week ? 1 : 5) }
+}
+
 private struct OverviewDashboard: View {
     @ObservedObject var state: AppState
     let sessions: [WakeSession]
-    @State private var selectedDays = 14
+    @State private var selectedRange: DashboardRange = .week
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { timeline in
@@ -65,10 +82,10 @@ private struct OverviewDashboard: View {
                     Spacer()
                     VStack(alignment: .trailing, spacing: 10) {
                         StatusPill(isHolding: isHolding)
-                        Picker("Range", selection: $selectedDays) {
-                            Text("7 days").tag(7)
-                            Text("14 days").tag(14)
-                            Text("30 days").tag(30)
+                        Picker("Range", selection: $selectedRange) {
+                            ForEach(DashboardRange.allCases) { range in
+                                Text(range.title).tag(range)
+                            }
                         }
                         .labelsHidden()
                         .pickerStyle(.segmented)
@@ -78,10 +95,11 @@ private struct OverviewDashboard: View {
 
                 let daily = dailyMetrics(now: now)
                 let rangeBattery = daily.reduce(0) { $0 + $1.batteryPoints }
+                let rangeSessions = recentSessions(now: now)
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 14)], spacing: 14) {
-                    MetricCard(title: "Awake today", value: duration(todayMetric(now: now).awakeSeconds), symbol: "sun.max")
-                    MetricCard(title: "Awake · \(selectedDays)d", value: duration(daily.reduce(0) { $0 + $1.awakeSeconds }), symbol: "clock")
-                    MetricCard(title: "Battery used · \(selectedDays)d", value: rangeBattery > 0 ? "\(rangeBattery.formatted(.number.precision(.fractionLength(0...1))))%" : "—", symbol: "battery.75percent")
+                    MetricCard(title: "Awake · \(selectedRange.title)", value: duration(daily.reduce(0) { $0 + $1.awakeSeconds }), symbol: "clock")
+                    MetricCard(title: "Sessions · \(selectedRange.title)", value: "\(rangeSessions.count)", symbol: "waveform.path.ecg")
+                    MetricCard(title: "Battery used · \(selectedRange.title)", value: rangeBattery > 0 ? "\(rangeBattery.formatted(.number.precision(.fractionLength(0...1))))%" : "—", symbol: "battery.75percent")
                     MetricCard(title: "Active reasons", value: "\(activeReasonCount)", symbol: "bolt.fill")
                 }
 
@@ -99,7 +117,7 @@ private struct OverviewDashboard: View {
                                     }
                                 }
                         }
-                        .chartXAxis { AxisMarks(values: .stride(by: .day, count: selectedDays <= 7 ? 1 : (selectedDays <= 14 ? 2 : 5))) { AxisGridLine().foregroundStyle(.clear); AxisValueLabel(format: .dateTime.day().month(.abbreviated)) } }
+                        .chartXAxis { AxisMarks(values: .stride(by: .day, count: selectedRange.axisStride)) { AxisGridLine().foregroundStyle(.clear); AxisValueLabel(format: .dateTime.day().month(.abbreviated)) } }
                         .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { value in AxisGridLine().foregroundStyle(.quaternary); AxisValueLabel { if let minutes = value.as(Double.self) { Text(axisDuration(minutes: minutes)) } } } }
                     }
 
@@ -116,7 +134,7 @@ private struct OverviewDashboard: View {
                                     }
                                 }
                         }
-                        .chartXAxis { AxisMarks(values: .stride(by: .day, count: selectedDays <= 7 ? 1 : (selectedDays <= 14 ? 2 : 5))) { AxisGridLine().foregroundStyle(.clear); AxisValueLabel(format: .dateTime.day().month(.abbreviated)) } }
+                        .chartXAxis { AxisMarks(values: .stride(by: .day, count: selectedRange.axisStride)) { AxisGridLine().foregroundStyle(.clear); AxisValueLabel(format: .dateTime.day().month(.abbreviated)) } }
                         .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { axisValue in AxisGridLine().foregroundStyle(.quaternary); AxisValueLabel { if let value = axisValue.as(Double.self) { Text("\(value.formatted(.number.precision(.fractionLength(0...1))))%") } } } }
                     }
 
@@ -138,7 +156,7 @@ private struct OverviewDashboard: View {
                         }
                     }
 
-                    AnalyticsCard(title: "Agent contribution", subtitle: "Attributed awake time · last \(selectedDays) days", symbol: "cpu") {
+                    AnalyticsCard(title: "Agent contribution", subtitle: "Attributed awake time · \(selectedRange.context)", symbol: "cpu") {
                         let agents = DashboardAnalytics.agentMetrics(sessions: recentSessions(now: now), now: now)
                         if agents.isEmpty {
                             EmptyChart(message: "No agent activity yet")
@@ -174,17 +192,17 @@ private struct OverviewDashboard: View {
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
-    private func todayMetric(now: Date) -> DailyWakeMetric {
-        let today = Calendar.current.startOfDay(for: now)
-        return DashboardAnalytics.dailyMetrics(sessions: sessions, from: today, through: now).first
-            ?? DailyWakeMetric(day: today, awakeSeconds: 0, batteryPoints: 0, segmentCount: 0)
+    private func recentSessions(now: Date) -> [WakeSession] {
+        let start = rangeStart(now: now)
+        return sessions.filter { ($0.endedAt ?? now) > start && $0.startedAt <= now }
     }
-    private func recentSessions(now: Date) -> [WakeSession] { sessions.filter { ($0.endedAt ?? now) > now.addingTimeInterval(-Double(selectedDays) * 86_400) } }
     private func dailyMetrics(now: Date) -> [DailyWakeMetric] {
+        DashboardAnalytics.dailyMetrics(sessions: sessions, from: rangeStart(now: now), through: now)
+    }
+    private func rangeStart(now: Date) -> Date {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: now)
-        let start = calendar.date(byAdding: .day, value: -(selectedDays - 1), to: today) ?? today
-        return DashboardAnalytics.dailyMetrics(sessions: sessions, from: start, through: now, calendar: calendar)
+        return calendar.date(byAdding: .day, value: -(selectedRange.rawValue - 1), to: today) ?? today
     }
     private var currentReasons: [String] { sessions.first(where: { $0.endedAt == nil })?.reasons ?? [] }
     private var activeReasonCount: Int { currentReasons.count }
