@@ -1,0 +1,5 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "hold-my-lid-antigravity",
+  "description": "Reports authoritative Antigravity execution state to Wake My Mac."
+}

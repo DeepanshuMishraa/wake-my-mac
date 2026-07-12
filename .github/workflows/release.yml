@@ -1,0 +1,108 @@
+name: Build Wake My Mac release DMG
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload:
+    name: Build and attach macOS DMG
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Validate release tag
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^V[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must use the format V0.0.1; received: $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+      - name: Check out release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Resolve version metadata
+        id: version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#V}"
+          IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION"
+          BUILD_NUMBER=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Sparkle signing configuration
+        shell: bash
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
+        run: |
+          if [[ -z "$SPARKLE_PRIVATE_KEY" || -z "$SPARKLE_PUBLIC_ED_KEY" ]]; then
+            echo "Configure SPARKLE_PRIVATE_KEY and SPARKLE_PUBLIC_ED_KEY repository secrets before publishing releases." >&2
+            exit 1
+          fi
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build application bundle
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          SPARKLE_FEED_URL: https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml
+          SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
+        run: ./Scripts/build-app.sh
+
+      - name: Create DMG
+        id: dmg
+        shell: bash
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          chmod +x Scripts/create-dmg.sh
+          DMG_PATH="$(./Scripts/create-dmg.sh)"
+          echo "path=$DMG_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Sign update and create appcast
+        id: appcast
+        shell: bash
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          DMG_PATH: ${{ steps.dmg.outputs.path }}
+        run: |
+          SIGN_UPDATE="$(find .build -type f -name sign_update -perm -111 -not -path '*/old_dsa_scripts/*' -print -quit)"
+          if [[ -z "$SIGN_UPDATE" ]]; then
+            echo "Sparkle sign_update tool was not found in SwiftPM artifacts." >&2
+            exit 1
+          fi
+          SIGNATURE_OUTPUT="$(printf '%s' "$SPARKLE_PRIVATE_KEY" | "$SIGN_UPDATE" --ed-key-file - "$DMG_PATH")"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/Wake-My-Mac-${VERSION}.dmg"
+          chmod +x Scripts/create-appcast.sh
+          APPCAST_PATH="$RUNNER_TEMP/appcast.xml"
+          ./Scripts/create-appcast.sh "$VERSION" "$BUILD_NUMBER" "$DOWNLOAD_URL" "$SIGNATURE_OUTPUT" "$APPCAST_PATH"
+          echo "path=$APPCAST_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload updater assets to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          DMG_PATH: ${{ steps.dmg.outputs.path }}
+          APPCAST_PATH: ${{ steps.appcast.outputs.path }}
+        run: gh release upload "$RELEASE_TAG" "$DMG_PATH" "$APPCAST_PATH" --clobber

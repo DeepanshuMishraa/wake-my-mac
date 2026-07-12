@@ -1,0 +1,18 @@
+{
+  "hold-my-lid-activity": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "/usr/bin/python3 \"$HOME/.gemini/config/plugins/hold-my-lid-antigravity/hold-my-lid-antigravity.py\" working",
+        "timeout": 5
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "/usr/bin/python3 \"$HOME/.gemini/config/plugins/hold-my-lid-antigravity/hold-my-lid-antigravity.py\" stop",
+        "timeout": 5
+      }
+    ]
+  }
+}
