@@ -116,7 +116,13 @@ final class CodexRolloutMonitor {
                 case "task_complete", "turn_aborted": state.status = .idle
                 default: continue
                 }
-                state.updated = event.timestamp.flatMap(Self.parseTimestamp) ?? Date()
+                // Filesystem modification time is the freshness signal. Rollout
+                // fixtures and imported sessions can contain timestamps from a
+                // different clock or an older host date, while the file itself
+                // was just written and is still a live session.
+                if let eventDate = event.timestamp.flatMap(Self.parseTimestamp) {
+                    state.updated = max(state.updated, eventDate)
+                }
             }
             files[path] = state
         } catch {
