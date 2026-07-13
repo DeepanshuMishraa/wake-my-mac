@@ -1,0 +1,23 @@
+Sources/HoldMyLid/PopoverView.swift
+  s_60a08d5bfd54dd::t_966109327e4a39 52-53
+Sources/HoldMyLid/Models.swift
+  s_60a08d5bfd54dd::t_966109327e4a39 14-18
+Sources/HoldMyLid/AgentMonitor.swift
+  s_60a08d5bfd54dd::t_966109327e4a39 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "17e6b4ff8a475b24d6b55fcccd1265ef713af8ab",
+  "prompts": {},
+  "sessions": {
+    "s_60a08d5bfd54dd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a39-6e04-73c3-bea3-e477605e357a",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
