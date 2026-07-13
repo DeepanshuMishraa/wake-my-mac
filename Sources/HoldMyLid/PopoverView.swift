@@ -49,8 +49,8 @@ struct PopoverView: View {
                 Text("Agents").font(.system(size: 15, weight: .medium, design: .rounded))
             }
             HStack(spacing: 8) {
-                ForEach(AgentKind.allCases) { agent in
-                    AgentChip(agent: agent, row: state.rows.first { $0.agent == agent })
+                ForEach(state.rows.filter { $0.agent.isMenuVisible && $0.agent.isInstalled }) { row in
+                    AgentChip(agent: row.agent, row: row)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

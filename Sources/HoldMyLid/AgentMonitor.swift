@@ -12,7 +12,7 @@ final class AgentMonitor {
     }
 
     func scan() -> [AgentRow] {
-        let installedAgents = AgentKind.allCases.filter(\.isInstalled)
+        let installedAgents = AgentKind.allCases.filter { $0.isMenuVisible && $0.isInstalled }
         let processRows = ProcessListing.read()
         let livePIDs = Set(processRows.map(\.pid))
         let hooked = readHookSessions(livePIDs: livePIDs, processRows: processRows)

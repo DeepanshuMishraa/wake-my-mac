@@ -11,6 +11,11 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
 
     var id: String { rawValue }
 
+    /// Only real agent integrations belong in the menu-bar status surface.
+    /// Croc is supported by the setup screen as a detected utility, but it has
+    /// no agent lifecycle or hook API and must never appear as an active agent.
+    var isMenuVisible: Bool { self != .croc }
+
     var appPaths: [String] {
         switch self {
         case .codex:
