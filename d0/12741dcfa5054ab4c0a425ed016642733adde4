@@ -1,0 +1,26 @@
+.github/workflows/release.yml
+  s_7abded6002ee1e::t_08fa138b183715 96-101
+VERSION
+  s_7abded6002ee1e::t_34af951e927ba0 1
+Scripts/build-app.sh
+  s_7abded6002ee1e::t_aeed65630e8490 10-12,14-20
+  s_7abded6002ee1e::t_08fa138b183715 13
+Scripts/create-appcast.sh
+  s_7abded6002ee1e::t_08fa138b183715 10-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "d012741dcfa5054ab4c0a425ed016642733adde4",
+  "prompts": {},
+  "sessions": {
+    "s_7abded6002ee1e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5c8d-a875-7a41-8c88-c082c2741c37",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
