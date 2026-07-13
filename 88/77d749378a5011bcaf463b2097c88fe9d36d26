@@ -1,0 +1,19 @@
+VERSION
+  s_60a08d5bfd54dd::t_666978898c71b2 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "8877d749378a5011bcaf463b2097c88fe9d36d26",
+  "prompts": {},
+  "sessions": {
+    "s_60a08d5bfd54dd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a39-6e04-73c3-bea3-e477605e357a",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
