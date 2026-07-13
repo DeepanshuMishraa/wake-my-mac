@@ -10,7 +10,10 @@ final class NotificationService {
 
     func requestAuthorization() {
         guard canUseUserNotifications else { return }
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        Task {
+            _ = try? await UNUserNotificationCenter.current()
+                .requestAuthorization(options: [.alert, .sound])
+        }
     }
 
     func send(title: String, body: String, soundName: String) {
@@ -24,7 +27,9 @@ final class NotificationService {
         content.sound = .default
 
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-        UNUserNotificationCenter.current().add(request)
+        Task {
+            try? await UNUserNotificationCenter.current().add(request)
+        }
     }
 
     private var canUseUserNotifications: Bool {
