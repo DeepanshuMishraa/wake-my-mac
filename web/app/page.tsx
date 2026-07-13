@@ -24,6 +24,52 @@ function DownloadButton({ className = "" }: { className?: string }) {
   return <a className={`button button-dark ${className}`} href="https://github.com/DeepanshuMishraa/wake-my-mac/releases/latest/download/Wake-My-Mac.dmg"><AppleIcon />Download for Mac</a>;
 }
 
+function GatekeeperInstructions() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const command = `sudo xattr -rd com.apple.quarantine "/Applications/Wake My Mac.app"`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy command", err);
+    }
+  };
+
+  return (
+    <div className="gatekeeper-box">
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="gatekeeper-toggle"
+        aria-expanded={isOpen}
+      >
+        <span>⚠️ Unsigned App Gatekeeper Info</span>
+        <span className={`gatekeeper-arrow ${isOpen ? "open" : ""}`}>↓</span>
+      </button>
+      
+      {isOpen && (
+        <div className="gatekeeper-content">
+          <p>
+            Wake My Mac is secure, open-source, and runs entirely locally. Because it is not currently signed by an Apple Developer account, Gatekeeper will block it on first launch.
+          </p>
+          <p>
+            To run it, download the DMG, drag the app to your <b>Applications</b> folder, open your <b>Terminal</b>, and run this command:
+          </p>
+          <div className="gatekeeper-code-wrapper">
+            <code className="gatekeeper-code">{command}</code>
+            <button onClick={handleCopy} className="gatekeeper-copy-btn">
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MiniIcon({ children }: { children: React.ReactNode }) {
   return <span className="mini-icon" aria-hidden="true">{children}</span>;
 }
@@ -59,7 +105,13 @@ export default function Home() {
         <p className="eyebrow reveal">A quiet utility for macOS</p>
         <h1 className="reveal delay-one">Stay in the flow.<br /><em>Keep your Mac awake.</em></h1>
         <p className="hero-copy reveal delay-two">Downloads finish. Builds complete. Remote sessions stay reachable. Wake My Mac keeps the machine working after you stop watching it.</p>
-        <div className="hero-actions reveal delay-three"><DownloadButton /><a className="text-link" href="#why">See what it protects <span aria-hidden="true">↓</span></a></div>
+        <div className="hero-actions reveal delay-three" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "25px" }}>
+            <DownloadButton />
+            <a className="text-link" href="#why">See what it protects <span aria-hidden="true">↓</span></a>
+          </div>
+          <GatekeeperInstructions />
+        </div>
         <p className="hero-note reveal delay-three"><span className="live-dot" /> Native macOS app · Runs locally · macOS 14+</p>
       </div>
       <div className="hero-aside" aria-label="Product promise"><span>01</span><p>No accounts.<br />No cloud dashboard.<br /><strong>Just a Mac that knows when to keep going.</strong></p></div>
@@ -82,7 +134,18 @@ export default function Home() {
 
     <section id="faqs" className="faq-section shell"><div className="faq-heading"><p className="eyebrow">Questions, answered</p><h2>Good to<br /><em>know.</em></h2><p>Still unsure? <a href="mailto:hello@wakemymac.com">Ask us directly ↗</a></p></div><div className="faq-list">{faqs.map(([question, answer], index) => <div className={`faq ${activeFaq === index ? "open" : ""}`} key={question}><button onClick={() => setActiveFaq(activeFaq === index ? null : index)} aria-expanded={activeFaq === index}><span>{question}</span><span className="plus">+</span></button><div className="faq-answer"><p>{answer}</p></div></div>)}</div></section>
 
-    <section id="download" className="download-section shell"><div><p className="eyebrow">A better default</p><h2>Keep going.<br /><em>On your terms.</em></h2></div><div className="download-side"><p>Wake My Mac is free to download, takes a minute to set up, and stays out of the way until your Mac needs a little more time.</p><DownloadButton /><small>Free · macOS 14 Sonoma or later</small></div></section>
+    <section id="download" className="download-section shell">
+      <div>
+        <p className="eyebrow">A better default</p>
+        <h2>Keep going.<br /><em>On your terms.</em></h2>
+      </div>
+      <div className="download-side">
+        <p>Wake My Mac is free to download, takes a minute to set up, and stays out of the way until your Mac needs a little more time.</p>
+        <DownloadButton />
+        <small style={{ display: "block", marginBottom: "16px" }}>Free · macOS 14 Sonoma or later</small>
+        <GatekeeperInstructions />
+      </div>
+    </section>
 
     <footer className="footer shell"><a className="wordmark" href="#top"><span className="wordmark-mark">—</span> Wake My Mac</a><div><a href="mailto:hello@wakemymac.com">Contact</a><a href="#faqs">FAQ</a><span>© 2026 Wake My Mac</span></div></footer>
   </main>;

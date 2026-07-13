@@ -9,19 +9,19 @@ struct PopoverView: View {
             header
             divider
             
-            VStack(spacing: 6) {
+            VStack(spacing: 10) {
                 agentsSection
                 modeSection
                 pauseSection
             }
-            .padding(.vertical, 6)
+            .padding(.vertical, 8)
             
             divider
             footer
         }
-        .padding(.horizontal, 15)
-        .padding(.vertical, 10)
-        .frame(width: 320, height: 260, alignment: .topLeading)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 14)
+        .frame(width: 320, height: 330, alignment: .topLeading)
         .background(PopoverPalette.background)
     }
 
@@ -122,10 +122,10 @@ struct PopoverView: View {
             MenuButton("Check for Updates…") { UpdateService.shared.checkForUpdates(nil) }
             MenuButton("Quit Wake My Mac", isDestructive: true) { NSApp.terminate(nil) }
         }
-        .padding(.top, 4)
+        .padding(.top, 6)
     }
 
-    private var divider: some View { Divider().overlay(PopoverPalette.divider).padding(.vertical, 6) }
+    private var divider: some View { Divider().overlay(PopoverPalette.divider).padding(.vertical, 8) }
 
     private var statusLine: String {
         if !state.isEnabled { return "Sleep mode is available." }

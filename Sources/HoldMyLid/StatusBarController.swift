@@ -15,7 +15,7 @@ final class StatusBarController: NSObject {
 
         let dashboard = NSHostingController(rootView: PopoverView(state: state))
         popover.contentViewController = dashboard
-        popover.contentSize = NSSize(width: 320, height: 260)
+        popover.contentSize = NSSize(width: 320, height: 330)
         popover.appearance = NSAppearance(named: .aqua)
         popover.animates = true
         popover.behavior = .transient
