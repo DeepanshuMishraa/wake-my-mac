@@ -30,7 +30,6 @@ function MiniIcon({ children }: { children: React.ReactNode }) {
 
 export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [isHeld, setIsHeld] = useState(true);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -66,22 +65,8 @@ export default function Home() {
       <div className="hero-aside" aria-label="Product promise"><span>01</span><p>No accounts.<br />No cloud dashboard.<br /><strong>Just a Mac that knows when to keep going.</strong></p></div>
     </section>
 
-    <section className="product-stage shell" aria-label="Wake My Mac dashboard preview">
-      <div className="stage-head"><span>Inside Wake My Mac</span><span>Live product preview <b>↗</b></span></div>
-      <div className="product-window">
-        <aside className="product-sidebar">
-          <div className="product-brand"><span className="brand-orb">—</span><span>Wake My Mac</span></div>
-          <div className="product-nav"><span className="selected">◉ &nbsp; Overview</span><span>◷ &nbsp; History</span><span>ϟ &nbsp; Activity Rules</span></div>
-          <div className="product-sidebar-foot">v0.0.2<br /><span>macOS utility</span></div>
-        </aside>
-        <div className="product-content">
-          <div className="product-topline"><div><span className="product-kicker">Live status</span><h3>Overview</h3><p>{isHeld ? "Your Mac is protected and reachable." : "Your Mac can sleep normally."}</p></div><div className="product-actions"><button className={`status-pill ${isHeld ? "is-on" : ""}`} onClick={() => setIsHeld(!isHeld)}><span />{isHeld ? "Holding awake" : "Sleep allowed"}</button><div className="range-pills"><span className="active">Today</span><span>7 Days</span><span>30 Days</span></div></div></div>
-          <div className="metric-grid"><div><span>Awake · Today</span><strong>{isHeld ? "6h 42m" : "—"}</strong><small>◷</small></div><div><span>Sessions · Today</span><strong>{isHeld ? "3" : "0"}</strong><small>⌁</small></div><div><span>Battery used</span><strong>{isHeld ? "4.8%" : "—"}</strong><small>▰</small></div></div>
-          <div className="chart-card"><div><strong>Awake time</strong><span>Minutes kept awake per day</span></div><div className="bars"><i style={{ height: "30%" }} /><i style={{ height: "49%" }} /><i style={{ height: "38%" }} /><i style={{ height: "72%" }} /><i className="today" style={{ height: isHeld ? "92%" : "12%" }} /><i style={{ height: "56%" }} /><i style={{ height: "30%" }} /></div><div className="chart-labels"><span>Jul 7</span><span>Jul 13</span></div></div>
-          <div className="product-bottom"><div><strong>Currently keeping awake</strong><span>✓ Agent activity</span><span>✓ SSH session</span></div><div><strong>Agents</strong><span><b className="green-dot" /> Codex</span><span><b className="blue-dot" /> Pi</span></div></div>
-        </div>
-      </div>
-    </section>
+    <img src="/dashboard-preview.png" alt="Wake My Mac Dashboard Overview" className="product-image shell" />
+
 
     <section id="why" className="why shell">
       <div className="section-lede"><p className="eyebrow">The problem is small. The interruption isn’t.</p><h2>The lid can close.<br /><em>Your work doesn’t have to.</em></h2></div>

@@ -50,14 +50,14 @@ struct DashboardView: View {
 }
 
 private enum DashboardPalette {
-    static let canvas = Color(red: 0.965, green: 0.965, blue: 0.955)
-    static let sidebar = Color(red: 0.915, green: 0.915, blue: 0.905)
-    static let card = Color(red: 0.995, green: 0.995, blue: 0.985)
-    static let ink = Color(red: 0.16, green: 0.15, blue: 0.14)
-    static let secondary = Color(red: 0.52, green: 0.51, blue: 0.47)
-    static let lime = Color(red: 0.66, green: 0.80, blue: 0.10)
-    static let blue = Color(red: 0.52, green: 0.60, blue: 0.88)
-    static let border = Color.black.opacity(0.12)
+    static let canvas = Color(red: 255/255, green: 241/255, blue: 223/255)
+    static let sidebar = Color(red: 244/255, green: 225/255, blue: 205/255)
+    static let card = Color(red: 252/255, green: 252/255, blue: 250/255)
+    static let ink = Color(red: 41/255, green: 37/255, blue: 36/255)
+    static let secondary = Color(red: 112/255, green: 95/255, blue: 84/255)
+    static let lime = Color(red: 217/255, green: 255/255, blue: 84/255)
+    static let blue = Color(red: 138/255, green: 158/255, blue: 228/255)
+    static let border = Color(red: 41/255, green: 37/255, blue: 36/255).opacity(0.17)
 }
 
 private struct DashboardSidebar: View {
@@ -147,20 +147,20 @@ private struct OverviewDashboard: View {
             let daily = dailyMetrics(now: now)
             let rangeBattery = daily.reduce(0) { $0 + $1.batteryPoints }
             let rangeSessions = recentSessions(now: now)
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Live status").font(.system(size: 16, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
-                        Text("Overview").font(.system(size: 42, weight: .bold, design: .rounded)).tracking(-1.8).foregroundStyle(DashboardPalette.ink)
-                        Text(statusText).font(.system(size: 16, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+            VStack(alignment: .leading, spacing: 20) {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Live status").font(.system(size: 11, weight: .bold, design: .rounded)).tracking(1.2).textCase(.uppercase).foregroundStyle(DashboardPalette.secondary)
+                        Text("Overview").font(.system(size: 34, weight: .bold, design: .rounded)).tracking(-1.2).foregroundStyle(DashboardPalette.ink)
+                        Text(statusText).font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                     }
                     Spacer()
-                    VStack(alignment: .trailing, spacing: 19) {
+                    VStack(alignment: .trailing, spacing: 10) {
                         Button { state.setEnabled(!state.isEnabled) } label: { StatusPill(isHolding: isHolding) }.buttonStyle(.plain)
                         NativeRangeSelector(selection: $selectedRange)
                     }
                 }
-                .padding(.bottom, 22)
+                .padding(.bottom, 12)
 
                 HStack(spacing: 12) {
                     NativeMetricCard(title: "Awake · Today", value: duration(daily.reduce(0) { $0 + $1.awakeSeconds }), symbol: "clock")
@@ -170,18 +170,24 @@ private struct OverviewDashboard: View {
 
                 NativeCard {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Awake time").font(.system(size: 18, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
-                        Text("Minutes kept awake per day").font(.system(size: 16, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                        Text("Awake time").font(.system(size: 17, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
+                        Text("Minutes kept awake per day").font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                         SwiftUIChartsAwakeChart(metrics: daily, isHolding: isHolding).frame(height: 215).padding(.top, 16)
                     }
                 }
 
                 HStack(alignment: .top, spacing: 12) {
-                    NativeCard { activityPanel }.frame(maxWidth: .infinity, minHeight: 122, alignment: .topLeading)
-                    NativeCard { agentsPanel }.frame(maxWidth: .infinity, minHeight: 122, alignment: .topLeading)
+                    NativeCard {
+                        activityPanel
+                            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
+                    }
+                    NativeCard {
+                        agentsPanel
+                            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
+                    }
                 }
             }
-            .padding(46)
+            .padding(36)
         }
         .scrollContentBackground(.hidden)
         .background(DashboardPalette.canvas)
@@ -209,14 +215,14 @@ private struct OverviewDashboard: View {
     private var statusText: String { isHolding ? "Your Mac is protected and reachable." : "Your Mac can sleep normally." }
 
     private var activityPanel: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("Currently keeping awake").font(.system(size: 17, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Currently keeping awake").font(.system(size: 15, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
             HStack(spacing: 16) {
                 if currentReasons.isEmpty {
-                    Text("No active wake reasons").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                    Text("No active wake reasons").font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                 } else {
                     ForEach(currentReasons, id: \.self) { reason in
-                        Label(reason, systemImage: "checkmark").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                        Label(reason, systemImage: "checkmark").font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                     }
                 }
             }
@@ -224,15 +230,15 @@ private struct OverviewDashboard: View {
     }
 
     private var agentsPanel: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("Agents").font(.system(size: 17, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Agents").font(.system(size: 15, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
             HStack(spacing: 12) {
                 let activeRows = state.rows.filter { $0.engagedCount > 0 }
                 if activeRows.isEmpty {
-                    Text("No active agents").font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                    Text("No active agents").font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                 } else {
                     ForEach(activeRows) { row in
-                        HStack(spacing: 5) { Circle().fill(row.agent == .codex ? DashboardPalette.lime : DashboardPalette.blue).frame(width: 9, height: 9); Text(row.agent.rawValue).font(.system(size: 14, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary) }
+                        HStack(spacing: 5) { Circle().fill(row.agent == .codex ? DashboardPalette.lime : DashboardPalette.blue).frame(width: 9, height: 9); Text(row.agent.rawValue).font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary) }
                     }
                 }
             }
@@ -242,7 +248,7 @@ private struct OverviewDashboard: View {
 
 private struct NativeCard<Content: View>: View {
     @ViewBuilder let content: () -> Content
-    var body: some View { content().foregroundStyle(DashboardPalette.ink).padding(24).background(DashboardPalette.card, in: RoundedRectangle(cornerRadius: 17, style: .continuous)).overlay { RoundedRectangle(cornerRadius: 17, style: .continuous).stroke(DashboardPalette.border, lineWidth: 1) } }
+    var body: some View { content().foregroundStyle(DashboardPalette.ink).padding(20).background(DashboardPalette.card, in: RoundedRectangle(cornerRadius: 16, style: .continuous)).overlay { RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(DashboardPalette.border, lineWidth: 1) } }
 }
 
 private struct NativeRangeSelector: View {
@@ -250,18 +256,18 @@ private struct NativeRangeSelector: View {
     var body: some View {
         HStack(spacing: 0) {
             ForEach(DashboardRange.allCases) { range in
-                Button { withAnimation(.easeOut(duration: 0.16)) { selection = range } } label: {
-                    Text(range.title).font(.system(size: 15, weight: .medium, design: .rounded))
+                Button { withAnimation(.spring(response: 0.22, dampingFraction: 0.82)) { selection = range } } label: {
+                    Text(range.title).font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundStyle(selection == range ? Color.white : DashboardPalette.secondary)
-                        .frame(width: 86, height: 38)
-                        .background(selection == range ? DashboardPalette.ink : .clear)
+                        .frame(width: 72, height: 28)
+                        .background(selection == range ? DashboardPalette.ink : .clear, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                 }
                 .buttonStyle(.plain)
             }
         }
-        .background(DashboardPalette.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay { RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(DashboardPalette.border, lineWidth: 1) }
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(3)
+        .background(DashboardPalette.card, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DashboardPalette.border, lineWidth: 1) }
     }
 }
 
@@ -269,7 +275,7 @@ private struct NativeMetricCard: View {
     let title: String
     let value: String
     let symbol: String
-    var body: some View { NativeCard { VStack(alignment: .leading, spacing: 27) { HStack { Text(title).font(.system(size: 16, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary); Spacer(); Image(systemName: symbol).foregroundStyle(DashboardPalette.secondary) }; Text(value).font(.system(size: 34, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink).tracking(-1.4) } }.frame(maxWidth: .infinity, minHeight: 126, alignment: .leading) }
+    var body: some View { NativeCard { VStack(alignment: .leading, spacing: 20) { HStack(alignment: .center) { Text(title).font(.system(size: 14, weight: .semibold, design: .rounded)).foregroundStyle(DashboardPalette.secondary); Spacer(); Image(systemName: symbol).font(.system(size: 15, weight: .medium)).foregroundStyle(DashboardPalette.secondary) }; Text(value).font(.system(size: 32, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink).tracking(-1.2) } }.frame(maxWidth: .infinity, minHeight: 110, alignment: .leading) }
 }
 
 private struct SwiftUIChartsAwakeChart: View {
@@ -308,10 +314,10 @@ private struct StableDailyBarChart: View {
 
                     ZStack(alignment: .bottomLeading) {
                         VStack(spacing: 0) {
-                            ForEach(0..<3, id: \.self) { _ in
-                                Rectangle().fill(DashboardPalette.border).frame(height: 1)
-                                Spacer()
-                            }
+                            Rectangle().fill(DashboardPalette.border).frame(height: 1)
+                            Spacer()
+                            Rectangle().fill(DashboardPalette.border.opacity(0.5)).frame(height: 1)
+                            Spacer()
                             Rectangle().fill(DashboardPalette.border).frame(height: 1)
                         }
 
@@ -685,12 +691,20 @@ private struct StatusPill: View {
     let isHolding: Bool
     var body: some View {
         HStack(spacing: 9) {
-            Circle().fill(isHolding ? DashboardPalette.lime : DashboardPalette.secondary).frame(width: 10, height: 10)
-            Text(isHolding ? "Holding awake" : "Ready to sleep").font(.system(size: 15, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.ink)
+            Circle()
+                .fill(isHolding ? DashboardPalette.lime : DashboardPalette.secondary)
+                .frame(width: 8, height: 8)
+                .shadow(color: isHolding ? DashboardPalette.lime.opacity(0.8) : .clear, radius: 3)
+            Text(isHolding ? "Holding awake" : "Sleep allowed")
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .foregroundStyle(DashboardPalette.ink)
         }
-        .padding(.horizontal, 16).padding(.vertical, 10)
-        .background(DashboardPalette.card, in: Capsule())
-        .overlay { Capsule().stroke(isHolding ? DashboardPalette.lime : DashboardPalette.border, lineWidth: 1) }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(isHolding ? DashboardPalette.lime.opacity(0.12) : DashboardPalette.card, in: Capsule())
+        .overlay {
+            Capsule().stroke(isHolding ? DashboardPalette.lime : DashboardPalette.border, lineWidth: 1.5)
+        }
     }
 }
 

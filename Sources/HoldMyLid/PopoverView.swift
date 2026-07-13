@@ -8,88 +8,130 @@ struct PopoverView: View {
         VStack(alignment: .leading, spacing: 0) {
             header
             divider
-            agentsSection
-            divider
-            pauseSection
+            
+            VStack(spacing: 6) {
+                agentsSection
+                modeSection
+                pauseSection
+            }
+            .padding(.vertical, 6)
+            
             divider
             footer
         }
         .padding(.horizontal, 15)
-        .padding(.vertical, 8)
-        .frame(width: 320, height: 300, alignment: .topLeading)
+        .padding(.vertical, 10)
+        .frame(width: 320, alignment: .topLeading)
         .background(PopoverPalette.background)
     }
 
     private var header: some View {
-        HStack(spacing: 14) {
-            BatteryBadge(percent: state.battery.percent, symbol: batterySymbol, colour: batteryBarColor)
-
+        HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("Wake My Mac")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                Text(statusLine)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(PopoverPalette.muted)
-                    .lineLimit(2)
-            }
-
-            Spacer(minLength: 8)
-            Toggle("", isOn: Binding(get: { state.isEnabled }, set: { state.setEnabled($0) }))
-                .labelsHidden()
-                .toggleStyle(.switch)
-            .controlSize(.small)
-                .tint(PopoverPalette.accent)
-        }
-        .padding(.bottom, 8)
-    }
-
-    private var agentsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Agents").font(.system(size: 15, weight: .medium, design: .rounded))
-            }
-            HStack(spacing: 8) {
-                ForEach(state.rows.filter { $0.agent.isMenuVisible && $0.agent.isInstalled }) { row in
-                    AgentChip(agent: row.agent, row: row)
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .foregroundStyle(PopoverPalette.primary)
+                HStack(spacing: 5) {
+                    HStack(spacing: 3) {
+                        Image(systemName: batterySymbol)
+                            .font(.system(size: 10))
+                        Text("\(state.battery.percent)%")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                    }
+                    .foregroundStyle(batteryBarColor)
+                    
+                    Text("·")
+                        .foregroundStyle(PopoverPalette.muted)
+                    
+                    Text(statusLine)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(PopoverPalette.muted)
+                        .lineLimit(1)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            Toggle("", isOn: Binding(get: { state.isEnabled }, set: { state.setEnabled($0) }))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .tint(PopoverPalette.accent)
         }
+        .padding(.vertical, 4)
+    }
+
+    private var agentsSection: some View {
+        HStack {
+            Text("Agents")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundStyle(PopoverPalette.muted)
+            Spacer()
+            let activeRows = state.rows.filter { $0.engagedCount > 0 }
+            if activeRows.isEmpty {
+                Text("None active")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(PopoverPalette.muted)
+            } else {
+                HStack(spacing: 6) {
+                    ForEach(activeRows) { row in
+                        AgentBrandIcon(agent: row.agent)
+                            .frame(width: 18, height: 18)
+                            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var modeSection: some View {
+        HStack {
+            Text("Mode")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundStyle(PopoverPalette.muted)
+            Spacer()
+            HStack(spacing: 4) {
+                ForEach(HoldMode.allCases) { mode in
+                    ModeButton(title: mode.title, isSelected: state.settings.mode == mode) {
+                        var newSettings = state.settings
+                        newSettings.mode = mode
+                        state.updateSettings(newSettings)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 
     private var pauseSection: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "clock").font(.system(size: 15, weight: .medium)).foregroundStyle(PopoverPalette.accent).frame(width: 20)
-            Text("Pause").font(.system(size: 13, weight: .medium, design: .rounded))
+        HStack {
+            Text("Pause")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundStyle(PopoverPalette.muted)
             Spacer()
-            Button("30m") { state.pause(for: 30 * 60) }.buttonStyle(PauseButtonStyle())
-            Button("1h") { state.pause(for: 60 * 60) }.buttonStyle(PauseButtonStyle())
+            PauseButton(title: "30m") { state.pause(for: 30 * 60) }
+            PauseButton(title: "1h") { state.pause(for: 60 * 60) }
         }
+        .padding(.vertical, 4)
     }
 
     private var footer: some View {
-        VStack(spacing: 4) {
-            Button { state.openSettings() } label: { footerLine("gearshape", "Settings…") }.buttonStyle(.plain)
-            Button { IntegrationInstaller.presentConfiguration() } label: { footerLine("puzzlepiece.extension", "Configure Agent Integrations…") }.buttonStyle(.plain)
-            Button { UpdateService.shared.checkForUpdates(nil) } label: { footerLine("arrow.clockwise", "Check for Updates…") }.buttonStyle(.plain)
-            Button { NSApp.terminate(nil) } label: { footerLine("power", "Quit Wake My Mac", isDestructive: true) }.buttonStyle(.plain)
+        VStack(spacing: 2) {
+            MenuButton("Settings…") { state.openSettings() }
+            MenuButton("Configure Agent Integrations…") { IntegrationInstaller.presentConfiguration() }
+            MenuButton("Check for Updates…") { UpdateService.shared.checkForUpdates(nil) }
+            MenuButton("Quit Wake My Mac", isDestructive: true) { NSApp.terminate(nil) }
         }
+        .padding(.top, 4)
     }
 
-    private func footerLine(_ symbol: String, _ title: String, isDestructive: Bool = false) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: symbol).font(.system(size: 16, weight: .medium)).foregroundStyle(isDestructive ? PopoverPalette.red : PopoverPalette.muted).frame(width: 22)
-            Text(title).font(.system(size: 12, design: .rounded))
-            Spacer()
-        }
-        .padding(.vertical, 4)
-        .contentShape(Rectangle())
-    }
-
-    private var divider: some View { Divider().overlay(PopoverPalette.divider).padding(.vertical, 5) }
+    private var divider: some View { Divider().overlay(PopoverPalette.divider).padding(.vertical, 6) }
 
     private var statusLine: String {
         if !state.isEnabled { return "Sleep mode is available." }
+        if state.battery.percent <= 20 && !state.battery.isPluggedIn {
+            return "Battery low. Sleep allowed below \(state.settings.batteryCutoffPercent)%."
+        }
         if state.phase == .holding && state.settings.mode == .ssh { return "Your Mac is ready for SSH." }
         if state.phase == .holding && state.settings.mode == .manual { return "Your Mac is being kept awake." }
         if state.rows.contains(where: { $0.blockedCount > 0 }) { return "An agent needs your input." }
@@ -106,7 +148,7 @@ struct PopoverView: View {
     private var batteryBarColor: Color {
         if state.battery.percent <= state.settings.batteryCutoffPercent { return .red }
         if state.battery.percent < 30 { return .orange }
-        return PopoverPalette.green
+        return PopoverPalette.muted
     }
 
     private var batterySymbol: String {
@@ -120,74 +162,109 @@ struct PopoverView: View {
     }
 }
 
-private struct BatteryBadge: View {
-    let percent: Int
-    let symbol: String
-    let colour: Color
-
-    var body: some View {
-        ZStack {
-            Image(systemName: symbol)
-                .font(.system(size: 22, weight: .medium))
-                .foregroundStyle(colour)
-            Text("\(percent)")
-                .font(.system(size: 7, weight: .bold, design: .rounded))
-                .foregroundStyle(PopoverPalette.primary)
-                .offset(x: -1)
-        }
-        .frame(width: 30, height: 28)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Battery \(percent) percent")
-    }
-}
-
 private enum PopoverPalette {
-    static let background = Color(nsColor: .windowBackgroundColor)
-    static let surface = Color(nsColor: .controlBackgroundColor)
-    static let divider = Color(nsColor: .separatorColor)
-    static let primary = Color(nsColor: .labelColor)
-    static let muted = Color(nsColor: .secondaryLabelColor)
-    static let green = Color(red: 0.36, green: 0.55, blue: 1.0)
-    static let accent = Color(red: 0.36, green: 0.55, blue: 1.0)
-    static let active = Color(red: 0.10, green: 0.78, blue: 0.26)
+    static let background = Color(red: 255/255, green: 241/255, blue: 223/255)
+    static let surface = Color(red: 255/255, green: 251/255, blue: 247/255)
+    static let hover = Color(red: 244/255, green: 225/255, blue: 205/255)
+    static let divider = Color(red: 41/255, green: 37/255, blue: 36/255).opacity(0.24)
+    static let primary = Color(red: 41/255, green: 37/255, blue: 36/255)
+    static let muted = Color(red: 136/255, green: 119/255, blue: 107/255)
+    static let accent = Color(red: 41/255, green: 37/255, blue: 36/255)
+    static let blue = Color(red: 138/255, green: 158/255, blue: 228/255)
+    static let green = Color(red: 169/255, green: 203/255, blue: 36/255)
     static let orange = Color(red: 1.0, green: 0.61, blue: 0.18)
-    static let red = Color(red: 1.0, green: 0.30, blue: 0.34)
+    static let red = Color(red: 219/255, green: 68/255, blue: 85/255)
 }
 
-private struct PauseButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 11, weight: .medium, design: .rounded))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 4)
-            .background(RoundedRectangle(cornerRadius: 8).fill(PopoverPalette.surface.opacity(configuration.isPressed ? 1.7 : 1)))
-            .foregroundStyle(PopoverPalette.primary)
-    }
-}
-
-private struct AgentChip: View {
-    let agent: AgentKind
-    let row: AgentRow?
+private struct PauseButton: View {
+    let title: String
+    let action: () -> Void
+    @State private var isHovered = false
 
     var body: some View {
-        VStack(spacing: 6) {
-            AgentBrandIcon(agent: agent)
-                .frame(width: 21, height: 21)
-                .opacity(row == nil ? 0.45 : 1)
-            Circle()
-                .fill(dotColor)
-                .frame(width: 6, height: 6)
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(isHovered ? Color(red: 231/255, green: 210/255, blue: 187/255) : PopoverPalette.hover, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(PopoverPalette.divider, lineWidth: 1)
+                }
+                .foregroundStyle(PopoverPalette.primary)
         }
-        .frame(width: 30)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(agent.rawValue), \(row == nil ? "inactive" : row?.statusText ?? "inactive")")
+        .buttonStyle(.plain)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+}
+
+private struct ModeButton: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+    @State private var isHovered = false
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(
+                    isSelected 
+                        ? PopoverPalette.primary 
+                        : (isHovered ? Color(red: 231/255, green: 210/255, blue: 187/255) : PopoverPalette.hover),
+                    in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+                )
+                .overlay {
+                    if !isSelected {
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .stroke(PopoverPalette.divider, lineWidth: 1)
+                    }
+                }
+                .foregroundStyle(isSelected ? PopoverPalette.background : PopoverPalette.primary)
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+}
+
+private struct MenuButton: View {
+    let title: String
+    let isDestructive: Bool
+    let action: () -> Void
+    @State private var isHovered = false
+
+    init(_ title: String, isDestructive: Bool = false, action: @escaping () -> Void) {
+        self.title = title
+        self.isDestructive = isDestructive
+        self.action = action
     }
 
-    private var dotColor: Color {
-        guard let row else { return PopoverPalette.muted.opacity(0.35) }
-        if row.blockedCount > 0 { return PopoverPalette.orange }
-        if row.activeCount > 0 { return PopoverPalette.active }
-        return PopoverPalette.muted.opacity(0.45)
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(isDestructive ? PopoverPalette.red : PopoverPalette.primary)
+                Spacer()
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 5)
+            .background(isHovered ? PopoverPalette.hover : Color.clear, in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, -6)
+        .onHover { hovering in
+            withAnimation(.easeOut(duration: 0.1)) {
+                isHovered = hovering
+            }
+        }
     }
 }
 
