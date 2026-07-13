@@ -1,0 +1,21 @@
+web/app/globals.css
+  s_60a08d5bfd54dd::t_1d15f251cddaf5 5
+  s_60a08d5bfd54dd::t_008344795b28e1 3-4
+  s_60a08d5bfd54dd::t_3659bde191f0d9 6-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "ddd67c7b4257589a41f40f715b122bdd558556a2",
+  "prompts": {},
+  "sessions": {
+    "s_60a08d5bfd54dd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a39-6e04-73c3-bea3-e477605e357a",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
