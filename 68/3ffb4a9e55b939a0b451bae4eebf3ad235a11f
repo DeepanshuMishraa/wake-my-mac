@@ -1,0 +1,24 @@
+web/app/globals.css
+  s_60a08d5bfd54dd::t_aa04a08940e9a8 2-9
+web/app/layout.tsx
+  s_60a08d5bfd54dd::t_afb7308c874ecc 10-11,15,20
+web/app/page.tsx
+  s_60a08d5bfd54dd::t_afb7308c874ecc 24
+  s_60a08d5bfd54dd::t_be1becd00cb29a 5-8,12-16,19-23,25-29,35-43,47,49-55,59-66,70,72-82,86-89,91-94,96,98,100,102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "683ffb4a9e55b939a0b451bae4eebf3ad235a11f",
+  "prompts": {},
+  "sessions": {
+    "s_60a08d5bfd54dd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a39-6e04-73c3-bea3-e477605e357a",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
