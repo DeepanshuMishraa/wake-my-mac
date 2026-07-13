@@ -1,0 +1,162 @@
+web/app/sitemap.ts
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1
+  s_60a08d5bfd54dd::t_03ca0d58bd7393 2
+Scripts/create-dmg.sh
+  s_60a08d5bfd54dd::t_9ddecd251584da 6-7
+Sources/HoldMyLid/Resources/AgentIcons/claude-light.svg
+  s_60a08d5bfd54dd::t_92adf5a24131db 1
+web/next.config.ts
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1-8
+.impeccable.md
+  s_60a08d5bfd54dd::t_60e638996ed772 1-17
+Sources/HoldMyLid/DashboardWindowController.swift
+  s_60a08d5bfd54dd::t_e2d23ff1df27c7 8,10-11,17
+  s_60a08d5bfd54dd::t_7ef280d24697d2 19,28-31
+  s_60a08d5bfd54dd::t_ee2d82d4389170 25
+Sources/HoldMyLid/StatusBarController.swift
+  s_60a08d5bfd54dd::t_1455727e7e5cd7 17,19
+  s_60a08d5bfd54dd::t_a618fc73f66991 60-70
+.firecrawl/alcove-screenshot.png
+  s_60a08d5bfd54dd::t_4f57826f161b61 1-67
+web/app/layout.tsx
+  s_60a08d5bfd54dd::t_458c0d26cfb234 5,7-8,14,16-17,20
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1-4,6,9-13,15,18-19,21-26
+web/next-env.d.ts
+  s_60a08d5bfd54dd::t_64c744c1d08741 3,6
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1-2,4-5
+.firecrawl/alcove-branding.json
+  s_60a08d5bfd54dd::t_9eb7fa6d0eb282 1-180
+web/README.md
+  s_60a08d5bfd54dd::t_9cc083bf015b65 2,4-17
+  s_60a08d5bfd54dd::t_03ca0d58bd7393 1,3
+VERSION
+  s_60a08d5bfd54dd::t_9ddecd251584da 1
+Package.resolved
+  s_60a08d5bfd54dd::t_b3fb2e8b0e44e6 1-15
+Sources/HoldMyLid/Resources/AgentIcons/cursor-dark.svg
+  s_60a08d5bfd54dd::t_92adf5a24131db 1
+Scripts/build-app.sh
+  s_60a08d5bfd54dd::t_9ddecd251584da 8-9
+  s_60a08d5bfd54dd::t_29088707fb7495 11-12
+.gitignore
+  s_60a08d5bfd54dd::t_36eab77b03d95c 6-7
+Sources/HoldMyLid/AppState.swift
+  s_67a1ae54d4d783::t_ce7f9a94fdc413 30,54,68,165-175
+  s_60a08d5bfd54dd::t_c916844b1eb898 122,129
+  s_60a08d5bfd54dd::t_1455727e7e5cd7 4,29,53,67,86,110-114,158,183,202-203,207-224
+  s_60a08d5bfd54dd::t_29088707fb7495 99
+  s_60a08d5bfd54dd::t_e2d23ff1df27c7 103
+  s_67a1ae54d4d783::t_44f4068de77b03 231-235
+  s_60a08d5bfd54dd::t_d0b5c1de0c630a 225
+Sources/HoldMyLid/Resources/AgentIcons/cursor-light.svg
+  s_60a08d5bfd54dd::t_92adf5a24131db 1
+web/DESIGN.md
+  s_60a08d5bfd54dd::t_03ca0d58bd7393 1,31
+  s_60a08d5bfd54dd::t_36eab77b03d95c 2-30
+web/package.json
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1-23
+web/app/globals.css
+  s_60a08d5bfd54dd::t_0b9e4b9bc4f188 2
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1
+Sources/HoldMyLid/AppDelegate.swift
+  s_60a08d5bfd54dd::t_92ef4dd83bd3c3 26,39,58
+Sources/HoldMyLid/DashboardView.swift
+  s_60a08d5bfd54dd::t_ee2d82d4389170 154,160,173,213,228,245,248-267,272,624,686-694
+  s_60a08d5bfd54dd::t_d41d620baf2e69 358,360-428,444-482,625
+  s_60a08d5bfd54dd::t_2b2e080f78d866 281-283,286-289,295-296,298-304,306,308,310-317,333-336,346,349-350
+  s_60a08d5bfd54dd::t_0122bb6656a9da 488-490,492-493,496-535,537-538,548-549,558,560-561,570,573-574,585,590,592
+  s_60a08d5bfd54dd::t_be6f48ab794f8c 576-580,608-623
+  s_60a08d5bfd54dd::t_f60f32b15704f6 38,45-74,76-103,105,107-110,112-113,147-150,153,155,158-159,163,165-168,171-172,174,179,184,186-187,210-212,214,221-227,229,237-244,246-247,268-271,273-274,276-277,279,357
+  s_60a08d5bfd54dd::t_52699cd02e7fae 180-181,215-220,230-236
+  s_60a08d5bfd54dd::t_2449bc0641b75a 280,284,290-293,297,305,307,309,318-325,327-332,337-345,347-348
+  s_60a08d5bfd54dd::t_7e4b34e529c072 285,294,326
+  s_60a08d5bfd54dd::t_ae3d32052b7ecc 3,75,104,175,275,278,351-356
+  s_60a08d5bfd54dd::t_9ddecd251584da 429-443
+  s_60a08d5bfd54dd::t_2677a34a37d265 5,9,16,21-25,29,31,34,39-40,44
+  s_60a08d5bfd54dd::t_85c0571b09502e 359
+  s_60a08d5bfd54dd::t_46690594d2afaf 626
+.github/workflows/release.yml
+  s_60a08d5bfd54dd::t_29088707fb7495 52,54-55,67
+Sources/HoldMyLid/Resources/AgentIcons/claude-dark.svg
+  s_60a08d5bfd54dd::t_92adf5a24131db 1
+Sources/HoldMyLid/DisplayManager.swift
+  s_67a1ae54d4d783::t_ce7f9a94fdc413 40-44
+  s_60a08d5bfd54dd::t_1455727e7e5cd7 6-7,17-22,30-33
+web/app/page.tsx
+  s_60a08d5bfd54dd::t_458c0d26cfb234 13,26,31,38-39,42-47,50,60
+  s_60a08d5bfd54dd::t_03ca0d58bd7393 14-16
+  s_60a08d5bfd54dd::t_052cf961dd313e 19-20,32,58
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1-12,17-18,21-25,27-30,33-37,40-41,48-49,51-57,59,61-62
+Sources/HoldMyLid/Models.swift
+  s_67a1ae54d4d783::t_44f4068de77b03 284-287
+  s_67a1ae54d4d783::t_ce7f9a94fdc413 270
+  s_60a08d5bfd54dd::t_10114d41329719 8-10,24-25,40-45,52-77,85,100-105,115-117,127-129,139-141,155
+Sources/HoldMyLid/PopoverView.swift
+  s_60a08d5bfd54dd::t_33ca418fd893d0 322
+  s_60a08d5bfd54dd::t_1455727e7e5cd7 19
+  s_60a08d5bfd54dd::t_db3c355d3bf880 18,43,51
+  s_60a08d5bfd54dd::t_a7d97529458bdf 25
+  s_60a08d5bfd54dd::t_82b460d5c621c7 81-82,160-161,163,179
+  s_60a08d5bfd54dd::t_435f056ee51c80 10-12,14,20,24,32-33,36-39,46-47,52-53,56,65-66,70-71,76,80,92-96,98,100-102,106-109,112-119,121,144
+  s_60a08d5bfd54dd::t_850506f2258a5e 150-151,153-154
+  s_60a08d5bfd54dd::t_ba6519a08d371a 17,29,31,40,49
+  s_60a08d5bfd54dd::t_1f9f5951db15a1 99
+  s_60a08d5bfd54dd::t_092aed51f6cd31 41
+  s_60a08d5bfd54dd::t_df13055aaff5e5 152,189
+  s_60a08d5bfd54dd::t_334270f8e054ce 162,175,181
+  s_60a08d5bfd54dd::t_0c43f71bdba89a 145-149
+  s_60a08d5bfd54dd::t_f54dd92a68e4a4 62-63,85,89
+  s_60a08d5bfd54dd::t_71ec46c357eba1 155,164-174,176-178,180,182-188,190
+  s_60a08d5bfd54dd::t_a618fc73f66991 72,74-75,79
+  s_60a08d5bfd54dd::t_92ef4dd83bd3c3 73
+  s_60a08d5bfd54dd::t_24f89798f4102c 123-140
+  s_60a08d5bfd54dd::t_92d6b0d5f022d5 26
+  s_60a08d5bfd54dd::t_59a6b33cf29f97 90
+  s_60a08d5bfd54dd::t_6e92ca9a931dbe 156
+web/app/robots.ts
+  s_60a08d5bfd54dd::t_03ca0d58bd7393 2
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1
+Sources/HoldMyLid/IntegrationInstaller.swift
+  s_60a08d5bfd54dd::t_2d6becca80570a 1,3,5-16,18-73,81-110,113-128,130-143,147-247,249-250
+  s_60a08d5bfd54dd::t_34c211378b36a5 74-80,111-112,129
+Sources/HoldMyLid/PowerAssertionManager.swift
+  s_67a1ae54d4d783::t_ce7f9a94fdc413 12-15,29,41-44
+  s_67a1ae54d4d783::t_a5b15ca11bb76f 45
+Tests/HoldMyLidTests/ActivityDetectionTests.swift
+  s_67a1ae54d4d783::t_44f4068de77b03 88-89
+  s_67a1ae54d4d783::t_ce7f9a94fdc413 85-87,90-91
+web/tsconfig.json
+  s_60a08d5bfd54dd::t_0252bf95b568e5 1-20
+Package.swift
+  s_60a08d5bfd54dd::t_1e0f4e44fb8db7 12-14,18-21
+Sources/HoldMyLid/Resources/Integrations/hold-my-lid-claude.sh
+  s_60a08d5bfd54dd::t_33ca418fd893d0 1-30
+Sources/HoldMyLid/Resources/AgentIcons/croc.svg
+  s_60a08d5bfd54dd::t_c1725b921d99c3 1-5
+web/bun.lock
+  s_60a08d5bfd54dd::t_b85486d7179165 1-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "2b879df5012b9b179707cd51fc6f7e870fe5a887",
+  "prompts": {},
+  "sessions": {
+    "s_60a08d5bfd54dd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a39-6e04-73c3-bea3-e477605e357a",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    },
+    "s_67a1ae54d4d783": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5a38-89a0-70d1-83f7-3e3cc57f7a30",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
