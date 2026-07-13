@@ -14,9 +14,10 @@ final class StatusBarController: NSObject {
         super.init()
 
         let dashboard = NSHostingController(rootView: PopoverView(state: state))
-        dashboard.view.frame = NSRect(x: 0, y: 0, width: 320, height: 300)
         popover.contentViewController = dashboard
-        popover.contentSize = NSSize(width: 320, height: 300)
+        popover.contentSize = NSSize(width: 320, height: 260)
+        popover.appearance = NSAppearance(named: .aqua)
+        popover.animates = true
         popover.behavior = .transient
 
         if let button = statusItem.button {
@@ -57,17 +58,6 @@ final class StatusBarController: NSObject {
             // a transient popover when another application owns the menu bar interaction.
             NSApp.activate(ignoringOtherApps: true)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            if let buttonWindow = button.window,
-               let popoverWindow = popover.contentViewController?.view.window {
-                let buttonRect = buttonWindow.convertToScreen(button.convert(button.bounds, to: nil))
-                let frame = popoverWindow.frame
-                let origin = NSPoint(
-                    x: buttonRect.midX - frame.width / 2,
-                    y: buttonRect.minY - frame.height - 4
-                )
-                popoverWindow.setFrameOrigin(origin)
-                popoverWindow.makeKey()
-            }
         }
     }
 }

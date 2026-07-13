@@ -21,7 +21,7 @@ struct PopoverView: View {
         }
         .padding(.horizontal, 15)
         .padding(.vertical, 10)
-        .frame(width: 320, alignment: .topLeading)
+        .frame(width: 320, height: 260, alignment: .topLeading)
         .background(PopoverPalette.background)
     }
 

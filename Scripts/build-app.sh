@@ -7,7 +7,17 @@ EXECUTABLE_NAME="WatchMyMac"
 BUNDLE_ID="com.dipxsy.watchmymac"
 VERSION_FILE="$ROOT/VERSION"
 APP_VERSION="${APP_VERSION:-$(<"$VERSION_FILE")}"
-BUILD_NUMBER="${BUILD_NUMBER:-1}"
+if [[ ! "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "APP_VERSION must use semantic versioning (for example, 0.0.3); received: $APP_VERSION" >&2
+  exit 1
+fi
+IFS=. read -r MAJOR MINOR PATCH <<< "$APP_VERSION"
+EXPECTED_BUILD_NUMBER=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
+if [[ -n "${BUILD_NUMBER:-}" && "$BUILD_NUMBER" != "$EXPECTED_BUILD_NUMBER" ]]; then
+  echo "BUILD_NUMBER $BUILD_NUMBER does not match APP_VERSION $APP_VERSION (expected $EXPECTED_BUILD_NUMBER)" >&2
+  exit 1
+fi
+BUILD_NUMBER="$EXPECTED_BUILD_NUMBER"
 SPARKLE_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/DeepanshuMishraa/wake-my-mac/releases/latest/download/appcast.xml}"
 SPARKLE_PUBLIC_ED_KEY="${SPARKLE_PUBLIC_ED_KEY:-Co9AWWnH9corrdbp+CB3kMHaiYYprk5tw/o9rGsRiVQ=}"
 APP_DIR="$ROOT/build/$APP_NAME.app"
