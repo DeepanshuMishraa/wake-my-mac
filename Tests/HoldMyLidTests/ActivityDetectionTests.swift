@@ -82,6 +82,13 @@ struct ActivityDetectionTests {
         }
     }
 
+    @Test func sshModeUsesLowPowerHoldAndDisplaySleep() {
+        #expect(HoldMode.ssh.explanation.contains("low-power"))
+        #expect(HoldMode.agents.explanation.contains("reachable"))
+        #expect(!HoldPolicy.shouldStopForLowPowerMode(mode: .ssh, respectLowPowerMode: true, isLowPowerMode: true))
+        #expect(HoldPolicy.shouldStopForLowPowerMode(mode: .agents, respectLowPowerMode: true, isLowPowerMode: true))
+    }
+
     @MainActor @Test func historyRecordsReasonsDurationAndBatteryWithoutPrivateDetails() throws {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("history-\(UUID().uuidString).json")
         defer { try? FileManager.default.removeItem(at: file) }

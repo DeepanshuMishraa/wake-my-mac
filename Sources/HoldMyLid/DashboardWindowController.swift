@@ -5,24 +5,30 @@ import SwiftUI
 final class DashboardWindowController: NSObject, NSWindowDelegate {
     static let shared = DashboardWindowController()
     private var window: NSWindow?
+    private let navigation = DashboardNavigation()
 
-    func show(state: AppState) {
+    func show(state: AppState, section: DashboardSection = .overview) {
+        navigation.selection = section
         if let window {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
-        let hosting = NSHostingController(rootView: DashboardView(state: state))
+        let hosting = NSHostingController(rootView: DashboardView(state: state, navigation: navigation))
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 1_020, height: 700),
+            contentRect: NSRect(x: 0, y: 0, width: 1_240, height: 720),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         window.title = "Wake My Mac"
+        window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.toolbarStyle = .unified
-        window.minSize = NSSize(width: 780, height: 540)
+        window.backgroundColor = NSColor(calibratedWhite: 0.965, alpha: 1)
+        window.isOpaque = true
+        window.hasShadow = true
+        window.minSize = NSSize(width: 980, height: 620)
         window.contentViewController = hosting
         window.center()
         window.isReleasedWhenClosed = false

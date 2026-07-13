@@ -9,7 +9,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hotKey: GlobalHotKey?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        IntegrationInstaller.install()
         let state = AppState()
         let status = StatusBarController(state: state)
         let shortcut = GlobalHotKey(keyCode: UInt32(kVK_ANSI_L), modifiers: UInt32(optionKey | cmdKey)) {
@@ -24,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NotificationService.shared.requestAuthorization()
         state.start()
+        IntegrationInstaller.presentConfigurationIfNeeded()
         if CommandLine.arguments.contains("--open-dashboard") {
             state.openDashboard()
         }
@@ -35,8 +35,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let appItem = NSMenuItem()
         let appMenu = NSMenu(title: "Wake My Mac")
         appItem.submenu = appMenu
-        appMenu.addItem(withTitle: "Open Wake My Mac", action: #selector(openDashboard), keyEquivalent: "o")
         appMenu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
+        appMenu.addItem(withTitle: "Configure Agent Integrations…", action: #selector(configureIntegrations), keyEquivalent: "")
         appMenu.addItem(.separator())
         let updateItem = appMenu.addItem(withTitle: "Check for Updates…", action: #selector(UpdateService.checkForUpdates(_:)), keyEquivalent: "")
         updateItem.target = UpdateService.shared
@@ -55,6 +55,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openDashboard() { appState?.openDashboard() }
     @objc private func openSettings() { appState?.openSettings() }
+    @objc private func configureIntegrations() { IntegrationInstaller.presentConfiguration() }
 
     func applicationWillTerminate(_ notification: Notification) {
         appState?.stop()

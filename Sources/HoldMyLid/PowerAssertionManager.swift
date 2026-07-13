@@ -9,7 +9,10 @@ final class PowerAssertionManager {
         systemAssertion != 0 || idleAssertion != 0
     }
 
-    func hold(reason: String) {
+    /// Holds system sleep. SSH mode deliberately skips the user-idle assertion:
+    /// the system assertion keeps the Mac reachable, while avoiding an extra
+    /// assertion that can interfere with normal idle/display power behavior.
+    func hold(reason: String, conserveEnergy: Bool = false) {
         if systemAssertion == 0 {
             var assertion = IOPMAssertionID(0)
             let result = IOPMAssertionCreateWithName(
@@ -23,7 +26,7 @@ final class PowerAssertionManager {
             }
         }
 
-        if idleAssertion == 0 {
+        if !conserveEnergy, idleAssertion == 0 {
             var assertion = IOPMAssertionID(0)
             let result = IOPMAssertionCreateWithName(
                 kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
@@ -34,6 +37,11 @@ final class PowerAssertionManager {
             if result == kIOReturnSuccess {
                 idleAssertion = assertion
             }
+        }
+
+        if conserveEnergy, idleAssertion != 0 {
+            IOPMAssertionRelease(idleAssertion)
+            idleAssertion = 0
         }
     }
 

@@ -5,6 +5,9 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
     case openCode = "OpenCode"
     case pi = "Pi"
     case antigravity = "Antigravity"
+    case claude = "Claude Code"
+    case cursor = "Cursor Agent"
+    case croc = "Croc"
 
     var id: String { rawValue }
 
@@ -17,6 +20,8 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
         case .antigravity:
             ["/Applications/Antigravity.app"]
         case .pi:
+            []
+        case .claude, .cursor, .croc:
             []
         }
     }
@@ -32,13 +37,44 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
             return ["/opt/homebrew/bin/pi", "/usr/local/bin/pi", "\(home)/.local/bin/pi", "\(home)/.bun/bin/pi"]
         case .antigravity:
             return ["/opt/homebrew/bin/antigravity", "/usr/local/bin/antigravity", "\(home)/.local/bin/antigravity"]
+        case .claude:
+            return ["/opt/homebrew/bin/claude", "/usr/local/bin/claude", "\(home)/.local/bin/claude", "\(home)/.bun/bin/claude"]
+        case .cursor:
+            return ["/opt/homebrew/bin/cursor-agent", "/usr/local/bin/cursor-agent", "\(home)/.local/bin/cursor-agent", "\(home)/.local/bin/cursor"]
+        case .croc:
+            return ["/opt/homebrew/bin/croc", "/usr/local/bin/croc", "\(home)/.local/bin/croc"]
         }
     }
 
     var isInstalled: Bool {
         let files = FileManager.default
         return appPaths.contains(where: files.fileExists(atPath:))
-            || executablePaths.contains(where: files.isExecutableFile(atPath:))
+            || resolvedExecutablePath != nil
+    }
+
+    /// Resolves both conventional install locations and the user's actual shell PATH.
+    /// This avoids assuming that Homebrew or npm lives in one fixed directory.
+    var resolvedExecutablePath: String? {
+        let files = FileManager.default
+        let pathEntries = (ProcessInfo.processInfo.environment["PATH"] ?? "")
+            .split(separator: ":")
+            .map(String.init)
+        let candidates = executablePaths + pathEntries.flatMap { directory in
+            executableNames.map { URL(fileURLWithPath: directory).appendingPathComponent($0).path }
+        }
+        return candidates.first { files.isExecutableFile(atPath: $0) }
+    }
+
+    private var executableNames: [String] {
+        switch self {
+        case .codex: ["codex"]
+        case .openCode: ["opencode"]
+        case .pi: ["pi"]
+        case .antigravity: ["antigravity"]
+        case .claude: ["claude"]
+        case .cursor: ["cursor-agent", "cursor"]
+        case .croc: ["croc"]
+        }
     }
 
     var iconAssetPath: String? {
@@ -46,7 +82,7 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
         case .codex:
             let codexIcon = "/Applications/ChatGPT.app/Contents/Resources/icon-codex-dark-color.png"
             return FileManager.default.fileExists(atPath: codexIcon) ? codexIcon : nil
-        case .openCode, .antigravity, .pi:
+        case .openCode, .antigravity, .pi, .claude, .cursor, .croc:
             return nil
         }
     }
@@ -61,6 +97,12 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
             "antigravity"
         case .codex:
             nil
+        case .claude:
+            darkMode ? "claude-dark" : "claude-light"
+        case .cursor:
+            darkMode ? "cursor-dark" : "cursor-light"
+        case .croc:
+            "croc"
         }
     }
 
@@ -70,6 +112,9 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
         case .openCode: "OC"
         case .pi: "π"
         case .antigravity: "A"
+        case .claude: "C"
+        case .cursor: "⌁"
+        case .croc: "↗"
         }
     }
 
@@ -79,6 +124,9 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
         case .openCode: ["opencode", "open-code", "OpenCode.app", "OpenCode Beta.app"]
         case .pi: ["pi-coding-agent", "@earendil-works/pi", "/bin/pi"]
         case .antigravity: ["antigravity", "Antigravity.app"]
+        case .claude: ["claude", "claude-code", "Claude Code"]
+        case .cursor: ["cursor-agent", "cursor"]
+        case .croc: ["croc"]
         }
     }
 
@@ -88,6 +136,9 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
         case .openCode: ["opencode", "OpenCode"]
         case .pi: ["pi"]
         case .antigravity: ["antigravity", "Antigravity"]
+        case .claude: ["claude"]
+        case .cursor: ["cursor-agent", "cursor"]
+        case .croc: ["croc"]
         }
     }
 
@@ -101,7 +152,7 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
                 of: #"(?:^|/)opencode\s+serve(?:\s|$)"#,
                 options: [.regularExpression, .caseInsensitive]
             ) != nil
-        case .codex, .pi, .antigravity:
+        case .codex, .pi, .antigravity, .claude, .cursor, .croc:
             return false
         }
     }
@@ -216,7 +267,7 @@ enum HoldMode: String, CaseIterable, Identifiable, Codable {
     var explanation: String {
         switch self {
         case .agents: "Keeps the Mac reachable while a watched agent is working."
-        case .ssh: "Keeps the Mac and network awake continuously for remote access while allowing the display to sleep and lock."
+        case .ssh: "Keeps the Mac reachable for SSH with a low-power system hold while the display sleeps."
         case .manual: "Keeps the Mac awake until you turn Wake My Mac off."
         }
     }
@@ -229,6 +280,10 @@ struct HoldPolicy {
         case .agents: engagedAgentCount > 0 || activityMatchCount > 0
         case .ssh, .manual: true
         }
+    }
+
+    static func shouldStopForLowPowerMode(mode: HoldMode, respectLowPowerMode: Bool, isLowPowerMode: Bool) -> Bool {
+        respectLowPowerMode && isLowPowerMode && mode != .ssh
     }
 }
 

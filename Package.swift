@@ -9,10 +9,16 @@ let package = Package(
     products: [
         .executable(name: "WatchMyMac", targets: ["WatchMyMac"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/willdale/SwiftUICharts.git", from: "2.9.9")
+    ],
     targets: [
         .executableTarget(
             name: "WatchMyMac",
-            dependencies: ["Sparkle"],
+            dependencies: [
+                "Sparkle",
+                .product(name: "SwiftUICharts", package: "SwiftUICharts")
+            ],
             path: "Sources/HoldMyLid",
             exclude: [
                 "Resources/AppIcon.png",

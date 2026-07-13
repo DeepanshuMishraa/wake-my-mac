@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import AppKit
+import CoreGraphics
 
 @MainActor
 final class AppState: ObservableObject {
@@ -25,6 +26,8 @@ final class AppState: ObservableObject {
     private var timer: Timer?
     private var idleBeganAt: Date?
     private var wasHolding = false
+    private var finishDisplayOffPending = false
+    private var didTurnDisplayOffForSSH = false
     private var workspaceObservers: [NSObjectProtocol] = []
 
     init(settings: HoldSettings = SettingsStore.shared.load()) {
@@ -47,6 +50,8 @@ final class AppState: ObservableObject {
         workspaceObservers.forEach(NSWorkspace.shared.notificationCenter.removeObserver)
         workspaceObservers.removeAll()
         displayManager.cancelPendingDisplayOff()
+        finishDisplayOffPending = false
+        didTurnDisplayOffForSSH = false
         history.update(isHolding: false, reasons: [], agents: [], battery: battery.percent)
         powerManager.release()
     }
@@ -59,6 +64,8 @@ final class AppState: ObservableObject {
             pauseUntil = nil
             idleBeganAt = nil
             heldSince = nil
+            finishDisplayOffPending = false
+            didTurnDisplayOffForSSH = false
             powerManager.release()
             notify(title: "Wake My Mac off", body: "Wake assertions released.")
         } else {
@@ -76,6 +83,7 @@ final class AppState: ObservableObject {
         powerManager.release()
         heldSince = nil
         idleBeganAt = nil
+        finishDisplayOffPending = false
         notify(title: "Wake My Mac paused", body: "Wake assertions are paused temporarily.")
         refresh()
     }
@@ -88,17 +96,22 @@ final class AppState: ObservableObject {
     }
 
     func openSettings() {
-        SettingsWindowController.shared.show(state: self)
+        DashboardWindowController.shared.show(state: self, section: .overview)
     }
 
     func openDashboard() {
-        DashboardWindowController.shared.show(state: self)
+        DashboardWindowController.shared.show(state: self, section: .overview)
     }
 
     private func refresh() {
         battery = batteryMonitor.snapshot()
         rows = agentMonitor.scan()
         activityMatches = activityMonitor.scan(rules: settings.activityRules)
+        let userIsIdle = isUserIdle
+        displayManager.setDisplayOffAllowed(userIsIdle)
+        if !userIsIdle {
+            displayManager.cancelPendingDisplayOff()
+        }
 
         if let pauseUntil, pauseUntil <= Date() {
             self.pauseUntil = nil
@@ -106,14 +119,14 @@ final class AppState: ObservableObject {
 
         let engagedCount = rows.reduce(0) { $0 + $1.engagedCount }
         let shouldHold = HoldPolicy.shouldHold(mode: settings.mode, isEnabled: isEnabled, engagedAgentCount: engagedCount, activityMatchCount: activityMatches.count)
-        applyPolicy(shouldHold: shouldHold)
+        applyPolicy(shouldHold: shouldHold, userIsIdle: userIsIdle)
         let activeAgents = rows.flatMap(\.sessions).filter { $0.status == .working || $0.status == .blocked }.map(\.agent.rawValue)
         let reasons = activityMatches.map(\.reason) + (engagedCount > 0 ? ["Agent activity"] : []) + (settings.mode == .ssh ? ["SSH mode"] : []) + (settings.mode == .manual ? ["Manual mode"] : [])
         history.update(isHolding: powerManager.isHolding, reasons: Array(Set(reasons)).sorted(), agents: Array(Set(activeAgents)).sorted(), battery: battery.percent)
         onVisualStateChange?()
     }
 
-    private func applyPolicy(shouldHold: Bool) {
+    private func applyPolicy(shouldHold: Bool, userIsIdle: Bool) {
         guard isEnabled else {
             phase = .disabled
             powerManager.release()
@@ -142,13 +155,24 @@ final class AppState: ObservableObject {
             // A previous idle cycle may have scheduled display sleep. Once work
             // resumes that delayed action must never fire during the new task.
             displayManager.cancelPendingDisplayOff()
+            finishDisplayOffPending = false
             idleBeganAt = nil
             phase = .holding
             if heldSince == nil {
                 heldSince = Date()
                 notify(title: "Wake My Mac engaged", body: "A wake rule is active, so sleep is being held.")
             }
-            powerManager.hold(reason: holdReason)
+            if settings.mode == .ssh,
+               settings.turnDisplayOffOnLidClose,
+               !didTurnDisplayOffForSSH {
+                // macOS does not expose a reliable public lid-close event.
+                // Turning the display off when SSH mode engages gives the
+                // same low-power result and is safe when the lid is already
+                // closed (the command simply has no visible effect).
+                displayManager.turnDisplayOffNow()
+                didTurnDisplayOffForSSH = true
+            }
+            powerManager.hold(reason: holdReason, conserveEnergy: settings.mode == .ssh)
             wasHolding = true
             return
         }
@@ -156,6 +180,7 @@ final class AppState: ObservableObject {
         guard wasHolding else {
             phase = .guarded("No watched agents are working.")
             powerManager.release()
+            scheduleDisplayOffIfSafe(userIsIdle: userIsIdle)
             return
         }
 
@@ -174,8 +199,28 @@ final class AppState: ObservableObject {
             wasHolding = false
             powerManager.release()
             notify(title: "Agent finished", body: "Idle grace period ended. Your Mac can sleep.")
-            displayManager.turnDisplayOffAfter(seconds: settings.turnDisplayOffAfterFinishSeconds)
+            finishDisplayOffPending = true
+            scheduleDisplayOffIfSafe(userIsIdle: userIsIdle)
         }
+    }
+
+    private func scheduleDisplayOffIfSafe(userIsIdle: Bool) {
+        guard finishDisplayOffPending,
+              userIsIdle,
+              !displayManager.hasPendingDisplayOff else { return }
+        finishDisplayOffPending = false
+        displayManager.turnDisplayOffAfter(seconds: settings.turnDisplayOffAfterFinishSeconds)
+    }
+
+    private var isUserIdle: Bool {
+        let eventSource = CGEventSourceStateID.combinedSessionState
+        let inputTimes = [
+            CGEventSource.secondsSinceLastEventType(eventSource, eventType: .mouseMoved),
+            CGEventSource.secondsSinceLastEventType(eventSource, eventType: .keyDown),
+            CGEventSource.secondsSinceLastEventType(eventSource, eventType: .leftMouseDown),
+            CGEventSource.secondsSinceLastEventType(eventSource, eventType: .rightMouseDown)
+        ]
+        return inputTimes.min() ?? .infinity >= 60
     }
 
     private func currentGuardrail() -> String? {
@@ -183,7 +228,11 @@ final class AppState: ObservableObject {
             return "Only-when-plugged-in mode is enabled."
         }
 
-        if settings.respectLowPowerMode && battery.isLowPowerMode {
+        if HoldPolicy.shouldStopForLowPowerMode(
+            mode: settings.mode,
+            respectLowPowerMode: settings.respectLowPowerMode,
+            isLowPowerMode: battery.isLowPowerMode
+        ) {
             return "Low Power Mode is on."
         }
 

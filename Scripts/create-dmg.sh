@@ -3,7 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_NAME="Wake My Mac"
-VERSION="${APP_VERSION:-0.1.0}"
+VERSION_FILE="$ROOT/VERSION"
+VERSION="${APP_VERSION:-$(<"$VERSION_FILE")}"
 APP_PATH="$ROOT/build/$APP_NAME.app"
 STAGING_DIR="$ROOT/build/dmg-root"
 DMG_PATH="$ROOT/build/Wake-My-Mac-$VERSION.dmg"
