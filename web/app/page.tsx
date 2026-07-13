@@ -21,7 +21,7 @@ function AppleIcon() {
 }
 
 function DownloadButton({ className = "" }: { className?: string }) {
-  return <a className={`button button-dark ${className}`} href="https://github.com/DeepanshuMishraa/wake-my-mac/releases/download/V0.0.2/Wake-My-Mac-0.0.2.dmg"><AppleIcon />Download for Mac</a>;
+  return <a className={`button button-dark ${className}`} href="https://github.com/DeepanshuMishraa/wake-my-mac/releases/download/V0.0.3/Wake-My-Mac-0.0.3.dmg"><AppleIcon />Download for Mac</a>;
 }
 
 function MiniIcon({ children }: { children: React.ReactNode }) {
