@@ -1,0 +1,22 @@
+web/app/page.tsx
+  s_c8af9d2415cdd6::t_3200464f6bb0aa 24
+Scripts/create-dmg.sh
+  s_c8af9d2415cdd6::t_3200464f6bb0aa 11,19,31
+  s_c8af9d2415cdd6::t_2a6441a4b8bced 32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "221230493522cb4b3fe7ac326b4c64070b63ca6e",
+  "prompts": {},
+  "sessions": {
+    "s_c8af9d2415cdd6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5bf7-853e-7f90-b20b-ece2e3d3b54b",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
