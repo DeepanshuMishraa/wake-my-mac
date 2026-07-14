@@ -326,6 +326,55 @@ button {
   margin-bottom: 175px
 }
 
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 90px;
+  padding-bottom: 175px
+}
+
+.comparison h2 {
+  font-size: clamp(48px, 6.6vw, 84px);
+  line-height: .88;
+  letter-spacing: -.078em;
+  font-weight: 600;
+  margin: 0
+}
+
+.comparison h2 em {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  letter-spacing: -.045em;
+  margin-left: .04em
+}
+
+.comparison-copy {
+  max-width: 500px;
+  padding-top: 50px;
+  color: #705f54;
+  font-size: 17px
+}
+
+.comparison-copy p {
+  margin: 0 0 21px
+}
+
+.comparison-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 32px
+}
+
+.comparison-terms span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600
+}
+
 .principles-inner {
   padding: 112px 0 118px
 }
@@ -571,12 +620,18 @@ button {
 
   .why,
   .use-cases,
+  .comparison,
   .faq-section {
     display: block;
     padding-bottom: 105px
   }
 
   .why-copy {
+    padding-top: 42px;
+    font-size: 16px
+  }
+
+  .comparison-copy {
     padding-top: 42px;
     font-size: 16px
   }
