@@ -1,0 +1,38 @@
+marketing/video/narration-ava.srt
+  s_7abded6002ee1e::t_15ee00ad6aad4b 1-48
+marketing/wake-my-mac-30s-launch-video.md
+  s_7abded6002ee1e::t_e873c593657920 1-134
+marketing/wake-my-mac-narration.txt
+  s_7abded6002ee1e::t_9ec3821cf8efee 1-13
+marketing/video/index.html
+  s_7abded6002ee1e::t_e1d9bd48723fe0 2-8,10-79,84,88,92,95,98,101,104,106-135
+  s_7abded6002ee1e::t_43030ee3fab61e 9,80-81,85,89-90,93-94,96,99,102-103
+  s_7abded6002ee1e::t_0901a73f563625 1
+  s_7abded6002ee1e::t_5b383992b737b3 82-83
+  s_7abded6002ee1e::t_7d50be6ee14761 86-87
+  s_7abded6002ee1e::t_883cab47d9f136 91
+  s_7abded6002ee1e::t_0f65436aa6f884 97
+  s_7abded6002ee1e::t_4b39b57879eb8f 100
+  s_7abded6002ee1e::t_c3190ac6db4e6b 105
+  s_7abded6002ee1e::t_668ab2adda2e7d 136-138
+.hyperframes/expanded-prompt.md
+  s_7abded6002ee1e::t_c8b20d99c2f8b4 1-116
+marketing/video/vendor/gsap.min.js
+  s_7abded6002ee1e::t_83564b6e6d6612 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "0f150ee3b5fb1b98db5390f45ea9e94cc9a8936a",
+  "prompts": {},
+  "sessions": {
+    "s_7abded6002ee1e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5c8d-a875-7a41-8c88-c082c2741c37",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
