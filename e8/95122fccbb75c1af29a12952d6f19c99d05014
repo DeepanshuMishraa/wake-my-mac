@@ -1,0 +1,19 @@
+web/app/page.tsx
+  s_2dfca8e88cb026::t_d0fbcc7441f1f3 27,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "e895122fccbb75c1af29a12952d6f19c99d05014",
+  "prompts": {},
+  "sessions": {
+    "s_2dfca8e88cb026": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5f59-02e0-7fd2-b989-a800d0d0483e",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
