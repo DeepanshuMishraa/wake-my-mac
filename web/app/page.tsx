@@ -24,7 +24,7 @@ function AppleIcon() {
 }
 
 function DownloadButton({ className = "" }: { className?: string }) {
-  return <a className={`button button-dark ${className}`} href="https://github.com/DeepanshuMishraa/wake-my-mac/releases/latest/download/Wake-My-Mac.dmg"><AppleIcon />Download for Mac</a>;
+  return <a className={`button button-dark ${className}`} href="https://github.com/DeepanshuMishraa/wake-my-mac/releases/download/V0.0.1/Wake-My-Mac-0.0.1.dmg"><AppleIcon />Download for Mac</a>;
 }
 
 function GatekeeperInstructions() {
@@ -105,7 +105,7 @@ export default function Home() {
         name: "Wake My Mac",
         alternateName: "Hold My Lid",
         url: "https://wakemymac.com/",
-        downloadUrl: "https://github.com/DeepanshuMishraa/wake-my-mac/releases/latest/download/Wake-My-Mac.dmg",
+        downloadUrl: "https://github.com/DeepanshuMishraa/wake-my-mac/releases/download/V0.0.1/Wake-My-Mac-0.0.1.dmg",
         operatingSystem: "macOS 14 Sonoma and later",
         applicationCategory: "UtilitiesApplication",
         description: "A native macOS utility that keeps your Mac awake while downloads, builds, exports, and remote sessions finish.",
