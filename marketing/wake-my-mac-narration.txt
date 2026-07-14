@@ -1,0 +1,13 @@
+Your Mac went to sleep. The download didn’t finish.
+
+Meet Wake My Mac: the native utility that keeps your Mac working when you step away.
+
+It watches the work that matters: agents, builds, renders, backups, downloads, and SSH.
+
+Set the rule once. Let the display sleep. Respect the battery.
+
+When the work is done, Wake My Mac lets your Mac sleep again.
+
+Not a permanent keep-awake switch. A smarter handoff between work and sleep.
+
+Wake My Mac. Keep going, on your terms.

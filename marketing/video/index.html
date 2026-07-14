@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wake My Mac — Launch Film</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root { 
+      --paper: #FFF0DF; 
+      --ink: #292524; 
+      --muted: #705F54; 
+      --peach: #F6E5D4; 
+      --lime: #D8FF4F; 
+      --dark: #1c1918; 
+      --dark-stage: #151312;
+      --border: rgba(41, 37, 36, .17);
+      --border-dark: rgba(255, 255, 255, .1);
+    }
+    * { box-sizing: border-box; }
+    html, body { 
+      margin: 0; 
+      width: 100%; 
+      height: 100%; 
+      overflow: hidden; 
+      background: var(--paper); 
+      color: var(--ink); 
+      font-family: "DM Sans", -apple-system, sans-serif; 
+      -webkit-font-smoothing: antialiased;
+    }
+    [data-composition-id] { width: 100%; height: 100%; overflow: hidden; position: relative; }
+    .scene { position: absolute; inset: 0; width: 100%; height: 100%; padding: 90px 120px; overflow: hidden; }
+    .scene-content { width: 100%; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; position: relative; z-index: 3; }
+    
+    .paper { background: var(--paper); color: var(--ink); }
+    .dark { background: var(--dark); color: #F8F7F4; }
+    
+    .grain { 
+      position: absolute; 
+      inset: 0; 
+      opacity: .06; 
+      background-image: radial-gradient(rgba(41,37,36,.5) .7px, transparent .7px); 
+      background-size: 8px 8px; 
+      mix-blend-mode: multiply; 
+      pointer-events: none;
+    }
+    .dark .grain { opacity: .04; mix-blend-mode: screen; }
+    
+    .ghost { 
+      position: absolute; 
+      font-size: 240px; 
+      line-height: .8; 
+      font-weight: 800; 
+      letter-spacing: -.08em; 
+      opacity: .04; 
+      white-space: nowrap; 
+      z-index: 1; 
+      pointer-events: none;
+    }
+    
+    .topline { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      color: var(--muted); 
+      font: 700 14px/1 monospace; 
+      letter-spacing: .1em; 
+      text-transform: uppercase;
+    }
+    .dark .topline { color: rgba(255,255,255,.45); }
+    
+    .kicker { 
+      font: 700 15px/1.1 monospace; 
+      letter-spacing: .1em; 
+      color: var(--muted); 
+      text-transform: uppercase; 
+    }
+    .dark .kicker { color: rgba(255,255,255,.5); }
+    
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 88px; line-height: .95; letter-spacing: -.05em; font-weight: 750; max-width: 1000px; }
+    h2 { font-size: 68px; line-height: .98; letter-spacing: -.04em; font-weight: 750; max-width: 1000px; }
+    
+    .serif { 
+      font-family: "Instrument Serif", Georgia, serif; 
+      font-style: italic; 
+      font-weight: 400; 
+    }
+    
+    .sub { 
+      font-size: 26px; 
+      line-height: 1.35; 
+      color: var(--muted); 
+      max-width: 720px; 
+    }
+    .dark .sub { color: rgba(255,255,255,.6); }
+    
+    .rule { width: 100%; height: 1px; background: var(--ink); transform-origin: left center; opacity: .12; }
+    .dark .rule { background: #fff; opacity: .12; }
+    
+    .lime { color: var(--lime); }
+    
+    .status { 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 10px; 
+      padding: 10px 18px; 
+      border-radius: 99px; 
+      border: 1px solid var(--border); 
+      font: 700 15px/1 monospace; 
+      letter-spacing: .05em;
+      background: rgba(41,37,36,.02);
+    }
+    .dark .status { 
+      border-color: rgba(255,255,255,.15);
+      background: rgba(255,255,255,.02);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 6px rgba(216,255,79,.15); }
+    
+    .progress-shell { 
+      width: 680px; 
+      height: 16px; 
+      border: 1px solid var(--border); 
+      padding: 3px; 
+      border-radius: 99px; 
+      background: rgba(41,37,36,.02);
+    }
+    .progress { width: 94%; height: 100%; background: var(--lime); border-radius: 99px; transform-origin: left center; }
+    
+    .meta { font: 700 13px/1 monospace; color: var(--muted); letter-spacing: .08em; }
+    .dark .meta { color: rgba(255,255,255,.45); }
+    
+    .pill-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .pill { 
+      padding: 10px 16px; 
+      border: 1px solid var(--border); 
+      border-radius: 99px; 
+      font: 700 15px/1 monospace; 
+      color: var(--muted);
+      background: rgba(41,37,36,.03);
+    }
+    .dark .pill { 
+      border-color: rgba(255,255,255,.15); 
+      color: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.03);
+    }
+    
+    .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; }
+    .activity-card { 
+      padding: 24px; 
+      min-height: 200px; 
+      border: 1px solid var(--border); 
+      border-radius: 20px; 
+      background: rgba(246,229,212,.4); 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      box-shadow: 0 10px 30px rgba(41,37,36,.03);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .card-icon {
+      color: var(--muted);
+      opacity: 0.8;
+    }
+    .activity-card strong { font-size: 26px; letter-spacing: -.03em; font-weight: 700; color: var(--ink); }
+    .wave { height: 32px; display: flex; align-items: center; gap: 4px; }
+    .wave i { display: block; width: 5px; border-radius: 3px; background: var(--ink); opacity: .3; }
+    .wave i:nth-child(1){height:10px}.wave i:nth-child(2){height:22px}.wave i:nth-child(3){height:30px}.wave i:nth-child(4){height:16px}.wave i:nth-child(5){height:26px}.wave i:nth-child(6){height:10px}.wave i:nth-child(7){height:20px}.wave i:nth-child(8){height:28px}.wave i:nth-child(9){height:15px}
+    
+    .reveal-stage { 
+      position: absolute; 
+      right: 140px; 
+      top: 130px; 
+      width: 500px; 
+      height: 500px; 
+      border-radius: 36px; 
+      background: radial-gradient(circle at 50% 30%, #3e3734, #1c1918 80%); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      box-shadow: 0 35px 80px rgba(0,0,0,.4); 
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .reveal-stage img { width: 220px; height: 220px; border-radius: 46px; box-shadow: 0 20px 45px rgba(0,0,0,.5); }
+    .menu-pill { 
+      position: absolute; 
+      right: 30px; 
+      top: 30px; 
+      padding: 10px 16px; 
+      background: #2A2B34; 
+      border: 1px solid rgba(255,255,255,.15); 
+      border-radius: 99px; 
+      color: #fff; 
+      font: 700 13px/1 monospace; 
+      letter-spacing: .05em;
+    }
+    .menu-pill span { color: var(--lime); }
+    
+    .dashboard-stage { 
+      position: absolute; 
+      left: 120px; 
+      right: 120px; 
+      bottom: 78px; 
+      top: 250px; 
+      background: var(--dark-stage); 
+      border-radius: 20px; 
+      box-shadow: 0 40px 100px rgba(0,0,0,.5); 
+      border: 1px solid var(--border-dark); 
+      overflow: hidden; 
+      display: flex;
+      flex-direction: column;
+    }
+    .window-header {
+      height: 38px;
+      background: #24211f;
+      display: flex;
+      align-items: center;
+      padding-left: 16px;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      flex-shrink: 0;
+    }
+    .traffic-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .traffic-dot.red { background: #ff5f56; }
+    .traffic-dot.yellow { background: #ffbd2e; }
+    .traffic-dot.green { background: #27c93f; }
+    
+    .dashboard-stage img { 
+      flex-grow: 1;
+      width: 100%; 
+      height: calc(100% - 38px); 
+      object-fit: contain; 
+      background: var(--dark-stage);
+    }
+    
+    .callout { 
+      position: absolute; 
+      padding: 10px 16px; 
+      background: var(--lime); 
+      color: var(--ink); 
+      border-radius: 8px; 
+      font: 800 15px/1 monospace; 
+      box-shadow: 0 10px 25px rgba(0,0,0,.3); 
+      border: 1px solid rgba(0,0,0,.05);
+      z-index: 10;
+    }
+    .c1 { left: 340px; top: 380px; }
+    .c2 { left: 740px; top: 430px; }
+    .c3 { right: 380px; top: 350px; }
+    .c4 { right: 260px; bottom: 120px; }
+    
+    .compare { 
+      margin-top: 60px; 
+      display: grid; 
+      grid-template-columns: 1fr 1fr 1fr; 
+      border-top: 1px solid var(--border); 
+      border-bottom: 1px solid var(--border); 
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .compare > div { 
+      padding: 34px; 
+      min-height: 220px; 
+      border-right: 1px solid var(--border); 
+      background: rgba(41,37,36,.01);
+    }
+    .compare > div:last-child { 
+      border-right: 0; 
+      background: rgba(216,255,79,.08); 
+    }
+    .compare h3 { font: 700 20px/1.1 monospace; margin-bottom: 16px; color: var(--muted); }
+    .compare div:last-child h3 { color: var(--ink); }
+    .compare p { font-size: 24px; line-height: 1.15; letter-spacing: -.03em; font-weight: 700; }
+    
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 380px; margin-top: 50px; }
+    .split-card { 
+      border: 1px solid var(--border-dark); 
+      border-radius: 24px; 
+      padding: 36px; 
+      background: linear-gradient(145deg, #24211f, #1c1918); 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+      box-shadow: 0 20px 50px rgba(0,0,0,.2);
+    }
+    .split-card h3 { font-size: 34px; letter-spacing: -.03em; font-weight: 700; line-height: 1.1; }
+    .gauge { 
+      height: 12px; 
+      border: 1px solid rgba(255,255,255,.15); 
+      border-radius: 99px; 
+      padding: 2px; 
+      background: rgba(0,0,0,.3);
+    }
+    .gauge i { display: block; width: 72%; height: 100%; background: var(--lime); border-radius: 99px; }
+    
+    .cta { align-items: center; justify-content: center; text-align: center; }
+    .cta img { width: 130px; height: 130px; border-radius: 28px; box-shadow: 0 15px 35px rgba(0,0,0,.15); margin-bottom: 24px; }
+    .cta h2 { max-width: 900px; }
+    .cta .sub { margin-top: 20px; }
+    .cta .status { margin-top: 32px; color: var(--ink); }
+    
+    .scene1 .scene-content { justify-content: center; gap: 32px; }
+    .scene2 .scene-content { justify-content: center; gap: 38px; }
+    .scene3 .scene-content { justify-content: center; max-width: 800px; gap: 24px; }
+    .scene4 .scene-content { gap: 14px; }
+    .scene5 .scene-content { justify-content: center; }
+    .scene6 .scene-content { justify-content: center; }
+  </style>
+  <script src="vendor/gsap.min.js"></script>
+</head>
+<body>
+  <div data-hf-id="hf-tkq8" data-composition-id="wake-my-mac-launch" data-start="0" data-width="1920" data-height="1080" data-duration="34" data-fps="60">
+    
+    <!-- Scene 1: Interruption -->
+    <div data-hf-id="hf-dqp9" id="scene1" class="clip scene scene1 paper" data-start="0" data-duration="3.5" data-track-index="1">
+      <div data-hf-id="hf-h60x" class="grain"></div>
+      <div data-hf-id="hf-939n" class="ghost" style="right:-50px;bottom:20px">94%</div>
+      <div data-hf-id="hf-cn5c" class="scene-content">
+        <div data-hf-id="hf-o5lv" class="topline">
+          <span data-hf-id="hf-i0sn">WAKE MY MAC / POWER STATE</span>
+          <span data-hf-id="hf-2nbl">00:00</span>
+        </div>
+        <div data-hf-id="hf-a46i" class="rule"></div>
+        <div data-hf-id="hf-vi4g" class="kicker">A small interruption</div>
+        <h1 data-hf-id="hf-vop4">Your Mac went to sleep.<br data-hf-id="hf-x5px"><span data-hf-id="hf-hqpc" class="serif">The download didn’t finish.</span></h1>
+        <div data-hf-id="hf-zb1g" class="progress-shell">
+          <div data-hf-id="hf-31j5" class="progress"></div>
+        </div>
+        <div data-hf-id="hf-pz6r" class="topline">
+          <span data-hf-id="hf-rv71">DOWNLOAD</span>
+          <span data-hf-id="hf-18t7">94% — PAUSED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 2: The Waiting Parts -->
+    <div data-hf-id="hf-j22l" id="scene2" class="clip scene scene2 paper" data-start="3.5" data-duration="3.5" data-track-index="1">
+      <div data-hf-id="hf-3l5h" class="grain"></div>
+      <div data-hf-id="hf-j8w4" class="ghost" style="left:-20px;top:200px">WAIT</div>
+      <div data-hf-id="hf-o0eg" class="scene-content">
+        <div data-hf-id="hf-pkvq" class="topline">
+          <span data-hf-id="hf-u1z1">THE WAITING PARTS</span>
+          <span data-hf-id="hf-5g3c">01 / 07</span>
+        </div>
+        <div data-hf-id="hf-yeow">
+          <div data-hf-id="hf-l579" class="kicker">The waiting part is still work.</div>
+          <h2 data-hf-id="hf-pj1u" style="margin-top:22px">Long jobs don’t stop<br data-hf-id="hf-rsrt"><span data-hf-id="hf-gt96" class="serif">just because you stepped away.</span></h2>
+        </div>
+        <div data-hf-id="hf-g3sv" class="card-grid">
+          
+          <div data-hf-id="hf-4ggy" class="activity-card">
+            <div data-hf-id="hf-89q4" class="card-header">
+              <span data-hf-id="hf-d4ak" class="meta">01 / BUILD</span>
+              <svg data-hf-id="hf-t7e7" class="card-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline data-hf-id="hf-wnf8" points="16 18 22 12 16 6" /><polyline data-hf-id="hf-9tmw" points="8 6 2 12 8 18" /></svg>
+            </div>
+            <strong data-hf-id="hf-09ac">Compiling</strong>
+            <div data-hf-id="hf-cfyz" class="wave">
+              <i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i><i data-hf-id="hf-ylp6"></i><i data-hf-id="hf-0l8b"></i><i data-hf-id="hf-0zjc"></i><i data-hf-id="hf-zsm9"></i><i data-hf-id="hf-06xa"></i><i data-hf-id="hf-26gf"></i>
+            </div>
+          </div>
+          
+          <div data-hf-id="hf-0cp2" class="activity-card">
+            <div data-hf-id="hf-1tbo" class="card-header">
+              <span data-hf-id="hf-n4mb" class="meta">02 / RENDER</span>
+              <svg data-hf-id="hf-a9cf" class="card-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon data-hf-id="hf-5pmv" points="23 7 16 12 23 17 23 7" /><rect data-hf-id="hf-ck1c" x="1" y="5" width="15" height="14" rx="2" ry="2" /></svg>
+            </div>
+            <strong data-hf-id="hf-fn1c">Exporting</strong>
+            <div data-hf-id="hf-wrob" class="wave">
+              <i data-hf-id="hf-2krg"></i><i data-hf-id="hf-oz7w"></i><i data-hf-id="hf-okwv"></i><i data-hf-id="hf-o6lu"></i><i data-hf-id="hf-jqbp"></i><i data-hf-id="hf-qkg0"></i><i data-hf-id="hf-q64z"></i><i data-hf-id="hf-prty"></i><i data-hf-id="hf-pdix"></i>
+            </div>
+          </div>
+          
+          <div data-hf-id="hf-0r03" class="activity-card">
+            <div data-hf-id="hf-0mel" class="card-header">
+              <span data-hf-id="hf-q1qw" class="meta">03 / BACKUP</span>
+              <svg data-hf-id="hf-9v1e" class="card-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path data-hf-id="hf-l57f" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline data-hf-id="hf-2jhx" points="17 8 12 3 7 8" /><line data-hf-id="hf-brk3" x1="12" y1="3" x2="12" y2="15" /></svg>
+            </div>
+            <strong data-hf-id="hf-0f3t">Uploading</strong>
+            <div data-hf-id="hf-wdda" class="wave">
+              <i data-hf-id="hf-hqsk"></i><i data-hf-id="hf-hchj"></i><i data-hf-id="hf-8d0n"></i><i data-hf-id="hf-8rbo"></i><i data-hf-id="hf-7kel"></i><i data-hf-id="hf-7ypm"></i><i data-hf-id="hf-9y8r"></i><i data-hf-id="hf-acjs"></i><i data-hf-id="hf-95mp"></i>
+            </div>
+          </div>
+          
+          <div data-hf-id="hf-15b4" class="activity-card">
+            <div data-hf-id="hf-10pm" class="card-header">
+              <span data-hf-id="hf-7s3h" class="meta">04 / SSH</span>
+              <svg data-hf-id="hf-9gqd" class="card-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect data-hf-id="hf-ewml" x="2" y="2" width="20" height="8" rx="2" ry="2" /><rect data-hf-id="hf-9sni" x="2" y="14" width="20" height="8" rx="2" ry="2" /><line data-hf-id="hf-5d0x" x1="6" y1="6" x2="6.01" y2="6" /><line data-hf-id="hf-dfpp" x1="6" y1="18" x2="6.01" y2="18" /></svg>
+            </div>
+            <strong data-hf-id="hf-dj29">Reachable</strong>
+            <div data-hf-id="hf-vz29" class="wave">
+              <i data-hf-id="hf-9jxq"></i><i data-hf-id="hf-bjgv"></i><i data-hf-id="hf-bxrw"></i><i data-hf-id="hf-7lcu"></i><i data-hf-id="hf-771t"></i><i data-hf-id="hf-8dyw"></i><i data-hf-id="hf-7znv"></i><i data-hf-id="hf-604q"></i><i data-hf-id="hf-5ltp"></i>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 3: Product Reveal -->
+    <div data-hf-id="hf-gseo" id="scene3" class="clip scene scene3 dark" data-start="7" data-duration="4" data-track-index="1">
+      <div data-hf-id="hf-4s2k" class="grain"></div>
+      <div data-hf-id="hf-b8y2" class="reveal-stage">
+        <img data-hf-id="hf-4fw7" src="assets/AppIcon.png" alt="Wake My Mac icon">
+        <div data-hf-id="hf-ifoa" class="menu-pill"><span data-hf-id="hf-ald6">●</span> WORKING</div>
+      </div>
+      <div data-hf-id="hf-mthd" class="scene-content">
+        <div data-hf-id="hf-p6kp" class="topline">
+          <span data-hf-id="hf-mw46">WAKE MY MAC</span>
+          <span data-hf-id="hf-yimz">02 / REVEAL</span>
+        </div>
+        <div data-hf-id="hf-66zv" class="kicker">A native utility for macOS</div>
+        <h1 data-hf-id="hf-izht">Keep your Mac<br data-hf-id="hf-szow"><span data-hf-id="hf-v8qa" class="lime serif">working.</span></h1>
+        <p data-hf-id="hf-hwf0" class="sub">Runs locally. Watches the work that matters. Gets out of the way when it’s done.</p>
+        <div data-hf-id="hf-t5je" class="pill-row">
+          <span data-hf-id="hf-09n3" class="pill">LOCAL</span>
+          <span data-hf-id="hf-1ian" class="pill">NATIVE</span>
+          <span data-hf-id="hf-cvav" class="pill">macOS 14+</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 4: Dashboard Proof -->
+    <div data-hf-id="hf-2c1q" id="scene4" class="clip scene scene4 dark" data-start="11" data-duration="5" data-track-index="1">
+      <div data-hf-id="hf-4drj" class="grain"></div>
+      <div data-hf-id="hf-n7se" class="scene-content">
+        <div data-hf-id="hf-os9o" class="topline">
+          <span data-hf-id="hf-midp">LIVE STATUS / OVERVIEW</span>
+          <span data-hf-id="hf-3wxb">03 / PROOF</span>
+        </div>
+        <h2 data-hf-id="hf-gzay">Rules that match<br data-hf-id="hf-sldv"><span data-hf-id="hf-y5x9" class="lime serif">the work.</span></h2>
+        
+        <div data-hf-id="hf-0l65" class="dashboard-stage">
+          <div data-hf-id="hf-c5py" class="window-header">
+            <span data-hf-id="hf-r5wr" class="traffic-dot red"></span>
+            <span data-hf-id="hf-8pv2" class="traffic-dot yellow"></span>
+            <span data-hf-id="hf-k9hr" class="traffic-dot green"></span>
+          </div>
+          <img data-hf-id="hf-6l8k" src="assets/dashboard-preview.png" alt="Wake My Mac dashboard preview">
+        </div>
+        
+        <div data-hf-id="hf-hpgu" class="callout c1">Agent activity</div>
+        <div data-hf-id="hf-qlmb" class="callout c2">Download</div>
+        <div data-hf-id="hf-d3hi" class="callout c3">Rendering</div>
+        <div data-hf-id="hf-z4ko" class="callout c4">SSH mode</div>
+      </div>
+    </div>
+
+    <!-- Scene 5: The Better Fit -->
+    <div data-hf-id="hf-r8xr" id="scene5" class="clip scene scene5 paper" data-start="16" data-duration="5" data-track-index="1">
+      <div data-hf-id="hf-5kom" class="grain"></div>
+      <div data-hf-id="hf-m0vb" class="scene-content">
+        <div data-hf-id="hf-odyn" class="topline">
+          <span data-hf-id="hf-i1mq">DIFFERENT TOOLS / DIFFERENT FIT</span>
+          <span data-hf-id="hf-fmpk">04 / FOCUS</span>
+        </div>
+        <h2 data-hf-id="hf-m0b8">Not “never sleep.”<br data-hf-id="hf-qluq"><span data-hf-id="hf-7579" class="serif">Know when to keep going.</span></h2>
+        
+        <div data-hf-id="hf-krut" class="compare">
+          <div data-hf-id="hf-y7yw">
+            <h3 data-hf-id="hf-wtsi">Caffeine / Coffee</h3>
+            <p data-hf-id="hf-thi8">Simple manual<br data-hf-id="hf-q7jp">keep-awake.</p>
+          </div>
+          <div data-hf-id="hf-x11t">
+            <h3 data-hf-id="hf-a55d">Amphetamine</h3>
+            <p data-hf-id="hf-dkui">Broad sessions<br data-hf-id="hf-regs">and triggers.</p>
+          </div>
+          <div data-hf-id="hf-xfcu">
+            <h3 data-hf-id="hf-eq3o"><span data-hf-id="hf-8suz" class="lime">Wake My Mac</span></h3>
+            <p data-hf-id="hf-zhn1">Focused rules<br data-hf-id="hf-r05r">for work in progress.</p>
+          </div>
+        </div>
+        
+        <div data-hf-id="hf-6zuy" class="meta" style="margin-top:22px">The right tool depends on the job. Wake My Mac is built for the waiting parts of developer work.</div>
+      </div>
+    </div>
+
+    <!-- Scene 6: Low-power Handoff -->
+    <div data-hf-id="hf-riy1" id="scene6" class="clip scene scene6 dark" data-start="21" data-duration="5" data-track-index="1">
+      <div data-hf-id="hf-56dl" class="grain"></div>
+      <div data-hf-id="hf-mf6c" class="scene-content">
+        <div data-hf-id="hf-nznm" class="topline">
+          <span data-hf-id="hf-bcdr">LOW-POWER HANDOFF</span>
+          <span data-hf-id="hf-y9iq">05 / RELEASE</span>
+        </div>
+        <h2 data-hf-id="hf-zqzw">Keep the useful part.<br data-hf-id="hf-p0mm"><span data-hf-id="hf-095f" class="lime serif">Respect the machine.</span></h2>
+        
+        <div data-hf-id="hf-hgc8" class="split">
+          <div data-hf-id="hf-pn6r" class="split-card">
+            <span data-hf-id="hf-yvyf" class="meta">SSH MODE</span>
+            <h3 data-hf-id="hf-zv3d">Display off.<br data-hf-id="hf-ombl">Mac reachable.</h3>
+            <div data-hf-id="hf-3057" class="status"><span data-hf-id="hf-9gry" class="dot"></span> SSH REACHABLE</div>
+          </div>
+          <div data-hf-id="hf-x2n7" class="split-card">
+            <span data-hf-id="hf-p7oz" class="meta">BATTERY RULE</span>
+            <h3 data-hf-id="hf-y8d7">Work ends.<br data-hf-id="hf-qsyj">Sleep returns.</h3>
+            <div data-hf-id="hf-bpqp" class="gauge"><i data-hf-id="hf-6sqs"></i></div>
+            <div data-hf-id="hf-3r85" class="status"><span data-hf-id="hf-zcc2" class="dot"></span> PLUGGED IN ONLY</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 7: Close / CTA -->
+    <div data-hf-id="hf-k62r" id="scene7" class="clip scene scene7 paper" data-start="26" data-duration="8" data-track-index="1">
+      <div data-hf-id="hf-6dao" class="grain"></div>
+      <div data-hf-id="hf-c2um" class="scene-content cta">
+        <img data-hf-id="hf-k12v" src="assets/AppIcon.png" alt="Wake My Mac icon">
+        <h2 data-hf-id="hf-8ly2">Keep going.<br data-hf-id="hf-r79k"><span data-hf-id="hf-h9yn" class="serif">On your terms.</span></h2>
+        <p data-hf-id="hf-4p08" class="sub">Wake My Mac — a smarter handoff between work and sleep.</p>
+        <div data-hf-id="hf-tnvl" class="status"><span data-hf-id="hf-zqn3" class="dot"></span> SLEEPING NORMALLY</div>
+        <div data-hf-id="hf-9ski" class="meta" style="margin-top:27px">Free · Local · macOS 14+</div>
+      </div>
+    </div>
+
+    <!-- Audios: Narration & Background Music -->
+    <audio data-hf-id="hf-rocl" id="narration" src="narration-ava.mp3" data-start="0" data-duration="34" data-track-index="10" data-volume="1"></audio>
+    <audio data-hf-id="hf-music" id="music" src="assets/background-music.mp3" data-start="0" data-duration="34" data-track-index="11" data-volume="0.12" loop></audio>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const scenes = [
+        ['#scene1', 0, 3.5], ['#scene2', 3.5, 3.5], ['#scene3', 7, 4], ['#scene4', 11, 5], ['#scene5', 16, 5], ['#scene6', 21, 5], ['#scene7', 26, 8]
+      ];
+      scenes.forEach(([sel, start, duration]) => {
+        tl.set(sel, { opacity: 0 }, start);
+        tl.to(sel, { opacity: 1, duration: .42, ease: 'power2.out' }, start);
+        tl.to(sel, { opacity: 0, duration: .38, ease: 'power2.in' }, start + duration - .38);
+      });
+      tl.fromTo('#scene1 .progress', { scaleX: .91 }, { scaleX: 1, duration: 1.2, ease: 'power2.out' }, .6);
+      tl.fromTo('#scene1 h1', { y: 42, opacity: 0 }, { y: 0, opacity: 1, duration: .72, ease: 'power3.out' }, .25);
+      tl.fromTo('#scene1 .progress-shell', { x: -35, opacity: 0 }, { x: 0, opacity: 1, duration: .6, ease: 'power2.out' }, 1.28);
+      tl.fromTo('#scene2 .activity-card', { y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: .55, stagger: .16, ease: 'power3.out' }, 3.85);
+      tl.fromTo('#scene2 h2', { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: .7, ease: 'power3.out' }, 3.7);
+      tl.fromTo('#scene3 .reveal-stage', { scale: .88, opacity: 0, x: 35 }, { scale: 1, opacity: 1, x: 0, duration: .85, ease: 'power3.out' }, 7.15);
+      tl.fromTo('#scene3 h1', { x: -50, opacity: 0 }, { x: 0, opacity: 1, duration: .7, ease: 'power3.out' }, 7.35);
+      tl.fromTo('#scene4 .dashboard-stage', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .75, ease: 'power3.out' }, 11.3);
+      tl.fromTo('#scene4 .callout', { scale: .8, opacity: 0 }, { scale: 1, opacity: 1, duration: .42, stagger: .28, ease: 'back.out(1.6)' }, 12.25);
+      tl.fromTo('#scene5 .compare > div', { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: .52, stagger: .18, ease: 'power2.out' }, 16.7);
+      tl.fromTo('#scene6 .split-card', { x: (i) => i ? 45 : -45, opacity: 0 }, { x: 0, opacity: 1, duration: .65, stagger: .15, ease: 'power3.out' }, 21.5);
+      tl.fromTo('#scene7 img', { scale: .8, opacity: 0 }, { scale: 1, opacity: 1, duration: .6, ease: 'back.out(1.7)' }, 26.25);
+      tl.fromTo('#scene7 h2', { y: 25, opacity: 0 }, { y: 0, opacity: 1, duration: .65, ease: 'power3.out' }, 26.65);
+      tl.fromTo('#scene7 .status, #scene7 .meta', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .5, stagger: .18, ease: 'power2.out' }, 27.4);
+      window.__timelines['wake-my-mac-launch'] = tl;
+    </script>
+  </div>
+</body>
+</html>

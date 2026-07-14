@@ -114,7 +114,7 @@ button {
 }
 
 .hero {
-  min-height: 650px;
+  min-height: 600px;
   padding: clamp(90px, 10vw, 140px) 0 120px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
@@ -661,4 +661,91 @@ button {
   }
 }
 
-.gatekeeper-box{margin-top:20px;border:1px solid var(--line);border-radius:12px;background:rgba(41,37,36,.03);overflow:hidden;transition:all .3s ease;width:100%;max-width:440px}.gatekeeper-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 16px;border:0;background:transparent;cursor:pointer;font-size:12px;font-weight:700;color:var(--ink);text-align:left}.gatekeeper-arrow{transition:transform .3s ease;font-size:14px;line-height:1;margin-left:8px}.gatekeeper-arrow.open{transform:rotate(180deg)}.gatekeeper-content{padding:0 16px 16px;font-size:12px;color:#705f54;line-height:1.55}.gatekeeper-content p{margin:0 0 10px}.gatekeeper-content b{color:var(--ink)}.gatekeeper-code-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f4e1cd;border:1px solid rgba(41,37,36,.12);border-radius:6px;padding:8px 12px;margin-top:8px}.gatekeeper-code{font-family:monospace;font-size:10.5px;color:var(--ink);word-break:break-all;user-select:all}.gatekeeper-copy-btn{flex-shrink:0;border:0;background:var(--ink);color:var(--paper);font-size:10px;font-weight:700;padding:5px 9px;border-radius:4px;cursor:pointer;transition:background .2s ease}.gatekeeper-copy-btn:hover{background:#3e3734}
+.gatekeeper-box {
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(41, 37, 36, .03);
+  overflow: hidden;
+  transition: all .3s ease;
+  width: 100%;
+  max-width: 440px
+}
+
+.gatekeeper-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: left
+}
+
+.gatekeeper-arrow {
+  transition: transform .3s ease;
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 8px
+}
+
+.gatekeeper-arrow.open {
+  transform: rotate(180deg)
+}
+
+.gatekeeper-content {
+  padding: 0 16px 16px;
+  font-size: 12px;
+  color: #705f54;
+  line-height: 1.55
+}
+
+.gatekeeper-content p {
+  margin: 0 0 10px
+}
+
+.gatekeeper-content b {
+  color: var(--ink)
+}
+
+.gatekeeper-code-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f4e1cd;
+  border: 1px solid rgba(41, 37, 36, .12);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 8px
+}
+
+.gatekeeper-code {
+  font-family: monospace;
+  font-size: 10.5px;
+  color: var(--ink);
+  word-break: break-all;
+  user-select: all
+}
+
+.gatekeeper-copy-btn {
+  flex-shrink: 0;
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .2s ease
+}
+
+.gatekeeper-copy-btn:hover {
+  background: #3e3734
+}

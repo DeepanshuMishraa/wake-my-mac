@@ -1,0 +1,48 @@
+1
+00:00:00,050 --> 00:00:02,000
+Your Mac went to sleep.
+
+2
+00:00:02,000 --> 00:00:04,050
+The download didn’t finish.
+
+3
+00:00:04,050 --> 00:00:09,237
+Meet Wake My Mac: the native utility that keeps your Mac working when you step away.
+
+4
+00:00:09,237 --> 00:00:16,775
+It watches the work that matters: agents, builds, renders, backups, downloads, and SSH.
+
+5
+00:00:16,775 --> 00:00:18,312
+Set the rule once.
+
+6
+00:00:18,312 --> 00:00:19,950
+Let the display sleep.
+
+7
+00:00:19,950 --> 00:00:21,337
+Respect the battery.
+
+8
+00:00:21,337 --> 00:00:25,375
+When the work is done, Wake My Mac lets your Mac sleep again.
+
+9
+00:00:25,375 --> 00:00:27,725
+Not a permanent keep-awake switch.
+
+10
+00:00:27,725 --> 00:00:30,787
+A smarter handoff between work and sleep.
+
+11
+00:00:30,787 --> 00:00:32,087
+Wake My Mac.
+
+12
+00:00:32,087 --> 00:00:33,862
+Keep going, on your terms.
+
