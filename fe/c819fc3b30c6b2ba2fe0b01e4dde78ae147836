@@ -1,0 +1,34 @@
+web/app/manifest.ts
+  s_2dfca8e88cb026::t_b88f10599cd3e0 1-14
+web/app/page.tsx
+  s_2dfca8e88cb026::t_05ee46238f794c 20-21,85-86,95-114,116-123,171-183
+  s_2dfca8e88cb026::t_601544245509b0 87-94,115
+  s_2dfca8e88cb026::t_027e526a3cda29 4,156
+web/app/sitemap.ts
+  s_2dfca8e88cb026::t_b88f10599cd3e0 2-4
+web/app/globals.css
+  s_2dfca8e88cb026::t_c52daf19bd01c8 329-377,623,634
+  s_2dfca8e88cb026::t_d16e2e71e4c74e 635-637
+  s_2dfca8e88cb026::t_c9e11495dceb23 638
+web/app/icon.svg
+  s_2dfca8e88cb026::t_5800315fdae3cd 1-5
+web/app/layout.tsx
+  s_2dfca8e88cb026::t_5800315fdae3cd 6,25,27
+  s_2dfca8e88cb026::t_b88f10599cd3e0 8,11-17,20-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "fec819fc3b30c6b2ba2fe0b01e4dde78ae147836",
+  "prompts": {},
+  "sessions": {
+    "s_2dfca8e88cb026": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f5f59-02e0-7fd2-b989-a800d0d0483e",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
