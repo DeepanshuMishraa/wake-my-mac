@@ -1,0 +1,54 @@
+Sources/HoldMyLid/StatusBarController.swift
+  s_277c5dc015994b::t_239b2e38fc4032 9,18-22,83-86,88-93
+  s_277c5dc015994b::t_2f54e68d4004ae 5,27,69-70,72,75-76,100-111,118-125,130
+  s_277c5dc015994b::t_7e37ae7b0c20e9 10,71,77,112-117,126-129
+  s_277c5dc015994b::t_c7912b46c36cef 24,39,67,78-82,87,94-99
+Sources/HoldMyLid/DisplayManager.swift
+  s_009751ca17120b::t_0e7e324edc8d51 14-16,32,38,40,50-51,53-54
+Tests/HoldMyLidTests/ActivityDetectionTests.swift
+  s_277c5dc015994b::t_45959ddeaff5d7 87-90
+  s_277c5dc015994b::t_8f02693d420c27 91-92
+  s_277c5dc015994b::t_8583219f5824f1 86
+  s_009751ca17120b::t_0e7e324edc8d51 93,95
+  s_277c5dc015994b::t_d1077c25518d67 85
+Sources/HoldMyLid/Models.swift
+  s_009751ca17120b::t_0e7e324edc8d51 275
+Sources/HoldMyLid/AppState.swift
+  s_009751ca17120b::t_0e7e324edc8d51 89,93-102
+Sources/HoldMyLid/PopoverView.swift
+  s_009751ca17120b::t_53136f17c90c8c 439,458-467
+  s_277c5dc015994b::t_fbc3e1aeab5785 136
+  s_277c5dc015994b::t_da76454f1c4e4e 6,21-28,31,41,45-46,48-54,60-88,100,140,142,144-145,152-153,158-159,163-168,183,186,189-196,198-210,336,343,346,352,354,363-365,367,370-371,375,387-388,391,393-395,397-400,406,408,414,425-426
+  s_277c5dc015994b::t_45959ddeaff5d7 8,11,177-180
+  s_277c5dc015994b::t_8583219f5824f1 5,9,32,93,121,147,155,160,345,369,384,403
+  s_277c5dc015994b::t_c7912b46c36cef 12-13,33-34,39-40
+  s_277c5dc015994b::t_08ed62a5946661 132-135,161,175,214-229,232-275,277-292,294-318,320-332,468
+  s_277c5dc015994b::t_01ee1f9ecb7b50 407
+  s_277c5dc015994b::t_239b2e38fc4032 7,10,15-16,35-38,94,96-99,101-120,122-124,169-174
+  s_277c5dc015994b::t_4297ac37bb33d1 176
+  s_277c5dc015994b::t_5afde1fdcb3812 428,433-434
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "95e00f527f38733b8ec9c1bf9c41e13a0971bdca",
+  "prompts": {},
+  "sessions": {
+    "s_009751ca17120b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f605d-df8b-7d23-85ae-42a7e5e81539",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    },
+    "s_277c5dc015994b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6a9c-f84d-7471-bd06-ca0c6c5969d3",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
