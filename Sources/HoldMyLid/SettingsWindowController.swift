@@ -61,11 +61,7 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
                 if state.reliableWakeState.needsSetupAction {
                     Button(state.reliableWakeState == .approvalRequired ? "Open Login Items…" : "Enable Reliable Wake") {
-                        if state.reliableWakeState == .approvalRequired {
-                            state.openReliableWakeApprovalSettings()
-                        } else {
-                            state.setupReliableWake()
-                        }
+                        state.performReliableWakeSetupAction()
                     }
                 }
             }

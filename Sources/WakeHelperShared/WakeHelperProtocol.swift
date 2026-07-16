@@ -1,6 +1,7 @@
 import Foundation
 
 public enum WakeHelperConstants {
+    public static let applicationBundleIdentifier = "com.dipxsy.watchmymac"
     public static let machServiceName = "com.dipxsy.watchmymac.helper"
     public static let launchDaemonPlistName = "com.dipxsy.watchmymac.helper.plist"
     public static let defaultLeaseDuration: TimeInterval = 12

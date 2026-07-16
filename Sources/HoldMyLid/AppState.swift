@@ -21,8 +21,11 @@ final class AppState: ObservableObject {
     private let powerManager = PowerAssertionManager()
     private let batteryMonitor = BatteryMonitor()
     private let agentMonitor = AgentMonitor()
+    private let agentScanQueue = DispatchQueue(label: "com.dipxsy.watchmymac.agent-scan", qos: .utility)
     private let activityMonitor = ActivityRuleMonitor()
     private var timer: Timer?
+    private var isStarted = false
+    private var isAgentScanInFlight = false
     private var idleBeganAt: Date?
     private var wasHolding = false
     private var workspaceObservers: [NSObjectProtocol] = []
@@ -38,6 +41,7 @@ final class AppState: ObservableObject {
     }
 
     func start() {
+        isStarted = true
         observePowerLifecycle()
         powerManager.refreshHelperStatus()
         refresh()
@@ -49,6 +53,7 @@ final class AppState: ObservableObject {
     }
 
     func stop() {
+        isStarted = false
         timer?.invalidate()
         workspaceObservers.forEach(NSWorkspace.shared.notificationCenter.removeObserver)
         workspaceObservers.removeAll()
@@ -120,14 +125,42 @@ final class AppState: ObservableObject {
         powerManager.openApprovalSettings()
     }
 
+    func performReliableWakeSetupAction() {
+        if reliableWakeState == .approvalRequired {
+            openReliableWakeApprovalSettings()
+        } else {
+            setupReliableWake()
+        }
+    }
+
     private func refresh() {
         battery = batteryMonitor.snapshot()
-        rows = agentMonitor.scan()
+        refreshAgents()
         activityMatches = activityMonitor.scan(rules: settings.activityRules)
         if reliableWakeState.needsSetupAction {
             powerManager.refreshHelperStatus()
         }
 
+        evaluateCurrentPolicy()
+    }
+
+    private func refreshAgents() {
+        guard isStarted, !isAgentScanInFlight else { return }
+        isAgentScanInFlight = true
+        let monitor = agentMonitor
+        agentScanQueue.async { [weak self] in
+            let rows = monitor.scan()
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isAgentScanInFlight = false
+                guard self.isStarted else { return }
+                self.rows = rows
+                self.evaluateCurrentPolicy()
+            }
+        }
+    }
+
+    private func evaluateCurrentPolicy() {
         if let pauseUntil, pauseUntil <= Date() {
             self.pauseUntil = nil
         }

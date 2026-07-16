@@ -112,11 +112,7 @@ struct PopoverView: View {
             Spacer(minLength: 6)
 
             Button(reliableWakeSetupButtonTitle) {
-                if state.reliableWakeState == .approvalRequired {
-                    state.openReliableWakeApprovalSettings()
-                } else {
-                    state.setupReliableWake()
-                }
+                state.performReliableWakeSetupAction()
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.small)

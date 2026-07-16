@@ -431,11 +431,7 @@ private struct SettingsDashboard: View {
                             }
                             if state.reliableWakeState.needsSetupAction {
                                 Button(state.reliableWakeState == .approvalRequired ? "Open Login Items…" : "Enable Reliable Wake") {
-                                    if state.reliableWakeState == .approvalRequired {
-                                        state.openReliableWakeApprovalSettings()
-                                    } else {
-                                        state.setupReliableWake()
-                                    }
+                                    state.performReliableWakeSetupAction()
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .tint(DashboardPalette.ink)

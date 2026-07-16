@@ -138,21 +138,20 @@ final class PrivilegedWakeClient {
         desiredHolding = false
         generation += 1
 
-        if shouldRelease, service.status == .enabled {
-            let semaphore = DispatchSemaphore(value: 0)
-            let connection = connection ?? makeConnection()
-            self.connection = connection
-            let proxy = connection.remoteObjectProxyWithErrorHandler { _ in
-                semaphore.signal()
-            } as? WakeHelperXPCProtocol
-            proxy?.releaseLease(identifier: leaseIdentifier) { _, _ in
-                semaphore.signal()
-            }
-            _ = semaphore.wait(timeout: .now() + 2)
+        guard shouldRelease, service.status == .enabled, let proxy = remoteProxy(), let activeConnection = connection else {
+            invalidateConnection()
+            return
         }
 
-        connection?.invalidate()
-        connection = nil
+        proxy.releaseLease(identifier: leaseIdentifier) { [weak self] _, _ in
+            Task { @MainActor in
+                self?.finishShutdown(connection: activeConnection)
+            }
+        }
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(2))
+            self?.finishShutdown(connection: activeConnection)
+        }
     }
 
     private func remoteProxy() -> WakeHelperXPCProtocol? {
@@ -192,5 +191,10 @@ final class PrivilegedWakeClient {
     private func invalidateConnection() {
         connection?.invalidate()
         connection = nil
+    }
+
+    private func finishShutdown(connection activeConnection: NSXPCConnection) {
+        guard connection === activeConnection else { return }
+        invalidateConnection()
     }
 }

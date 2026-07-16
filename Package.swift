@@ -41,7 +41,10 @@ let package = Package(
         .executableTarget(
             name: "WakeMyMacHelper",
             dependencies: ["WakeHelperShared"],
-            path: "Sources/WakeMyMacHelper"
+            path: "Sources/WakeMyMacHelper",
+            linkerSettings: [
+                .linkedFramework("Security")
+            ]
         ),
         .testTarget(
             name: "WatchMyMacTests",

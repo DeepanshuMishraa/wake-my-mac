@@ -1,6 +1,6 @@
 import Foundation
 
-enum AgentKind: String, CaseIterable, Identifiable, Codable {
+enum AgentKind: String, CaseIterable, Identifiable, Codable, Sendable {
     case codex = "Codex"
     case openCode = "OpenCode"
     case pi = "Pi"
@@ -163,14 +163,14 @@ enum AgentKind: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum AgentStatus: String, Codable {
+enum AgentStatus: String, Codable, Sendable {
     case working
     case blocked
     case idle
     case absent
 }
 
-struct AgentSession: Identifiable, Codable, Equatable {
+struct AgentSession: Identifiable, Codable, Equatable, Sendable {
     var id: String
     var agent: AgentKind
     var title: String
@@ -182,7 +182,7 @@ struct AgentSession: Identifiable, Codable, Equatable {
     var deepLink: String?
 }
 
-struct AgentRow: Identifiable, Equatable {
+struct AgentRow: Identifiable, Equatable, Sendable {
     var id: AgentKind { agent }
     var agent: AgentKind
     var sessions: [AgentSession]

@@ -123,6 +123,9 @@ PLIST
 # Local development signing gives Service Management a sealed bundle to
 # register. Release distribution replaces "-" with the Developer ID identity.
 codesign --force --sign - --identifier "$HELPER_ID" "$RESOURCES/$HELPER_NAME"
-codesign --force --deep --sign - --identifier "$BUNDLE_ID" "$APP_DIR"
+if [[ -d "$CONTENTS/Frameworks/Sparkle.framework" ]]; then
+  codesign --force --sign - "$CONTENTS/Frameworks/Sparkle.framework"
+fi
+codesign --force --sign - --identifier "$BUNDLE_ID" "$APP_DIR"
 
 echo "$APP_DIR"

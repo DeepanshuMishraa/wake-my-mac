@@ -1,7 +1,16 @@
 import Foundation
+import Darwin
+import MachO
+import Security
 import WakeHelperShared
 
 private final class PowerOverrideController {
+    private enum OwnershipState: String {
+        case pending
+        case owned
+    }
+
+    private static let pmsetDeadline: TimeInterval = 5
     private let stateDirectory = URL(fileURLWithPath: "/Library/Application Support/Wake My Mac", isDirectory: true)
     private var ownershipMarker: URL {
         stateDirectory.appendingPathComponent("helper-owned-sleep-override")
@@ -19,12 +28,19 @@ private final class PowerOverrideController {
 
             if shouldDisableSleep {
                 if currentlyDisabled {
+                    if FileManager.default.fileExists(atPath: ownershipMarker.path) {
+                        try writeOwnershipMarker(.owned)
+                        ownsOverride = true
+                    }
                     return .success(true)
                 }
 
+                // Persist intent before changing global power policy. A crash at
+                // any later point leaves enough information for startup recovery.
+                try writeOwnershipMarker(.pending)
                 try setSleepDisabled(true)
+                try writeOwnershipMarker(.owned)
                 ownsOverride = true
-                try writeOwnershipMarker()
                 return .success(true)
             }
 
@@ -35,8 +51,8 @@ private final class PowerOverrideController {
             if currentlyDisabled {
                 try setSleepDisabled(false)
             }
+            try FileManager.default.removeItem(at: ownershipMarker)
             ownsOverride = false
-            try? FileManager.default.removeItem(at: ownershipMarker)
             return .success(true)
         } catch {
             return .failure(error)
@@ -49,9 +65,14 @@ private final class PowerOverrideController {
 
     private func recoverStaleOverrideIfNeeded() {
         guard FileManager.default.fileExists(atPath: ownershipMarker.path) else { return }
-        _ = try? runPMSet(arguments: ["-a", "disablesleep", "0"])
-        try? FileManager.default.removeItem(at: ownershipMarker)
-        ownsOverride = false
+        ownsOverride = true
+        do {
+            try setSleepDisabled(false)
+            try FileManager.default.removeItem(at: ownershipMarker)
+            ownsOverride = false
+        } catch {
+            // Keep the marker and ownership flag so the lease timer can retry.
+        }
     }
 
     private func readSleepDisabled() throws -> Bool {
@@ -73,32 +94,67 @@ private final class PowerOverrideController {
         let process = Process()
         let stdout = Pipe()
         let stderr = Pipe()
+        let termination = DispatchSemaphore(value: 0)
+        let readers = DispatchGroup()
+        let output = PipeCapture()
+        let errorOutput = PipeCapture()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
         process.arguments = arguments
         process.standardOutput = stdout
         process.standardError = stderr
+        process.terminationHandler = { _ in termination.signal() }
 
         try process.run()
-        process.waitUntilExit()
+        readers.enter()
+        DispatchQueue.global(qos: .utility).async {
+            output.data = stdout.fileHandleForReading.readDataToEndOfFile()
+            readers.leave()
+        }
+        readers.enter()
+        DispatchQueue.global(qos: .utility).async {
+            errorOutput.data = stderr.fileHandleForReading.readDataToEndOfFile()
+            readers.leave()
+        }
 
-        let output = stdout.fileHandleForReading.readDataToEndOfFile()
-        let errorOutput = stderr.fileHandleForReading.readDataToEndOfFile()
+        if termination.wait(timeout: .now() + Self.pmsetDeadline) == .timedOut {
+            process.terminate()
+            if termination.wait(timeout: .now() + 1) == .timedOut {
+                kill(process.processIdentifier, SIGKILL)
+                _ = termination.wait(timeout: .now() + 1)
+            }
+            if readers.wait(timeout: .now() + 1) == .timedOut {
+                try? stdout.fileHandleForReading.close()
+                try? stderr.fileHandleForReading.close()
+                _ = readers.wait(timeout: .now() + 1)
+            }
+            throw HelperError.pmsetTimedOut
+        }
+        readers.wait()
+
         guard process.terminationStatus == 0 else {
-            let message = String(data: errorOutput, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let message = String(data: errorOutput.data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
             throw HelperError.pmsetFailed(message ?? "pmset exited with status \(process.terminationStatus)")
         }
-        return String(data: output, encoding: .utf8) ?? ""
+        return String(data: output.data, encoding: .utf8) ?? ""
     }
 
-    private func writeOwnershipMarker() throws {
+    private func writeOwnershipMarker(_ state: OwnershipState) throws {
         try FileManager.default.createDirectory(at: stateDirectory, withIntermediateDirectories: true)
-        try Data("owned\n".utf8).write(to: ownershipMarker, options: .atomic)
+        try Data("\(state.rawValue)\n".utf8).write(to: ownershipMarker, options: .atomic)
+        let handle = try FileHandle(forWritingTo: ownershipMarker)
+        defer { try? handle.close() }
+        try handle.synchronize()
     }
+}
+
+private final class PipeCapture: @unchecked Sendable {
+    var data = Data()
 }
 
 private enum HelperError: LocalizedError {
     case invalidPMSetOutput
     case verificationFailed
+    case pmsetTimedOut
     case pmsetFailed(String)
 
     var errorDescription: String? {
@@ -107,6 +163,8 @@ private enum HelperError: LocalizedError {
             "Could not read the current macOS sleep policy."
         case .verificationFailed:
             "macOS did not apply the requested sleep policy."
+        case .pmsetTimedOut:
+            "Timed out while asking macOS to update the sleep policy."
         case .pmsetFailed(let message):
             message
         }
@@ -131,6 +189,7 @@ private final class WakeHelperService: NSObject, WakeHelperXPCProtocol, NSXPCLis
     }
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
+        guard isAuthorized(connection) else { return false }
         connection.exportedInterface = NSXPCInterface(with: WakeHelperXPCProtocol.self)
         connection.exportedObject = self
         connection.resume()
@@ -176,17 +235,80 @@ private final class WakeHelperService: NSObject, WakeHelperXPCProtocol, NSXPCLis
     private func expireLeases() {
         stateLock.lock()
         defer { stateLock.unlock() }
-        guard ledger.removeExpired() > 0 else { return }
+        let removedLease = ledger.removeExpired() > 0
+        guard removedLease || (power.ownsOverride && !ledger.hasActiveLeases) else { return }
         _ = applyDesiredState()
     }
 
     private func applyDesiredState() -> (Bool, String?) {
         switch power.reconcile(shouldDisableSleep: ledger.hasActiveLeases) {
-        case .success:
-            (true, nil)
+        case .success(let applied):
+            (applied, nil)
         case .failure(let error):
             (false, error.localizedDescription)
         }
+    }
+
+    private func isAuthorized(_ connection: NSXPCConnection) -> Bool {
+        let attributes = [kSecGuestAttributePid as String: NSNumber(value: connection.processIdentifier)] as CFDictionary
+        var guestCode: SecCode?
+        guard SecCodeCopyGuestWithAttributes(nil, attributes, [], &guestCode) == errSecSuccess,
+              let guestCode,
+              let guestStaticCode = staticCode(for: guestCode),
+              let applicationCode = authorizedApplicationCode(),
+              let guestIdentity = signingIdentity(for: guestStaticCode),
+              let applicationIdentity = signingIdentity(for: applicationCode) else {
+            return false
+        }
+        return guestIdentity.identifier == WakeHelperConstants.applicationBundleIdentifier
+            && guestIdentity.identifier == applicationIdentity.identifier
+            && guestIdentity.uniqueHash == applicationIdentity.uniqueHash
+    }
+
+    private func staticCode(for code: SecCode) -> SecStaticCode? {
+        var staticCode: SecStaticCode?
+        guard SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess else { return nil }
+        return staticCode
+    }
+
+    private func authorizedApplicationCode() -> SecStaticCode? {
+        guard let executable = currentExecutableURL() else { return nil }
+        let application = executable
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        guard application.pathExtension == "app" else { return nil }
+        var staticCode: SecStaticCode?
+        guard SecStaticCodeCreateWithPath(application as CFURL, [], &staticCode) == errSecSuccess else {
+            return nil
+        }
+        return staticCode
+    }
+
+    private func currentExecutableURL() -> URL? {
+        var size: UInt32 = 0
+        _ = _NSGetExecutablePath(nil, &size)
+        var path = [CChar](repeating: 0, count: Int(size))
+        guard _NSGetExecutablePath(&path, &size) == 0 else { return nil }
+        return path.withUnsafeBufferPointer { buffer in
+            guard let baseAddress = buffer.baseAddress else { return nil }
+            return URL(
+                fileURLWithFileSystemRepresentation: baseAddress,
+                isDirectory: false,
+                relativeTo: nil
+            ).resolvingSymlinksInPath()
+        }
+    }
+
+    private func signingIdentity(for code: SecStaticCode) -> (identifier: String, uniqueHash: Data)? {
+        var information: CFDictionary?
+        guard SecCodeCopySigningInformation(code, SecCSFlags(rawValue: kSecCSSigningInformation), &information) == errSecSuccess,
+              let values = information as? [CFString: Any],
+              let identifier = values[kSecCodeInfoIdentifier] as? String,
+              let uniqueHash = values[kSecCodeInfoUnique] as? Data else {
+            return nil
+        }
+        return (identifier, uniqueHash)
     }
 }
 

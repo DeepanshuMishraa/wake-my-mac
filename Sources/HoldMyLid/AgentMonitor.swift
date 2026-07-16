@@ -1,6 +1,8 @@
 import Foundation
 
-final class AgentMonitor {
+// AppState serializes access on its dedicated utility queue. The monitor owns
+// incremental rollout state, so callers must not scan it concurrently.
+final class AgentMonitor: @unchecked Sendable {
     private let hooksDirectory: URL
     private let codexMonitor = CodexRolloutMonitor()
 
