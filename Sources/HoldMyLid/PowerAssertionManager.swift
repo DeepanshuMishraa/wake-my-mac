@@ -1,35 +1,29 @@
 import Foundation
 import IOKit.pwr_mgt
 
+@MainActor
 final class PowerAssertionManager {
-    private var systemAssertion: IOPMAssertionID = 0
     private var idleAssertion: IOPMAssertionID = 0
+    private let privilegedClient = PrivilegedWakeClient()
 
-    var isHolding: Bool {
-        systemAssertion != 0 || idleAssertion != 0
+    var onStateChange: ((ReliableWakeState) -> Void)? {
+        didSet { privilegedClient.onStateChange = onStateChange }
     }
 
-    /// Holds system sleep. SSH mode deliberately skips the user-idle assertion:
-    /// the system assertion keeps the Mac reachable, while avoiding an extra
-    /// assertion that can interfere with normal idle/display power behavior.
-    func hold(reason: String, conserveEnergy: Bool = false) {
-        if systemAssertion == 0 {
-            var assertion = IOPMAssertionID(0)
-            let result = IOPMAssertionCreateWithName(
-                kIOPMAssertionTypePreventSystemSleep as CFString,
-                IOPMAssertionLevel(kIOPMAssertionLevelOn),
-                reason as CFString,
-                &assertion
-            )
-            if result == kIOReturnSuccess {
-                systemAssertion = assertion
-            }
-        }
+    var reliableWakeState: ReliableWakeState { privilegedClient.state }
 
-        if !conserveEnergy, idleAssertion == 0 {
+    var isHolding: Bool {
+        reliableWakeState == .active
+    }
+
+    /// The supported IOKit assertion is retained as a best-effort fallback.
+    /// Reliable wake is provided by the privileged helper lease, whose state is
+    /// reported separately and must be acknowledged before the UI says "Awake".
+    func hold(reason: String) {
+        if idleAssertion == 0 {
             var assertion = IOPMAssertionID(0)
             let result = IOPMAssertionCreateWithName(
-                kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
+                kIOPMAssertPreventUserIdleSystemSleep as CFString,
                 IOPMAssertionLevel(kIOPMAssertionLevelOn),
                 reason as CFString,
                 &assertion
@@ -38,21 +32,19 @@ final class PowerAssertionManager {
                 idleAssertion = assertion
             }
         }
-
-        if conserveEnergy, idleAssertion != 0 {
-            IOPMAssertionRelease(idleAssertion)
-            idleAssertion = 0
-        }
+        privilegedClient.renewLease(reason: reason)
     }
 
     func release() {
-        if systemAssertion != 0 {
-            IOPMAssertionRelease(systemAssertion)
-            systemAssertion = 0
-        }
         if idleAssertion != 0 {
             IOPMAssertionRelease(idleAssertion)
             idleAssertion = 0
         }
+        privilegedClient.releaseLease()
     }
+
+    func refreshHelperStatus() { privilegedClient.refreshServiceStatus() }
+    func registerHelper() { privilegedClient.registerHelper() }
+    func openApprovalSettings() { privilegedClient.openApprovalSettings() }
+    func shutdown() { privilegedClient.shutdown() }
 }

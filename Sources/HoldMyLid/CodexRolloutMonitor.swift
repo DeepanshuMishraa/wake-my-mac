@@ -1,6 +1,8 @@
 import Foundation
 
 final class CodexRolloutMonitor {
+    private static let discoveryBlockSize: UInt64 = 262_144
+
     private struct FileState {
         var offset: UInt64
         var status: AgentStatus
@@ -55,9 +57,80 @@ final class CodexRolloutMonitor {
                   modified >= recent else { continue }
             if files[url.path] == nil {
                 let size = UInt64(values.fileSize ?? 0)
-                files[url.path] = FileState(offset: size > 262_144 ? size - 262_144 : 0, status: .idle, updated: modified)
+                files[url.path] = initialState(for: url, fileSize: size, modified: modified)
             }
         }
+    }
+
+    /// Reconstructs the current state of an existing rollout before switching to
+    /// incremental reads. Active turns can produce megabytes of tool and context
+    /// events after `task_started`, so a fixed-size tail can incorrectly classify
+    /// a live task as idle.
+    private func initialState(for url: URL, fileSize: UInt64, modified: Date) -> FileState {
+        guard let handle = FileHandle(forReadingAtPath: url.path) else {
+            return FileState(offset: 0, status: .idle, updated: modified)
+        }
+        defer { try? handle.close() }
+
+        do {
+            let completeEnd = try lastCompleteRecordEnd(in: handle, fileSize: fileSize)
+            let status = try latestLifecycleStatus(in: handle, endingAt: completeEnd) ?? .idle
+            return FileState(offset: completeEnd, status: status, updated: modified)
+        } catch {
+            return FileState(offset: 0, status: .idle, updated: modified)
+        }
+    }
+
+    private func lastCompleteRecordEnd(in handle: FileHandle, fileSize: UInt64) throws -> UInt64 {
+        var cursor = fileSize
+        while cursor > 0 {
+            let start = cursor > Self.discoveryBlockSize ? cursor - Self.discoveryBlockSize : 0
+            try handle.seek(toOffset: start)
+            let data = handle.readData(ofLength: Int(cursor - start))
+            if let newline = data.lastIndex(of: 0x0A) {
+                return start + UInt64(data.distance(from: data.startIndex, to: newline)) + 1
+            }
+            cursor = start
+        }
+        return 0
+    }
+
+    private func latestLifecycleStatus(in handle: FileHandle, endingAt end: UInt64) throws -> AgentStatus? {
+        guard end > 0 else { return nil }
+        var cursor = end
+        var leadingFragment = Data()
+        let decoder = JSONDecoder()
+
+        while cursor > 0 {
+            let start = cursor > Self.discoveryBlockSize ? cursor - Self.discoveryBlockSize : 0
+            try handle.seek(toOffset: start)
+            var combined = handle.readData(ofLength: Int(cursor - start))
+            combined.append(leadingFragment)
+
+            let pieces = combined.split(separator: 0x0A, omittingEmptySubsequences: false)
+            let beginsWithDelimiter = combined.first == 0x0A
+            let firstCandidate = start == 0 || beginsWithDelimiter ? 0 : 1
+
+            if firstCandidate < pieces.count {
+                for piece in pieces[firstCandidate...].reversed() where !piece.isEmpty {
+                    guard let event = try? decoder.decode(RolloutEvent.self, from: Data(piece)),
+                          event.type == "event_msg" else { continue }
+                    switch event.payload.type {
+                    case "task_started": return .working
+                    case "task_complete", "turn_aborted": return .idle
+                    default: continue
+                    }
+                }
+            }
+
+            if start > 0, !beginsWithDelimiter, let first = pieces.first {
+                leadingFragment = Data(first)
+            } else {
+                leadingFragment.removeAll(keepingCapacity: true)
+            }
+            cursor = start
+        }
+        return nil
     }
 
     private func threadID(for path: String) -> String? {

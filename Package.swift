@@ -7,7 +7,8 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .executable(name: "WatchMyMac", targets: ["WatchMyMac"])
+        .executable(name: "WatchMyMac", targets: ["WatchMyMac"]),
+        .executable(name: "WakeMyMacHelper", targets: ["WakeMyMacHelper"])
     ],
     dependencies: [
         .package(url: "https://github.com/willdale/SwiftUICharts.git", from: "2.9.9")
@@ -16,6 +17,7 @@ let package = Package(
         .executableTarget(
             name: "WatchMyMac",
             dependencies: [
+                "WakeHelperShared",
                 "Sparkle",
                 .product(name: "SwiftUICharts", package: "SwiftUICharts")
             ],
@@ -32,9 +34,21 @@ let package = Package(
                 .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])
             ]
         ),
+        .target(
+            name: "WakeHelperShared",
+            path: "Sources/WakeHelperShared"
+        ),
+        .executableTarget(
+            name: "WakeMyMacHelper",
+            dependencies: ["WakeHelperShared"],
+            path: "Sources/WakeMyMacHelper",
+            linkerSettings: [
+                .linkedFramework("Security")
+            ]
+        ),
         .testTarget(
             name: "WatchMyMacTests",
-            dependencies: ["WatchMyMac"],
+            dependencies: ["WatchMyMac", "WakeHelperShared"],
             path: "Tests/HoldMyLidTests"
         ),
         .binaryTarget(

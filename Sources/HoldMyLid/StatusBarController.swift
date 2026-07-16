@@ -44,9 +44,11 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
     private func refreshStatusItem() {
         guard let button = statusItem.button else { return }
         let hasBlocked = state.rows.contains { $0.blockedCount > 0 }
-        let hasWorking = state.rows.contains { $0.activeCount > 0 }
-        let symbol = (hasBlocked || hasWorking) ? "bolt.fill" : "laptopcomputer"
-        let color: NSColor = hasBlocked ? .systemOrange : (hasWorking ? .systemGreen : .labelColor)
+        let wakeFailed: Bool
+        if case .failed = state.reliableWakeState { wakeFailed = true } else { wakeFailed = false }
+        let isReliablyAwake = state.reliableWakeState == .active
+        let symbol = wakeFailed ? "exclamationmark.triangle.fill" : (isReliablyAwake ? "bolt.fill" : "laptopcomputer")
+        let color: NSColor = (hasBlocked || wakeFailed) ? .systemOrange : (isReliablyAwake ? .systemGreen : .labelColor)
         let configuration = NSImage.SymbolConfiguration(paletteColors: [color])
         let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Wake My Mac")?
             .withSymbolConfiguration(configuration)
@@ -82,7 +84,8 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
             width: PopoverView.preferredWidth,
             height: PopoverView.preferredHeight(
                 agentCount: state.rows.count,
-                agentsExpanded: areAgentsExpanded
+                agentsExpanded: areAgentsExpanded,
+                showsReliableWakeSetup: state.reliableWakeState.needsSetupAction
             )
         )
     }

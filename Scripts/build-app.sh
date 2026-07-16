@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_NAME="Wake My Mac"
 EXECUTABLE_NAME="WatchMyMac"
+HELPER_NAME="WakeMyMacHelper"
+HELPER_ID="com.dipxsy.watchmymac.helper"
 BUNDLE_ID="com.dipxsy.watchmymac"
 VERSION_FILE="$ROOT/VERSION"
 APP_VERSION="${APP_VERSION:-$(<"$VERSION_FILE")}"
@@ -24,14 +26,16 @@ APP_DIR="$ROOT/build/$APP_NAME.app"
 CONTENTS="$APP_DIR/Contents"
 MACOS="$CONTENTS/MacOS"
 RESOURCES="$CONTENTS/Resources"
+LAUNCH_DAEMONS="$CONTENTS/Library/LaunchDaemons"
 ASSET_OUTPUT="$ROOT/build/asset-output"
 
 cd "$ROOT"
 swift build -c release
 
 rm -rf "$APP_DIR" "$ASSET_OUTPUT"
-mkdir -p "$MACOS" "$RESOURCES"
+mkdir -p "$MACOS" "$RESOURCES" "$LAUNCH_DAEMONS"
 cp "$ROOT/.build/release/$EXECUTABLE_NAME" "$MACOS/$EXECUTABLE_NAME"
+cp "$ROOT/.build/release/$HELPER_NAME" "$RESOURCES/$HELPER_NAME"
 cp -R "$ROOT/.build/release/WatchMyMac_WatchMyMac.bundle" "$RESOURCES/"
 mkdir -p "$ASSET_OUTPUT"
 xcrun actool \
@@ -44,6 +48,30 @@ xcrun actool \
   >/dev/null
 cp "$ASSET_OUTPUT/AppIcon.icns" "$RESOURCES/AppIcon.icns"
 cp "$ASSET_OUTPUT/Assets.car" "$RESOURCES/Assets.car"
+
+cat > "$LAUNCH_DAEMONS/$HELPER_ID.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$HELPER_ID</string>
+  <key>BundleProgram</key>
+  <string>Contents/Resources/$HELPER_NAME</string>
+  <key>MachServices</key>
+  <dict>
+    <key>$HELPER_ID</key>
+    <true/>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ProcessType</key>
+  <string>Adaptive</string>
+</dict>
+</plist>
+PLIST
 
 SPARKLE_FRAMEWORK="$(find "$ROOT/.build" -type d -name Sparkle.framework -path '*release*' -print -quit)"
 if [[ -n "$SPARKLE_FRAMEWORK" ]]; then
@@ -91,5 +119,13 @@ cat > "$CONTENTS/Info.plist" <<PLIST
 </dict>
 </plist>
 PLIST
+
+# Local development signing gives Service Management a sealed bundle to
+# register. Release distribution replaces "-" with the Developer ID identity.
+codesign --force --sign - --identifier "$HELPER_ID" "$RESOURCES/$HELPER_NAME"
+if [[ -d "$CONTENTS/Frameworks/Sparkle.framework" ]]; then
+  codesign --force --sign - "$CONTENTS/Frameworks/Sparkle.framework"
+fi
+codesign --force --sign - --identifier "$BUNDLE_ID" "$APP_DIR"
 
 echo "$APP_DIR"

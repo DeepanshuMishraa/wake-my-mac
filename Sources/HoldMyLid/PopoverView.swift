@@ -4,11 +4,17 @@ import SwiftUI
 struct PopoverView: View {
     static let preferredWidth: CGFloat = 330
 
-    static func preferredHeight(agentCount: Int, agentsExpanded: Bool) -> CGFloat {
-        guard agentsExpanded else { return 309 }
+    static func preferredHeight(
+        agentCount: Int,
+        agentsExpanded: Bool,
+        showsReliableWakeSetup: Bool = false
+    ) -> CGFloat {
+        let setupHeight: CGFloat = showsReliableWakeSetup ? 42 : 0
+        guard agentsExpanded else { return 309 + setupHeight }
         // Every installed agent adds one 23pt row and one 2pt stack gap.
         // The expanded empty state needs slightly more room than a single row.
-        return agentCount == 0 ? 343 : 309 + CGFloat(agentCount) * 25
+        let contentHeight: CGFloat = agentCount == 0 ? 343 : 309 + CGFloat(agentCount) * 25
+        return contentHeight + setupHeight
     }
 
     @ObservedObject var state: AppState
@@ -18,6 +24,10 @@ struct PopoverView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
+            if state.reliableWakeState.needsSetupAction {
+                sectionDivider
+                reliableWakeSetup
+            }
             sectionDivider
             batterySection
             sectionDivider
@@ -34,7 +44,8 @@ struct PopoverView: View {
             width: Self.preferredWidth,
             height: Self.preferredHeight(
                 agentCount: state.rows.count,
-                agentsExpanded: areAgentsExpanded
+                agentsExpanded: areAgentsExpanded,
+                showsReliableWakeSetup: state.reliableWakeState.needsSetupAction
             ),
             alignment: .topLeading
         )
@@ -87,6 +98,38 @@ struct PopoverView: View {
             }
             .font(.system(size: 11))
         }
+    }
+
+    private var reliableWakeSetup: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.shield.fill")
+                .foregroundStyle(.orange)
+
+            Text(reliableWakeSetupText)
+                .font(.system(size: 11, weight: .medium))
+                .lineLimit(1)
+
+            Spacer(minLength: 6)
+
+            Button(reliableWakeSetupButtonTitle) {
+                state.performReliableWakeSetupAction()
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+        }
+        .frame(height: 26)
+    }
+
+    private var reliableWakeSetupText: String {
+        switch state.reliableWakeState {
+        case .approvalRequired: "Approve helper in System Settings"
+        case .failed: "Reliable wake needs attention"
+        default: "Enable reliable wake once"
+        }
+    }
+
+    private var reliableWakeSetupButtonTitle: String {
+        state.reliableWakeState == .approvalRequired ? "Approve…" : "Enable"
     }
 
     private var agentsSection: some View {
@@ -187,9 +230,20 @@ struct PopoverView: View {
     }
 
     private func headerDetail(at date: Date) -> String {
+        switch state.reliableWakeState {
+        case .setupRequired, .approvalRequired:
+            return "Setup required · Mac may sleep"
+        case .failed:
+            return "Wake failed · Mac may sleep"
+        case .activating where state.phase == .holding:
+            return "Enabling · \(state.settings.mode.title)"
+        default:
+            break
+        }
+
         let status: String
         switch state.phase {
-        case .holding: status = "Awake"
+        case .holding: status = state.reliableWakeState == .active ? "Awake" : "Enabling"
         case .paused: status = "Paused"
         case .idleCountdown: status = "Finishing"
         case .disabled: status = "Off"
