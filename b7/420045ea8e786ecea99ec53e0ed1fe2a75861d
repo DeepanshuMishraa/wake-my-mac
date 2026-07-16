@@ -1,0 +1,43 @@
+Sources/HoldMyLid/AppState.swift
+  s_277c5dc015994b::t_812bac9dfb4f50 24,27-28,44,56,128-135,138,144-163
+Sources/HoldMyLid/SettingsWindowController.swift
+  s_277c5dc015994b::t_812bac9dfb4f50 64
+Scripts/build-app.sh
+  s_277c5dc015994b::t_812bac9dfb4f50 126-129
+Package.swift
+  s_277c5dc015994b::t_9f9046ebd793fe 44-47
+Sources/HoldMyLid/AgentMonitor.swift
+  s_277c5dc015994b::t_812bac9dfb4f50 3-5
+Sources/WakeHelperShared/WakeHelperProtocol.swift
+  s_277c5dc015994b::t_9f9046ebd793fe 4
+Sources/HoldMyLid/DashboardView.swift
+  s_277c5dc015994b::t_812bac9dfb4f50 434
+Sources/HoldMyLid/PopoverView.swift
+  s_277c5dc015994b::t_812bac9dfb4f50 115
+Sources/HoldMyLid/PrivilegedWakeClient.swift
+  s_277c5dc015994b::t_86c3ea05cf187d 141-143,146-154,195-198
+  s_277c5dc015994b::t_714e8795186145 199
+Sources/WakeMyMacHelper/main.swift
+  s_277c5dc015994b::t_baf7e1fb06a6ae 253,257,259,266-271
+  s_277c5dc015994b::t_35d725d00a387b 3,275,286-300
+  s_277c5dc015994b::t_9f9046ebd793fe 2,4,8-13,31-34,38-40,42,54,68-75,97-100,105,108-124,130-132,135,138,141,143,150-153,157,166-167,192,238-239,245-246,251-252,254-256,258,260-265,272-274,276-285,301-312
+  s_277c5dc015994b::t_94cce044771cbd 125-129,144-146
+Sources/HoldMyLid/Models.swift
+  s_277c5dc015994b::t_812bac9dfb4f50 3,166,173,185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b7420045ea8e786ecea99ec53e0ed1fe2a75861d",
+  "prompts": {},
+  "sessions": {
+    "s_277c5dc015994b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6a9c-f84d-7471-bd06-ca0c6c5969d3",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
