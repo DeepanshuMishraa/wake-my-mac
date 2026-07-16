@@ -1,0 +1,57 @@
+Sources/HoldMyLid/StatusBarController.swift
+  s_277c5dc015994b::t_e7f231d2c0d604 47-51,87-88
+Sources/WakeMyMacHelper/main.swift
+  s_277c5dc015994b::t_4c56ad97e7561d 2,4-8,10-13,16-43,46-90,93-97,99-111,113-115,118-123,125-145,150,156,164,173,176,179,184-185,187,189,192,195-197
+  s_277c5dc015994b::t_a839b181ad7522 116-117,124,147-149,151,153,157-161,166-168,170-172,177-178,180,183,186,188,193-194
+Sources/HoldMyLid/Models.swift
+  s_277c5dc015994b::t_a46b8b9e3ac614 270-271
+Sources/HoldMyLid/SettingsWindowController.swift
+  s_277c5dc015994b::t_a46b8b9e3ac614 59-70,110-118
+  s_277c5dc015994b::t_299a4f83c0a4ae 119
+Sources/HoldMyLid/PopoverView.swift
+  s_277c5dc015994b::t_e7f231d2c0d604 7-13,16-17,27-30,47-48,103-138,237-247,250
+Sources/HoldMyLid/PowerAssertionManager.swift
+  s_277c5dc015994b::t_8b174c00dd3608 4,7,9-10,13,15-21,23,26,35,43,45-49
+  s_277c5dc015994b::t_6f7a399e8cddb5 22
+Sources/HoldMyLid/PrivilegedWakeClient.swift
+  s_277c5dc015994b::t_8b174c00dd3608 1-113,115-136,154-196
+  s_277c5dc015994b::t_6f7a399e8cddb5 114
+  s_277c5dc015994b::t_a83aa96ee00227 137-153
+Sources/WakeHelperShared/WakeHelperProtocol.swift
+  s_277c5dc015994b::t_4c56ad97e7561d 1-70
+Sources/HoldMyLid/AppState.swift
+  s_277c5dc015994b::t_6f7a399e8cddb5 176
+  s_277c5dc015994b::t_7c6f4ac4da42ef 71-73
+  s_277c5dc015994b::t_ab68f661a35f45 16,33-37,42,56,98,115-122,127-128,137,144
+Tests/HoldMyLidTests/ActivityDetectionTests.swift
+  s_277c5dc015994b::t_a46b8b9e3ac614 123-125
+  s_277c5dc015994b::t_d240bfcfd3f556 3,91-97,102-120
+  s_277c5dc015994b::t_35d98e8320f00a 98-101
+  s_277c5dc015994b::t_9250619f037bfd 40-57
+Sources/HoldMyLid/CodexRolloutMonitor.swift
+  s_277c5dc015994b::t_9250619f037bfd 4-5,60-129,131,133
+Sources/HoldMyLid/DashboardView.swift
+  s_277c5dc015994b::t_a46b8b9e3ac614 414,419-442,489-527
+Package.swift
+  s_277c5dc015994b::t_4c56ad97e7561d 10-11,20,37-45,48
+Scripts/build-app.sh
+  s_277c5dc015994b::t_2ab9d6fc49c932 71
+  s_277c5dc015994b::t_354c4b8192eacd 7-8,29,36,38,52-70,72-75,123-126
+  s_277c5dc015994b::t_79cb29aa371c4d 127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "081012e9f7ca23ed8d0949709272e7bc8f41ed8a",
+  "prompts": {},
+  "sessions": {
+    "s_277c5dc015994b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6a9c-f84d-7471-bd06-ca0c6c5969d3",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
