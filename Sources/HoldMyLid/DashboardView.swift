@@ -411,14 +411,35 @@ private struct SettingsDashboard: View {
                             SettingsHeading(title: "Battery", subtitle: "Keep energy use predictable.")
                             SettingsToggle(title: "Only hold when plugged in", isOn: $draft.onlyWhenPluggedIn)
                             SettingsToggle(title: "Respect Low Power Mode", isOn: $draft.respectLowPowerMode)
-                            Stepper("Stop below (draft.batteryCutoffPercent)%", value: $draft.batteryCutoffPercent, in: 5...80, step: 5).font(.system(size: 14, weight: .medium, design: .rounded))
+                            Stepper("Stop below \(draft.batteryCutoffPercent)%", value: $draft.batteryCutoffPercent, in: 5...80, step: 5).font(.system(size: 14, weight: .medium, design: .rounded))
                         }
                     }
                     NativeCard {
                         VStack(alignment: .leading, spacing: 18) {
-                            SettingsHeading(title: "Display", subtitle: "Choose what happens when the lid closes.")
-                            SettingsToggle(title: "Turn display off on lid close", isOn: $draft.turnDisplayOffOnLidClose)
-                            Stepper("Display off after (draft.turnDisplayOffAfterFinishSeconds)s", value: $draft.turnDisplayOffAfterFinishSeconds, in: 0...300, step: 10).font(.system(size: 14, weight: .medium, design: .rounded))
+                            SettingsHeading(title: "Reliable wake", subtitle: "One approval lets every mode prevent sleep automatically.")
+                            HStack(spacing: 9) {
+                                Image(systemName: reliableWakeSymbol)
+                                    .foregroundStyle(reliableWakeColor)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(reliableWakeTitle)
+                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    Text(reliableWakeDetail)
+                                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                                        .foregroundStyle(DashboardPalette.secondary)
+                                }
+                                Spacer()
+                            }
+                            if state.reliableWakeState.needsSetupAction {
+                                Button(state.reliableWakeState == .approvalRequired ? "Open Login Items…" : "Enable Reliable Wake") {
+                                    if state.reliableWakeState == .approvalRequired {
+                                        state.openReliableWakeApprovalSettings()
+                                    } else {
+                                        state.setupReliableWake()
+                                    }
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(DashboardPalette.ink)
+                            }
                         }
                     }
                 }
@@ -464,6 +485,45 @@ private struct SettingsDashboard: View {
         }
         .scrollContentBackground(.hidden)
         .background(DashboardPalette.canvas)
+    }
+
+    private var reliableWakeTitle: String {
+        switch state.reliableWakeState {
+        case .checking: "Checking helper…"
+        case .setupRequired: "Setup required"
+        case .approvalRequired: "Approval required"
+        case .ready: "Ready"
+        case .activating: "Enabling reliable wake…"
+        case .active: "Reliably awake"
+        case .failed: "Needs attention"
+        }
+    }
+
+    private var reliableWakeDetail: String {
+        switch state.reliableWakeState {
+        case .setupRequired: "macOS will ask for administrator approval once."
+        case .approvalRequired: "Allow Wake My Mac under Login Items in System Settings."
+        case .active: "The privileged wake lease is verified and active."
+        case .failed(let message): message
+        default: "Passwords are handled by macOS and are never stored by the app."
+        }
+    }
+
+    private var reliableWakeSymbol: String {
+        switch state.reliableWakeState {
+        case .active: "bolt.shield.fill"
+        case .ready: "checkmark.shield.fill"
+        case .failed: "exclamationmark.triangle.fill"
+        default: "shield.lefthalf.filled"
+        }
+    }
+
+    private var reliableWakeColor: Color {
+        switch state.reliableWakeState {
+        case .active, .ready: .green
+        case .failed, .approvalRequired: .orange
+        default: .secondary
+        }
     }
 }
 

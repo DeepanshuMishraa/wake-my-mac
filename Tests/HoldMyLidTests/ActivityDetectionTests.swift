@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import WakeHelperShared
 @testable import WatchMyMac
 
 struct ActivityDetectionTests {
@@ -36,29 +37,28 @@ struct ActivityDetectionTests {
         #expect(sessions.filter { $0.status == .working }.count == 1)
     }
 
+    @Test func codexDiscoversLargeConcurrentActiveRollouts() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let noise = String(repeating: event("token_count", at: "2026-07-11T12:00:01Z"), count: 6_000)
+        let first = root.appendingPathComponent("rollout-large-first.jsonl")
+        let second = root.appendingPathComponent("rollout-large-second.jsonl")
+        try (event("task_started", at: "2026-07-11T12:00:00Z") + noise)
+            .write(to: first, atomically: true, encoding: .utf8)
+        try (event("task_started", at: "2026-07-11T12:00:00Z") + noise + noise)
+            .write(to: second, atomically: true, encoding: .utf8)
+
+        let sessions = CodexRolloutMonitor(root: root).scan()
+        #expect(sessions.count == 2)
+        #expect(sessions.allSatisfy { $0.status == .working })
+    }
+
     @Test func opencodeServeIsInfrastructureOnly() {
         #expect(AgentKind.openCode.shouldIgnoreProcess(arguments: "opencode serve --port 64722"))
         #expect(AgentKind.openCode.shouldIgnoreProcess(arguments: "serve --port 64722"))
         #expect(!AgentKind.openCode.shouldIgnoreProcess(arguments: "opencode"))
-    }
-
-    @Test func resumedWorkCancelsPendingDisplaySleep() async throws {
-        final class Counter: @unchecked Sendable {
-            private let lock = NSLock()
-            private var value = 0
-            func increment() { lock.withLock { value += 1 } }
-            func read() -> Int { lock.withLock { value } }
-        }
-
-        let counter = Counter()
-        let manager = DisplayManager { counter.increment() }
-        manager.turnDisplayOffAfter(seconds: 1)
-        #expect(manager.hasPendingDisplayOff)
-
-        manager.cancelPendingDisplayOff()
-        #expect(!manager.hasPendingDisplayOff)
-        try await Task.sleep(for: .seconds(1.2))
-        #expect(counter.read() == 0)
     }
 
     @Test func rowDistinguishesBlockedWorkingIdleAndStopped() {
@@ -88,12 +88,41 @@ struct ActivityDetectionTests {
         #expect(PopoverView.preferredHeight(agentCount: 0, agentsExpanded: true) == 343)
         #expect(PopoverView.preferredHeight(agentCount: 5, agentsExpanded: true) == 434)
         #expect(PopoverView.preferredHeight(agentCount: 6, agentsExpanded: true) < 460)
+        #expect(PopoverView.preferredHeight(agentCount: 6, agentsExpanded: false, showsReliableWakeSetup: true) == 351)
     }
 
-    @Test func sshModeUsesLowPowerHoldWithoutForcingDisplaySleep() {
-        #expect(HoldMode.ssh.explanation.contains("low-power"))
-        #expect(!HoldMode.ssh.explanation.contains("display sleeps"))
-        #expect(HoldMode.agents.explanation.contains("reachable"))
+    @Test func wakeLeasesOverlapAndExpireWithoutPrematureRelease() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        var ledger = WakeLeaseLedger()
+
+        let renewedClaude = ledger.renew(identifier: "claude", reason: "Claude", duration: 10, now: now)
+        let renewedCodex = ledger.renew(identifier: "codex", reason: "Codex", duration: 20, now: now)
+        #expect(renewedClaude)
+        #expect(renewedCodex)
+        #expect(ledger.activeCount == 2)
+
+        #expect(ledger.removeExpired(now: now.addingTimeInterval(11)) == 1)
+        #expect(ledger.hasActiveLeases)
+        #expect(ledger.activeCount == 1)
+
+        #expect(ledger.removeExpired(now: now.addingTimeInterval(21)) == 1)
+        #expect(!ledger.hasActiveLeases)
+    }
+
+    @Test func wakeLeaseRenewalExtendsCrashSafetyDeadline() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        var ledger = WakeLeaseLedger()
+        ledger.renew(identifier: "app", reason: "SSH", duration: 10, now: now)
+        ledger.renew(identifier: "app", reason: "SSH", duration: 10, now: now.addingTimeInterval(8))
+
+        #expect(ledger.removeExpired(now: now.addingTimeInterval(11)) == 0)
+        #expect(ledger.hasActiveLeases)
+        #expect(ledger.removeExpired(now: now.addingTimeInterval(19)) == 1)
+    }
+
+    @Test func sshModeStaysEnabledUntilTheModeChanges() {
+        #expect(HoldMode.ssh.explanation.contains("until you change modes"))
+        #expect(HoldMode.agents.explanation.contains("awake"))
         #expect(!HoldPolicy.shouldStopForLowPowerMode(mode: .ssh, respectLowPowerMode: true, isLowPowerMode: true))
         #expect(HoldPolicy.shouldStopForLowPowerMode(mode: .agents, respectLowPowerMode: true, isLowPowerMode: true))
     }

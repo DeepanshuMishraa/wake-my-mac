@@ -229,8 +229,6 @@ struct HoldSettings: Codable, Equatable {
     var batteryCutoffPercent: Int = 15
     var onlyWhenPluggedIn: Bool = false
     var respectLowPowerMode: Bool = true
-    var turnDisplayOffOnLidClose: Bool = true
-    var turnDisplayOffAfterFinishSeconds: Int = 30
     var notificationsEnabled: Bool = true
     var soundName: String = "Glass"
     var mode: HoldMode = .agents
@@ -244,8 +242,6 @@ struct HoldSettings: Codable, Equatable {
         batteryCutoffPercent = try values.decodeIfPresent(Int.self, forKey: .batteryCutoffPercent) ?? 15
         onlyWhenPluggedIn = try values.decodeIfPresent(Bool.self, forKey: .onlyWhenPluggedIn) ?? false
         respectLowPowerMode = try values.decodeIfPresent(Bool.self, forKey: .respectLowPowerMode) ?? true
-        turnDisplayOffOnLidClose = try values.decodeIfPresent(Bool.self, forKey: .turnDisplayOffOnLidClose) ?? true
-        turnDisplayOffAfterFinishSeconds = try values.decodeIfPresent(Int.self, forKey: .turnDisplayOffAfterFinishSeconds) ?? 30
         notificationsEnabled = try values.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? true
         soundName = try values.decodeIfPresent(String.self, forKey: .soundName) ?? "Glass"
         mode = try values.decodeIfPresent(HoldMode.self, forKey: .mode) ?? .agents
@@ -271,8 +267,8 @@ enum HoldMode: String, CaseIterable, Identifiable, Codable {
 
     var explanation: String {
         switch self {
-        case .agents: "Keeps the Mac reachable while a watched agent is working."
-        case .ssh: "Keeps the Mac reachable for SSH with a low-power system hold without changing the display."
+        case .agents: "Keeps the Mac awake while a watched agent is working."
+        case .ssh: "Keeps the Mac awake and reachable until you change modes or turn it off."
         case .manual: "Keeps the Mac awake until you turn Wake My Mac off."
         }
     }

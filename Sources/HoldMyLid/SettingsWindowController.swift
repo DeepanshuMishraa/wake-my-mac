@@ -56,14 +56,18 @@ struct SettingsView: View {
                 Toggle("Respect Low Power Mode", isOn: $draft.respectLowPowerMode)
             }
 
-            Section("Display") {
-                Toggle("Turn display off on lid close when possible", isOn: $draft.turnDisplayOffOnLidClose)
-                Stepper(
-                    "Display off \(draft.turnDisplayOffAfterFinishSeconds)s after finish",
-                    value: $draft.turnDisplayOffAfterFinishSeconds,
-                    in: 0...300,
-                    step: 10
-                )
+            Section("Reliable Wake") {
+                Text(reliableWakeDescription)
+                    .foregroundStyle(.secondary)
+                if state.reliableWakeState.needsSetupAction {
+                    Button(state.reliableWakeState == .approvalRequired ? "Open Login Items…" : "Enable Reliable Wake") {
+                        if state.reliableWakeState == .approvalRequired {
+                            state.openReliableWakeApprovalSettings()
+                        } else {
+                            state.setupReliableWake()
+                        }
+                    }
+                }
             }
 
             Section("Notifications") {
@@ -102,5 +106,15 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .padding(20)
         .frame(width: 520, height: 520)
+    }
+
+    private var reliableWakeDescription: String {
+        switch state.reliableWakeState {
+        case .active: "Reliable wake is active and verified."
+        case .ready: "The reliable wake helper is ready."
+        case .approvalRequired: "Approval is required in System Settings before reliable wake can run."
+        case .failed(let message): "Reliable wake failed: \(message)"
+        default: "Enable the helper once so all modes can prevent sleep automatically."
+        }
     }
 }
