@@ -82,8 +82,17 @@ struct ActivityDetectionTests {
         }
     }
 
-    @Test func sshModeUsesLowPowerHoldAndDisplaySleep() {
+    @MainActor @Test func menuPopoverHeightIsCompactAndBounded() {
+        #expect(PopoverView.preferredWidth == 330)
+        #expect(PopoverView.preferredHeight(agentCount: 6, agentsExpanded: false) == 309)
+        #expect(PopoverView.preferredHeight(agentCount: 0, agentsExpanded: true) == 343)
+        #expect(PopoverView.preferredHeight(agentCount: 5, agentsExpanded: true) == 434)
+        #expect(PopoverView.preferredHeight(agentCount: 6, agentsExpanded: true) < 460)
+    }
+
+    @Test func sshModeUsesLowPowerHoldWithoutForcingDisplaySleep() {
         #expect(HoldMode.ssh.explanation.contains("low-power"))
+        #expect(!HoldMode.ssh.explanation.contains("display sleeps"))
         #expect(HoldMode.agents.explanation.contains("reachable"))
         #expect(!HoldPolicy.shouldStopForLowPowerMode(mode: .ssh, respectLowPowerMode: true, isLowPowerMode: true))
         #expect(HoldPolicy.shouldStopForLowPowerMode(mode: .agents, respectLowPowerMode: true, isLowPowerMode: true))

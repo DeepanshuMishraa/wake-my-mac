@@ -11,7 +11,9 @@ final class DisplayManager {
     }
 
     var hasPendingDisplayOff: Bool {
-        pendingDisplayOff != nil
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return pendingDisplayOff != nil
     }
 
     func setDisplayOffAllowed(_ allowed: Bool) {
@@ -26,14 +28,16 @@ final class DisplayManager {
 
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
-            self.pendingDisplayOff = nil
             self.stateLock.lock()
+            self.pendingDisplayOff = nil
             let allowed = self.displayOffAllowed
             self.stateLock.unlock()
             guard allowed else { return }
             self.turnDisplayOff()
         }
+        stateLock.lock()
         pendingDisplayOff = work
+        stateLock.unlock()
         DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + .seconds(seconds), execute: work)
     }
 
@@ -43,8 +47,11 @@ final class DisplayManager {
     }
 
     func cancelPendingDisplayOff() {
-        pendingDisplayOff?.cancel()
+        stateLock.lock()
+        let pending = pendingDisplayOff
         pendingDisplayOff = nil
+        stateLock.unlock()
+        pending?.cancel()
     }
 
     private static func performDisplayOff() {

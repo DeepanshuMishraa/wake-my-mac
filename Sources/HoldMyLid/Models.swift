@@ -272,7 +272,7 @@ enum HoldMode: String, CaseIterable, Identifiable, Codable {
     var explanation: String {
         switch self {
         case .agents: "Keeps the Mac reachable while a watched agent is working."
-        case .ssh: "Keeps the Mac reachable for SSH with a low-power system hold while the display sleeps."
+        case .ssh: "Keeps the Mac reachable for SSH with a low-power system hold without changing the display."
         case .manual: "Keeps the Mac awake until you turn Wake My Mac off."
         }
     }

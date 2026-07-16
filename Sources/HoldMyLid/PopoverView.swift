@@ -2,402 +2,416 @@ import AppKit
 import SwiftUI
 
 struct PopoverView: View {
+    static let preferredWidth: CGFloat = 330
+
+    static func preferredHeight(agentCount: Int, agentsExpanded: Bool) -> CGFloat {
+        guard agentsExpanded else { return 309 }
+        // Every installed agent adds one 23pt row and one 2pt stack gap.
+        // The expanded empty state needs slightly more room than a single row.
+        return agentCount == 0 ? 343 : 309 + CGFloat(agentCount) * 25
+    }
+
     @ObservedObject var state: AppState
+    let onAgentsExpansionChange: (Bool) -> Void
+    @State private var areAgentsExpanded = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            divider
-            
-            VStack(spacing: 10) {
-                agentsSection
-                modeSection
-                pauseSection
-            }
-            .padding(.vertical, 8)
-            
-            divider
+            sectionDivider
+            batterySection
+            sectionDivider
+            agentsSection
+            sectionDivider
+            modeSection
+            pauseSection
+            sectionDivider
             footer
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .frame(width: 320, height: 330, alignment: .topLeading)
-        .background(PopoverPalette.background)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .frame(
+            width: Self.preferredWidth,
+            height: Self.preferredHeight(
+                agentCount: state.rows.count,
+                agentsExpanded: areAgentsExpanded
+            ),
+            alignment: .topLeading
+        )
+        .background(.ultraThinMaterial)
     }
 
     private var header: some View {
-        HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Wake My Mac")
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(PopoverPalette.primary)
-                HStack(spacing: 5) {
-                    HStack(spacing: 3) {
-                        Image(systemName: batterySymbol)
-                            .font(.system(size: 10))
-                        Text("\(state.battery.percent)%")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                    }
-                    .foregroundStyle(batteryBarColor)
-                    
-                    Text("·")
-                        .foregroundStyle(PopoverPalette.muted)
-                    
-                    Text(statusLine)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(PopoverPalette.muted)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.primary)
+
+                TimelineView(.periodic(from: .now, by: 30)) { context in
+                    Text(headerDetail(at: context.date))
+                        .font(.system(size: 11, weight: .regular, design: .monospaced))
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Toggle("", isOn: Binding(get: { state.isEnabled }, set: { state.setEnabled($0) }))
-                .labelsHidden()
-                .toggleStyle(.switch)
-                .controlSize(.small)
-                .tint(PopoverPalette.accent)
+            Toggle(
+                "Keep awake",
+                isOn: Binding(get: { state.isEnabled }, set: { state.setEnabled($0) })
+            )
+            .labelsHidden()
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            .tint(.blue)
+            .accessibilityLabel("Keep Mac awake")
         }
-        .padding(.vertical, 4)
+    }
+
+    private var batterySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Battery")
+                .font(.system(size: 14, weight: .semibold))
+
+            ProgressView(value: Double(state.battery.percent), total: 100)
+                .progressViewStyle(.linear)
+                .tint(batteryColor)
+
+            HStack {
+                Text("\(state.battery.percent)% left")
+                    .foregroundStyle(.primary)
+                Spacer()
+                Text("stops below \(state.settings.batteryCutoffPercent)%")
+                    .foregroundStyle(.secondary)
+            }
+            .font(.system(size: 11))
+        }
     }
 
     private var agentsSection: some View {
-        HStack {
-            Text("Agents")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundStyle(PopoverPalette.muted)
-            Spacer()
-            let activeRows = state.rows.filter { $0.engagedCount > 0 }
-            if activeRows.isEmpty {
-                Text("None active")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(PopoverPalette.muted)
-            } else {
+        VStack(alignment: .leading, spacing: 2) {
+            Button(action: toggleAgents) {
                 HStack(spacing: 6) {
-                    ForEach(activeRows) { row in
-                        AgentBrandIcon(agent: row.agent)
-                            .frame(width: 18, height: 18)
-                            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    Image(systemName: areAgentsExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 10)
+
+                    Text("Agents")
+                        .font(.system(size: 14, weight: .semibold))
+
+                    Spacer()
+
+                    Text(agentSummary)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(areAgentsExpanded ? "Collapse agents" : "Expand agents")
+
+            if areAgentsExpanded {
+                if state.rows.isEmpty {
+                    Text("No supported agent CLIs found in your configured PATH.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 4)
+                } else {
+                    ForEach(state.rows) { row in
+                        AgentLine(row: row)
                     }
                 }
             }
         }
-        .padding(.vertical, 4)
     }
 
     private var modeSection: some View {
-        HStack {
-            Text("Mode")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundStyle(PopoverPalette.muted)
-            Spacer()
-            HStack(spacing: 4) {
-                ForEach(HoldMode.allCases) { mode in
-                    ModeButton(title: mode.title, isSelected: state.settings.mode == mode) {
-                        var newSettings = state.settings
-                        newSettings.mode = mode
-                        state.updateSettings(newSettings)
-                    }
-                }
-            }
-        }
-        .padding(.vertical, 4)
+        ModePopupControl(
+            selectedMode: state.settings.mode,
+            onSelect: selectMode
+        )
+        .frame(width: Self.preferredWidth - 32, height: 28)
     }
 
     private var pauseSection: some View {
-        HStack {
+        HStack(spacing: 7) {
             Text("Pause")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundStyle(PopoverPalette.muted)
+                .font(.system(size: 13, weight: .semibold))
             Spacer()
-            PauseButton(title: "30m") { state.pause(for: 30 * 60) }
-            PauseButton(title: "1h") { state.pause(for: 60 * 60) }
+            CompactActionButton(title: "30 min") { state.pause(for: 30 * 60) }
+            CompactActionButton(title: "1 hour") { state.pause(for: 60 * 60) }
         }
-        .padding(.vertical, 4)
+        .padding(.top, 8)
     }
 
     private var footer: some View {
         VStack(spacing: 2) {
-            MenuButton("Settings…") { state.openSettings() }
-            MenuButton("Configure Agent Integrations…") { IntegrationInstaller.presentConfiguration() }
-            MenuButton("Check for Updates…") { UpdateService.shared.checkForUpdates(nil) }
-            MenuButton("Quit Wake My Mac", isDestructive: true) { NSApp.terminate(nil) }
+            MenuRow(title: "Settings…", shortcut: "⌘,") { state.openSettings() }
+            MenuRow(title: "Quit Wake My Mac", shortcut: "⌘Q") { NSApp.terminate(nil) }
         }
-        .padding(.top, 6)
+        .padding(.bottom, 4)
     }
 
-    private var divider: some View { Divider().overlay(PopoverPalette.divider).padding(.vertical, 8) }
-
-    private var statusLine: String {
-        if !state.isEnabled { return "Sleep mode is available." }
-        if state.battery.percent <= 20 && !state.battery.isPluggedIn {
-            return "Battery low. Sleep allowed below \(state.settings.batteryCutoffPercent)%."
-        }
-        if state.phase == .holding && state.settings.mode == .ssh { return "Your Mac is ready for SSH." }
-        if state.phase == .holding && state.settings.mode == .manual { return "Your Mac is being kept awake." }
-        if state.rows.contains(where: { $0.blockedCount > 0 }) { return "An agent needs your input." }
-        if state.rows.contains(where: { $0.activeCount > 0 }) { return "An agent is actively working." }
-        return switch state.phase {
-        case .holding: "Your Mac is being kept awake."
-        case .idleCountdown(let seconds): "Ready to sleep in \(seconds) seconds."
-        case .disabled: "Sleep mode is available."
-        case .paused(let until): "Paused until \(until.formatted(date: .omitted, time: .shortened))."
-        case .guarded(let message): message
-        }
+    private var sectionDivider: some View {
+        Divider()
+            .padding(.vertical, 7)
     }
 
-    private var batteryBarColor: Color {
+    private var engagedSessionCount: Int {
+        state.rows.reduce(0) { $0 + $1.engagedCount }
+    }
+
+    private var agentSummary: String {
+        engagedSessionCount == 0 ? "idle" : "\(engagedSessionCount) working"
+    }
+
+    private func toggleAgents() {
+        let expanded = !areAgentsExpanded
+        areAgentsExpanded = expanded
+        onAgentsExpansionChange(expanded)
+    }
+
+    private func selectMode(_ mode: HoldMode) {
+        var settings = state.settings
+        settings.mode = mode
+        state.updateSettings(settings)
+    }
+
+    private var batteryColor: Color {
         if state.battery.percent <= state.settings.batteryCutoffPercent { return .red }
         if state.battery.percent < 30 { return .orange }
-        return PopoverPalette.muted
+        return .green
     }
 
-    private var batterySymbol: String {
-        if state.battery.isCharging { return "battery.100percent.bolt" }
-        switch state.battery.percent {
-        case 0..<25: return "battery.25percent"
-        case 25..<50: return "battery.50percent"
-        case 50..<75: return "battery.75percent"
-        default: return "battery.100percent"
+    private func headerDetail(at date: Date) -> String {
+        let status: String
+        switch state.phase {
+        case .holding: status = "Awake"
+        case .paused: status = "Paused"
+        case .idleCountdown: status = "Finishing"
+        case .disabled: status = "Off"
+        case .guarded: status = state.isEnabled ? "Monitoring" : "Off"
+        }
+
+        var parts = [status, state.settings.mode.title]
+        if let heldSince = state.heldSince, state.phase == .holding {
+            parts.append(elapsedText(from: heldSince, to: date))
+        } else if case .paused(let until) = state.phase {
+            parts.append("until \(until.formatted(date: .omitted, time: .shortened))")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    private func elapsedText(from start: Date, to end: Date) -> String {
+        let minutes = max(0, Int(end.timeIntervalSince(start)) / 60)
+        return "\(minutes / 60)h \(minutes % 60)m"
+    }
+}
+
+private struct ModePopupControl: NSViewRepresentable {
+    let selectedMode: HoldMode
+    let onSelect: (HoldMode) -> Void
+
+    func makeNSView(context: Context) -> ModePopupView {
+        let view = ModePopupView()
+        view.selectedMode = selectedMode
+        view.onSelect = onSelect
+        return view
+    }
+
+    func updateNSView(_ nsView: ModePopupView, context: Context) {
+        nsView.selectedMode = selectedMode
+        nsView.onSelect = onSelect
+        nsView.updateAccessibilityValue()
+    }
+}
+
+private final class ModePopupView: NSView {
+    var selectedMode: HoldMode = .agents
+    var onSelect: ((HoldMode) -> Void)?
+
+    private let titleLabel: NSTextField = {
+        let label = NSTextField(labelWithString: "Mode")
+        label.font = .systemFont(ofSize: 13, weight: .semibold)
+        label.textColor = .labelColor
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let chevronView: NSImageView = {
+        let view = NSImageView()
+        let configuration = NSImage.SymbolConfiguration(pointSize: 9, weight: .semibold)
+        view.image = NSImage(
+            systemSymbolName: "chevron.down",
+            accessibilityDescription: "Show mode options"
+        )?.withSymbolConfiguration(configuration)
+        view.contentTintColor = .secondaryLabelColor
+        view.imageScaling = .scaleProportionallyDown
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+
+        addSubview(titleLabel)
+        addSubview(chevronView)
+
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 2),
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            chevronView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -2),
+            chevronView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            chevronView.widthAnchor.constraint(equalToConstant: 10),
+            chevronView.heightAnchor.constraint(equalToConstant: 10)
+        ])
+
+        setAccessibilityRole(.popUpButton)
+        setAccessibilityLabel("Mode")
+        updateAccessibilityValue()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var acceptsFirstResponder: Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        showMenu(with: event)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if event.keyCode == 36 || event.charactersIgnoringModifiers == " " {
+            showMenu(with: event)
+        } else {
+            super.keyDown(with: event)
         }
     }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .pointingHand)
+    }
+
+    func updateAccessibilityValue() {
+        setAccessibilityValue(selectedMode.title)
+    }
+
+    private func showMenu(with event: NSEvent) {
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+
+        for mode in HoldMode.allCases {
+            let item = NSMenuItem(
+                title: mode.title,
+                action: #selector(selectMode(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.representedObject = mode.rawValue
+            item.state = mode == selectedMode ? .on : .off
+            item.isEnabled = true
+            menu.addItem(item)
+        }
+
+        NSMenu.popUpContextMenu(menu, with: event, for: self)
+    }
+
+    @objc private func selectMode(_ sender: NSMenuItem) {
+        guard
+            let rawValue = sender.representedObject as? String,
+            let mode = HoldMode(rawValue: rawValue)
+        else { return }
+
+        selectedMode = mode
+        updateAccessibilityValue()
+        onSelect?(mode)
+    }
 }
 
-private enum PopoverPalette {
-    static let background = Color(red: 255/255, green: 241/255, blue: 223/255)
-    static let surface = Color(red: 255/255, green: 251/255, blue: 247/255)
-    static let hover = Color(red: 244/255, green: 225/255, blue: 205/255)
-    static let divider = Color(red: 41/255, green: 37/255, blue: 36/255).opacity(0.24)
-    static let primary = Color(red: 41/255, green: 37/255, blue: 36/255)
-    static let muted = Color(red: 136/255, green: 119/255, blue: 107/255)
-    static let accent = Color(red: 41/255, green: 37/255, blue: 36/255)
-    static let blue = Color(red: 138/255, green: 158/255, blue: 228/255)
-    static let green = Color(red: 169/255, green: 203/255, blue: 36/255)
-    static let orange = Color(red: 1.0, green: 0.61, blue: 0.18)
-    static let red = Color(red: 219/255, green: 68/255, blue: 85/255)
-}
-
-private struct PauseButton: View {
+private struct CompactActionButton: View {
     let title: String
     let action: () -> Void
-    @State private var isHovered = false
 
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .font(.system(size: 11, weight: .medium))
                 .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(isHovered ? Color(red: 231/255, green: 210/255, blue: 187/255) : PopoverPalette.hover, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .stroke(PopoverPalette.divider, lineWidth: 1)
-                }
-                .foregroundStyle(PopoverPalette.primary)
+                .frame(height: 24)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
-        .onHover { hovering in
-            isHovered = hovering
-        }
     }
 }
 
-private struct ModeButton: View {
+private struct MenuRow: View {
     let title: String
-    let isSelected: Bool
+    let shortcut: String
     let action: () -> Void
     @State private var isHovered = false
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 11, weight: .bold, design: .rounded))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(
-                    isSelected 
-                        ? PopoverPalette.primary 
-                        : (isHovered ? Color(red: 231/255, green: 210/255, blue: 187/255) : PopoverPalette.hover),
-                    in: RoundedRectangle(cornerRadius: 6, style: .continuous)
-                )
-                .overlay {
-                    if !isSelected {
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .stroke(PopoverPalette.divider, lineWidth: 1)
-                    }
-                }
-                .foregroundStyle(isSelected ? PopoverPalette.background : PopoverPalette.primary)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering in
-            isHovered = hovering
-        }
-    }
-}
-
-private struct MenuButton: View {
-    let title: String
-    let isDestructive: Bool
-    let action: () -> Void
-    @State private var isHovered = false
-
-    init(_ title: String, isDestructive: Bool = false, action: @escaping () -> Void) {
-        self.title = title
-        self.isDestructive = isDestructive
-        self.action = action
-    }
 
     var body: some View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(isDestructive ? PopoverPalette.red : PopoverPalette.primary)
                 Spacer()
+                Text(shortcut)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
             }
+            .font(.system(size: 12))
             .padding(.horizontal, 6)
-            .padding(.vertical, 5)
-            .background(isHovered ? PopoverPalette.hover : Color.clear, in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .frame(height: 26)
+            .background(isHovered ? Color.primary.opacity(0.08) : .clear, in: RoundedRectangle(cornerRadius: 5))
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .padding(.horizontal, -6)
-        .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.1)) {
-                isHovered = hovering
-            }
-        }
+        .onHover { isHovered = $0 }
     }
 }
 
 private struct AgentLine: View {
     let row: AgentRow
-    @State private var showTaskPopover = false
-    @State private var hoverGeneration = 0
 
     var body: some View {
-        Group {
-            if linkedSessions.count > 1 {
-                Menu {
-                    ForEach(linkedSessions) { session in
-                        Button(session.title) { open(session) }
-                    }
-                } label: {
-                    rowContent
-                }
-                .menuStyle(.borderlessButton)
-            } else if let session = linkedSessions.first {
-                Button { open(session) } label: { rowContent }
-                    .buttonStyle(.plain)
-            } else {
-                rowContent
-            }
-        }
-        .onHover(perform: handleHover)
-        .popover(isPresented: $showTaskPopover, attachmentAnchor: .rect(.bounds), arrowEdge: .trailing) {
-            taskPopover
-        }
-    }
-
-    private var rowContent: some View {
         HStack(spacing: 9) {
-            AgentBrandIcon(agent: row.agent)
+            AgentBrandIcon(agent: row.agent, size: 18)
 
             Text(row.agent.rawValue)
-                .font(.system(size: 13, weight: row.engagedCount > 0 ? .semibold : .regular))
+                .font(.system(size: 12, weight: row.engagedCount > 0 ? .medium : .regular))
+                .foregroundStyle(row.engagedCount > 0 ? .primary : .secondary)
                 .lineLimit(1)
-                .foregroundStyle(row.isRunning ? .primary : .secondary)
 
-            Spacer()
+            Spacer(minLength: 8)
 
-            Text(row.statusText)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+            Text(sessionText)
+                .font(.system(size: 11))
+                .foregroundStyle(row.engagedCount > 0 ? .secondary : .tertiary)
 
-            Circle()
-                .fill(row.blockedCount > 0 ? Color.orange : (row.activeCount > 0 ? Color.green : Color.secondary.opacity(0.35)))
-                .frame(width: 7, height: 7)
-        }
-        .frame(height: 29)
-        .contentShape(Rectangle())
-    }
-
-    private var activeSessions: [AgentSession] {
-        row.sessions.filter { $0.status == .working || $0.status == .blocked }
-    }
-
-    private var linkedSessions: [AgentSession] {
-        activeSessions.filter { $0.deepLink != nil }
-    }
-
-    private var taskPopover: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Active Codex tasks")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.top, 8)
-
-            ForEach(linkedSessions) { session in
-                Button {
-                    showTaskPopover = false
-                    open(session)
-                } label: {
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(session.status == .blocked ? Color.orange : Color.green)
-                            .frame(width: 7, height: 7)
-                        Text(session.title)
-                            .font(.system(size: 13, weight: .medium))
-                            .lineLimit(2)
-                        Spacer(minLength: 8)
-                        Image(systemName: "arrow.up.forward.app")
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 7)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+            if row.engagedCount > 0 {
+                Circle()
+                    .fill(row.blockedCount > 0 ? Color.orange : Color.green)
+                    .frame(width: 6, height: 6)
             }
         }
-        .padding(.bottom, 6)
-        .frame(width: 280)
-        .onHover { inside in
-            if inside {
-                hoverGeneration += 1
-                showTaskPopover = true
-            } else {
-                schedulePopoverClose()
-            }
-        }
+        .frame(height: 23)
     }
 
-    private func handleHover(_ inside: Bool) {
-        guard !linkedSessions.isEmpty else { return }
-        hoverGeneration += 1
-        if inside {
-            showTaskPopover = true
-        } else {
-            schedulePopoverClose()
-        }
-    }
-
-    private func schedulePopoverClose() {
-        hoverGeneration += 1
-        let generation = hoverGeneration
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            guard hoverGeneration == generation else { return }
-            showTaskPopover = false
-        }
-    }
-
-    private func open(_ session: AgentSession) {
-        guard let value = session.deepLink, let url = URL(string: value) else { return }
-        NSWorkspace.shared.open(url)
+    private var sessionText: String {
+        guard row.engagedCount > 0 else { return "idle" }
+        return row.engagedCount == 1 ? "1 session" : "\(row.engagedCount) sessions"
     }
 }
 
 struct AgentBrandIcon: View {
     let agent: AgentKind
+    var size: CGFloat = 22
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -408,21 +422,21 @@ struct AgentBrandIcon: View {
                     .scaledToFit()
             } else {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.secondary.opacity(0.12))
+                    RoundedRectangle(cornerRadius: size * 0.27)
+                        .fill(Color.secondary.opacity(0.16))
                     Text(agent.brandMark)
-                        .font(.system(size: agent == .pi ? 17 : 11, weight: .semibold, design: .rounded))
+                        .font(.system(size: agent == .pi ? size * 0.77 : size * 0.5, weight: .semibold, design: .rounded))
                         .foregroundStyle(.primary)
                 }
             }
         }
-        .frame(width: 22, height: 22)
-        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.23))
     }
 
     private var brandImage: NSImage? {
         if let name = agent.bundledIconName(darkMode: colorScheme == .dark),
-           let url = Bundle.module.url(
+           let url = agentResourceBundle?.url(
                forResource: name,
                withExtension: agent == .antigravity ? "png" : "svg",
                subdirectory: "AgentIcons"
@@ -440,5 +454,16 @@ struct AgentBrandIcon: View {
         }
 
         return nil
+    }
+
+    private var agentResourceBundle: Bundle? {
+        let name = "WatchMyMac_WatchMyMac"
+        let candidates = [
+            Bundle.main.url(forResource: name, withExtension: "bundle"),
+            Bundle.main.resourceURL?.appendingPathComponent("\(name).bundle"),
+            Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/\(name).bundle")
+        ].compactMap { $0 }
+
+        return candidates.compactMap(Bundle.init(url:)).first
     }
 }

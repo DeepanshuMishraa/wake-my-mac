@@ -27,7 +27,6 @@ final class AppState: ObservableObject {
     private var idleBeganAt: Date?
     private var wasHolding = false
     private var finishDisplayOffPending = false
-    private var didTurnDisplayOffForSSH = false
     private var workspaceObservers: [NSObjectProtocol] = []
 
     init(settings: HoldSettings = SettingsStore.shared.load()) {
@@ -51,7 +50,6 @@ final class AppState: ObservableObject {
         workspaceObservers.removeAll()
         displayManager.cancelPendingDisplayOff()
         finishDisplayOffPending = false
-        didTurnDisplayOffForSSH = false
         history.update(isHolding: false, reasons: [], agents: [], battery: battery.percent)
         powerManager.release()
     }
@@ -65,7 +63,6 @@ final class AppState: ObservableObject {
             idleBeganAt = nil
             heldSince = nil
             finishDisplayOffPending = false
-            didTurnDisplayOffForSSH = false
             powerManager.release()
             notify(title: "Wake My Mac off", body: "Wake assertions released.")
         } else {
@@ -89,9 +86,20 @@ final class AppState: ObservableObject {
     }
 
     func updateSettings(_ newSettings: HoldSettings) {
+        let modeChanged = settings.mode != newSettings.mode
         settings = newSettings
         isEnabled = newSettings.isEnabled
         SettingsStore.shared.save(newSettings)
+        if modeChanged {
+            // A mode switch is a new lifecycle. Do not carry an SSH assertion,
+            // idle countdown, or delayed display action into the new mode.
+            displayManager.cancelPendingDisplayOff()
+            finishDisplayOffPending = false
+            idleBeganAt = nil
+            heldSince = nil
+            wasHolding = false
+            powerManager.release()
+        }
         refresh()
     }
 
@@ -161,16 +169,6 @@ final class AppState: ObservableObject {
             if heldSince == nil {
                 heldSince = Date()
                 notify(title: "Wake My Mac engaged", body: "A wake rule is active, so sleep is being held.")
-            }
-            if settings.mode == .ssh,
-               settings.turnDisplayOffOnLidClose,
-               !didTurnDisplayOffForSSH {
-                // macOS does not expose a reliable public lid-close event.
-                // Turning the display off when SSH mode engages gives the
-                // same low-power result and is safe when the lid is already
-                // closed (the command simply has no visible effect).
-                displayManager.turnDisplayOffNow()
-                didTurnDisplayOffForSSH = true
             }
             powerManager.hold(reason: holdReason, conserveEnergy: settings.mode == .ssh)
             wasHolding = true
