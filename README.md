@@ -20,19 +20,11 @@ History stays on the Mac. Wake My Mac records timestamps, wake reasons, agent na
 
 Download the latest DMG from [Releases](https://github.com/DeepanshuMishraa/wake-my-mac/releases).
 
-## Not Developer Signed
+## Signing
 
-Wake My Mac is not Developer ID signed or notarized at the moment. macOS may refuse to open it or move it to the Trash.
+Release builds are gated on Developer ID signing and Apple notarization so macOS can safely register the privileged wake helper. Local builds use an installed Apple Development identity when available and otherwise fall back to ad-hoc signing for development only.
 
-## Remove the Quarantine Attribute
-
-Only do this if you downloaded Wake My Mac from this repository and trust the file. Move the app to `/Applications`, then run:
-
-```sh
-xattr -dr com.apple.quarantine "/Applications/Wake My Mac.app"
-```
-
-Open the app normally after the command finishes.
+On first use, macOS may require one explicit approval for the reliable-wake background item. Wake My Mac registers both itself and the helper automatically; it never asks you to copy files into system folders.
 
 ## Build
 

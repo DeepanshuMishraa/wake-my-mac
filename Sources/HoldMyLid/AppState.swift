@@ -206,7 +206,7 @@ final class AppState: ObservableObject {
                 heldSince = Date()
                 notify(title: "Wake My Mac engaged", body: "A wake rule is active, so sleep is being held.")
             }
-            powerManager.hold(reason: holdReason)
+            powerManager.hold(reason: holdReason, kind: settings.mode.wakeRequestKind)
             wasHolding = true
             return
         }
@@ -224,7 +224,7 @@ final class AppState: ObservableObject {
 
         if secondsLeft > 0 {
             phase = .idleCountdown(secondsLeft: secondsLeft)
-            powerManager.hold(reason: "Wake My Mac: waiting for idle grace period")
+            powerManager.hold(reason: "Wake My Mac: waiting for idle grace period", kind: .leased)
         } else {
             phase = .guarded("Agents have been idle for 30 seconds.")
             heldSince = nil

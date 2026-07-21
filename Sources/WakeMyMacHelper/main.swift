@@ -5,9 +5,14 @@ import Security
 import WakeHelperShared
 
 private final class PowerOverrideController {
-    private enum OwnershipState: String {
+    private enum OwnershipState: String, Codable {
         case pending
         case owned
+    }
+
+    private struct OwnershipRecord: Codable {
+        let state: OwnershipState
+        let previousSleepDisabled: Bool
     }
 
     private static let pmsetDeadline: TimeInterval = 5
@@ -16,10 +21,11 @@ private final class PowerOverrideController {
         stateDirectory.appendingPathComponent("helper-owned-sleep-override")
     }
 
-    private(set) var ownsOverride = false
+    private var ownershipRecord: OwnershipRecord?
+    var ownsOverride: Bool { ownershipRecord != nil }
 
     init() {
-        recoverStaleOverrideIfNeeded()
+        ownershipRecord = Self.loadOwnershipRecord(from: ownershipMarker)
     }
 
     func reconcile(shouldDisableSleep: Bool) -> Result<Bool, Error> {
@@ -27,32 +33,39 @@ private final class PowerOverrideController {
             let currentlyDisabled = try readSleepDisabled()
 
             if shouldDisableSleep {
-                if currentlyDisabled {
-                    if FileManager.default.fileExists(atPath: ownershipMarker.path) {
-                        try writeOwnershipMarker(.owned)
-                        ownsOverride = true
-                    }
-                    return .success(true)
+                if ownershipRecord == nil {
+                    let pending = OwnershipRecord(
+                        state: .pending,
+                        previousSleepDisabled: currentlyDisabled
+                    )
+                    try writeOwnershipRecord(pending)
+                    ownershipRecord = pending
                 }
 
-                // Persist intent before changing global power policy. A crash at
-                // any later point leaves enough information for startup recovery.
-                try writeOwnershipMarker(.pending)
-                try setSleepDisabled(true)
-                try writeOwnershipMarker(.owned)
-                ownsOverride = true
+                if !currentlyDisabled {
+                    try setSleepDisabled(true)
+                }
+                guard let ownershipRecord else { throw HelperError.missingOwnershipRecord }
+                let owned = OwnershipRecord(
+                    state: .owned,
+                    previousSleepDisabled: ownershipRecord.previousSleepDisabled
+                )
+                try writeOwnershipRecord(owned)
+                self.ownershipRecord = owned
                 return .success(true)
             }
 
-            guard ownsOverride || FileManager.default.fileExists(atPath: ownershipMarker.path) else {
-                return .success(!currentlyDisabled)
+            guard let ownershipRecord else {
+                // Another tool may own SleepDisabled. Releasing Wake My Mac's
+                // request must not overwrite that external policy.
+                return .success(true)
             }
 
-            if currentlyDisabled {
-                try setSleepDisabled(false)
+            if currentlyDisabled != ownershipRecord.previousSleepDisabled {
+                try setSleepDisabled(ownershipRecord.previousSleepDisabled)
             }
             try FileManager.default.removeItem(at: ownershipMarker)
-            ownsOverride = false
+            self.ownershipRecord = nil
             return .success(true)
         } catch {
             return .failure(error)
@@ -61,18 +74,6 @@ private final class PowerOverrideController {
 
     func currentStatus() -> Result<Bool, Error> {
         Result { try readSleepDisabled() }
-    }
-
-    private func recoverStaleOverrideIfNeeded() {
-        guard FileManager.default.fileExists(atPath: ownershipMarker.path) else { return }
-        ownsOverride = true
-        do {
-            try setSleepDisabled(false)
-            try FileManager.default.removeItem(at: ownershipMarker)
-            ownsOverride = false
-        } catch {
-            // Keep the marker and ownership flag so the lease timer can retry.
-        }
     }
 
     private func readSleepDisabled() throws -> Bool {
@@ -138,10 +139,48 @@ private final class PowerOverrideController {
         return String(data: output.data, encoding: .utf8) ?? ""
     }
 
-    private func writeOwnershipMarker(_ state: OwnershipState) throws {
+    private func writeOwnershipRecord(_ record: OwnershipRecord) throws {
         try FileManager.default.createDirectory(at: stateDirectory, withIntermediateDirectories: true)
-        try Data("\(state.rawValue)\n".utf8).write(to: ownershipMarker, options: .atomic)
+        try JSONEncoder().encode(record).write(to: ownershipMarker, options: .atomic)
         let handle = try FileHandle(forWritingTo: ownershipMarker)
+        defer { try? handle.close() }
+        try handle.synchronize()
+    }
+
+    private static func loadOwnershipRecord(from url: URL) -> OwnershipRecord? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        if let record = try? JSONDecoder().decode(OwnershipRecord.self, from: data) {
+            return record
+        }
+        // Older helpers wrote only "pending" or "owned". They only created
+        // the marker when changing SleepDisabled from off to on.
+        let legacyState = String(data: data, encoding: .utf8)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard legacyState == OwnershipState.pending.rawValue || legacyState == OwnershipState.owned.rawValue else {
+            return nil
+        }
+        return OwnershipRecord(state: .owned, previousSleepDisabled: false)
+    }
+}
+
+private final class PersistentWakeStore {
+    private let stateDirectory = URL(fileURLWithPath: "/Library/Application Support/Wake My Mac", isDirectory: true)
+    private var stateFile: URL { stateDirectory.appendingPathComponent("persistent-wake-requests.json") }
+
+    func load() throws -> WakeRequestLedger.PersistentSnapshot {
+        guard FileManager.default.fileExists(atPath: stateFile.path) else {
+            return WakeRequestLedger.PersistentSnapshot()
+        }
+        return try JSONDecoder().decode(
+            WakeRequestLedger.PersistentSnapshot.self,
+            from: Data(contentsOf: stateFile)
+        )
+    }
+
+    func save(_ snapshot: WakeRequestLedger.PersistentSnapshot) throws {
+        try FileManager.default.createDirectory(at: stateDirectory, withIntermediateDirectories: true)
+        try JSONEncoder().encode(snapshot).write(to: stateFile, options: .atomic)
+        let handle = try FileHandle(forWritingTo: stateFile)
         defer { try? handle.close() }
         try handle.synchronize()
     }
@@ -152,6 +191,7 @@ private final class PipeCapture: @unchecked Sendable {
 }
 
 private enum HelperError: LocalizedError {
+    case missingOwnershipRecord
     case invalidPMSetOutput
     case verificationFailed
     case pmsetTimedOut
@@ -159,6 +199,8 @@ private enum HelperError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
+        case .missingOwnershipRecord:
+            "Wake My Mac lost ownership state while enabling the sleep override. The previous power policy is preserved; retry enabling wake protection."
         case .invalidPMSetOutput:
             "Could not read the current macOS sleep policy."
         case .verificationFailed:
@@ -173,19 +215,85 @@ private enum HelperError: LocalizedError {
 
 private final class WakeHelperService: NSObject, WakeHelperXPCProtocol, NSXPCListenerDelegate, @unchecked Sendable {
     private let stateLock = NSLock()
-    private let power = PowerOverrideController()
-    private var ledger = WakeLeaseLedger()
+    private let power: PowerOverrideController
+    private let persistentStore: PersistentWakeStore
+    private var ledger: WakeRequestLedger
+    private var persistentStateLoadError: String?
     private var timer: DispatchSourceTimer?
 
     override init() {
+        let persistentStore = PersistentWakeStore()
+        let loadedSnapshot: WakeRequestLedger.PersistentSnapshot
+        let loadError: String?
+        do {
+            loadedSnapshot = try persistentStore.load()
+            loadError = nil
+        } catch {
+            loadedSnapshot = WakeRequestLedger.PersistentSnapshot()
+            loadError = error.localizedDescription
+        }
+        self.persistentStore = persistentStore
+        power = PowerOverrideController()
+        ledger = WakeRequestLedger(persistentSnapshot: loadedSnapshot)
+        persistentStateLoadError = loadError
         super.init()
+        _ = applyDesiredState()
         let timer = DispatchSource.makeTimerSource(queue: .global(qos: .utility))
-        timer.schedule(deadline: .now() + 1, repeating: 1)
+        timer.schedule(deadline: .now() + 1, repeating: 5)
         timer.setEventHandler { [weak self] in
-            self?.expireLeases()
+            self?.reconcileRequests()
         }
         timer.resume()
         self.timer = timer
+    }
+
+    func activatePersistentWake(
+        identifier: String,
+        reason: String,
+        withReply reply: @escaping (Bool, String?) -> Void
+    ) {
+        stateLock.lock()
+        let previousLedger = ledger
+        let previousLoadError = persistentStateLoadError
+        guard ledger.activatePersistent(identifier: identifier, reason: reason) else {
+            stateLock.unlock()
+            return reply(false, "Persistent wake requires a non-empty identifier and reason.")
+        }
+        do {
+            if previousLedger.persistentSnapshot != ledger.persistentSnapshot || persistentStateLoadError != nil {
+                try persistentStore.save(ledger.persistentSnapshot)
+            }
+            persistentStateLoadError = nil
+        } catch {
+            ledger = previousLedger
+            persistentStateLoadError = previousLoadError
+            stateLock.unlock()
+            return reply(false, "Could not save persistent wake intent: \(error.localizedDescription)")
+        }
+        let result = applyDesiredState()
+        stateLock.unlock()
+        reply(result.0, result.1)
+    }
+
+    func releasePersistentWake(identifier: String, withReply reply: @escaping (Bool, String?) -> Void) {
+        stateLock.lock()
+        let previousLedger = ledger
+        let previousLoadError = persistentStateLoadError
+        ledger.releasePersistent(identifier: identifier)
+        do {
+            if previousLedger.persistentSnapshot != ledger.persistentSnapshot || persistentStateLoadError != nil {
+                try persistentStore.save(ledger.persistentSnapshot)
+            }
+            persistentStateLoadError = nil
+        } catch {
+            ledger = previousLedger
+            persistentStateLoadError = previousLoadError
+            stateLock.unlock()
+            return reply(false, "Could not save the restored sleep intent: \(error.localizedDescription)")
+        }
+        let result = applyDesiredState()
+        stateLock.unlock()
+        reply(result.0, result.1)
     }
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
@@ -203,7 +311,7 @@ private final class WakeHelperService: NSObject, WakeHelperXPCProtocol, NSXPCLis
         withReply reply: @escaping (Bool, String?) -> Void
     ) {
         stateLock.lock()
-        guard ledger.renew(identifier: identifier, reason: reason, duration: min(duration, 60)) else {
+        guard ledger.renew(identifier: identifier, reason: reason, duration: min(duration, 300)) else {
             stateLock.unlock()
             return reply(false, "Invalid wake lease.")
         }
@@ -220,32 +328,45 @@ private final class WakeHelperService: NSObject, WakeHelperXPCProtocol, NSXPCLis
         reply(result.0, result.1)
     }
 
-    func status(withReply reply: @escaping (Bool, Int, String?) -> Void) {
+    func status(withReply reply: @escaping (Bool, Int, Int, Int, String?) -> Void) {
         stateLock.lock()
         ledger.removeExpired()
-        let count = ledger.activeCount
+        let leaseCount = ledger.activeLeaseCount
+        let persistentCount = ledger.activePersistentCount
         let result = power.currentStatus()
+        let loadError = persistentStateLoadError
         stateLock.unlock()
+        if let loadError {
+            return reply(
+                false,
+                leaseCount,
+                persistentCount,
+                WakeHelperConstants.protocolVersion,
+                "Could not read saved wake intent: \(loadError). The existing sleep override was preserved; explicitly enable or disable Wake My Mac to repair it."
+            )
+        }
         switch result {
-        case .success(let disabled): reply(disabled, count, nil)
-        case .failure(let error): reply(false, count, error.localizedDescription)
+        case .success(let disabled):
+            reply(disabled, leaseCount, persistentCount, WakeHelperConstants.protocolVersion, nil)
+        case .failure(let error):
+            reply(false, leaseCount, persistentCount, WakeHelperConstants.protocolVersion, error.localizedDescription)
         }
     }
 
-    private func expireLeases() {
+    private func reconcileRequests() {
         stateLock.lock()
         defer { stateLock.unlock() }
-        let removedLease = ledger.removeExpired() > 0
-        guard removedLease || (power.ownsOverride && !ledger.hasActiveLeases) else { return }
+        ledger.removeExpired()
         _ = applyDesiredState()
     }
 
     private func applyDesiredState() -> (Bool, String?) {
-        switch power.reconcile(shouldDisableSleep: ledger.hasActiveLeases) {
+        let preserveUnrecoverableOverride = persistentStateLoadError != nil && power.ownsOverride
+        switch power.reconcile(shouldDisableSleep: ledger.shouldDisableSleep || preserveUnrecoverableOverride) {
         case .success(let applied):
-            (applied, nil)
+            return (applied, nil)
         case .failure(let error):
-            (false, error.localizedDescription)
+            return (false, error.localizedDescription)
         }
     }
 

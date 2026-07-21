@@ -122,7 +122,7 @@ struct PopoverView: View {
 
     private var reliableWakeSetupText: String {
         switch state.reliableWakeState {
-        case .approvalRequired: "Approve helper in System Settings"
+        case .approvalRequired: "macOS approval required once"
         case .failed: "Reliable wake needs attention"
         default: "Enable reliable wake once"
         }

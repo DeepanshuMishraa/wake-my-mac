@@ -366,7 +366,6 @@ private enum AppVersion {
 private struct SettingsDashboard: View {
     @ObservedObject var state: AppState
     @State private var draft: HoldSettings
-    @State private var didSave = false
 
     init(state: AppState) {
         self.state = state
@@ -416,7 +415,7 @@ private struct SettingsDashboard: View {
                     }
                     NativeCard {
                         VStack(alignment: .leading, spacing: 18) {
-                            SettingsHeading(title: "Reliable wake", subtitle: "One approval lets every mode prevent sleep automatically.")
+                            SettingsHeading(title: "Reliable wake", subtitle: "The app registers this automatically; macOS requires one approval.")
                             HStack(spacing: 9) {
                                 Image(systemName: reliableWakeSymbol)
                                     .foregroundStyle(reliableWakeColor)
@@ -468,19 +467,23 @@ private struct SettingsDashboard: View {
                 }
 
                 HStack {
-                    Text("Changes apply to the menu-bar service immediately.").font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                    Text("Changes save and apply immediately.").font(.system(size: 13, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                     Spacer()
-                    Button(didSave ? "Saved" : "Save Changes") {
-                        state.updateSettings(draft)
-                        withAnimation(.easeOut(duration: 0.2)) { didSave = true }
-                    }
-                    .buttonStyle(.borderedProminent).tint(DashboardPalette.ink)
+                    Label("Saved", systemImage: "checkmark.circle.fill")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DashboardPalette.secondary)
                 }
             }
             .padding(46)
         }
         .scrollContentBackground(.hidden)
         .background(DashboardPalette.canvas)
+        .onChange(of: draft) { _, settings in
+            state.updateSettings(settings)
+        }
+        .onChange(of: state.settings) { _, settings in
+            if draft != settings { draft = settings }
+        }
     }
 
     private var reliableWakeTitle: String {

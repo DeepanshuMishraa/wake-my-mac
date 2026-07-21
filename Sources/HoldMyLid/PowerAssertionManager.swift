@@ -19,7 +19,7 @@ final class PowerAssertionManager {
     /// The supported IOKit assertion is retained as a best-effort fallback.
     /// Reliable wake is provided by the privileged helper lease, whose state is
     /// reported separately and must be acknowledged before the UI says "Awake".
-    func hold(reason: String) {
+    func hold(reason: String, kind: WakeRequestKind) {
         if idleAssertion == 0 {
             var assertion = IOPMAssertionID(0)
             let result = IOPMAssertionCreateWithName(
@@ -32,7 +32,7 @@ final class PowerAssertionManager {
                 idleAssertion = assertion
             }
         }
-        privilegedClient.renewLease(reason: reason)
+        privilegedClient.hold(reason: reason, kind: kind)
     }
 
     func release() {
@@ -40,7 +40,7 @@ final class PowerAssertionManager {
             IOPMAssertionRelease(idleAssertion)
             idleAssertion = 0
         }
-        privilegedClient.releaseLease()
+        privilegedClient.releaseAll()
     }
 
     func refreshHelperStatus() { privilegedClient.refreshServiceStatus() }

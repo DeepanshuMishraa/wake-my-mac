@@ -80,6 +80,9 @@ struct ActivityDetectionTests {
         for mode in HoldMode.allCases {
             #expect(!HoldPolicy.shouldHold(mode: mode, isEnabled: false, engagedAgentCount: 99))
         }
+        #expect(HoldMode.agents.wakeRequestKind == .leased)
+        #expect(HoldMode.ssh.wakeRequestKind == .persistent)
+        #expect(HoldMode.manual.wakeRequestKind == .persistent)
     }
 
     @MainActor @Test func menuPopoverHeightIsCompactAndBounded() {
@@ -91,9 +94,9 @@ struct ActivityDetectionTests {
         #expect(PopoverView.preferredHeight(agentCount: 6, agentsExpanded: false, showsReliableWakeSetup: true) == 351)
     }
 
-    @Test func wakeLeasesOverlapAndExpireWithoutPrematureRelease() {
+    @Test func wakeRequestsOverlapAndExpireWithoutPrematureRelease() {
         let now = Date(timeIntervalSince1970: 1_000)
-        var ledger = WakeLeaseLedger()
+        var ledger = WakeRequestLedger()
 
         let renewedClaude = ledger.renew(identifier: "claude", reason: "Claude", duration: 10, now: now)
         let renewedCodex = ledger.renew(identifier: "codex", reason: "Codex", duration: 20, now: now)
@@ -111,13 +114,43 @@ struct ActivityDetectionTests {
 
     @Test func wakeLeaseRenewalExtendsCrashSafetyDeadline() {
         let now = Date(timeIntervalSince1970: 1_000)
-        var ledger = WakeLeaseLedger()
+        var ledger = WakeRequestLedger()
         ledger.renew(identifier: "app", reason: "SSH", duration: 10, now: now)
         ledger.renew(identifier: "app", reason: "SSH", duration: 10, now: now.addingTimeInterval(8))
 
         #expect(ledger.removeExpired(now: now.addingTimeInterval(11)) == 0)
         #expect(ledger.hasActiveLeases)
         #expect(ledger.removeExpired(now: now.addingTimeInterval(19)) == 1)
+    }
+
+    @Test func persistentWakeSurvivesHelperRestartUntilExplicitRelease() throws {
+        var ledger = WakeRequestLedger()
+        let activated = ledger.activatePersistent(identifier: "manual", reason: "Manual mode")
+        #expect(activated)
+        #expect(ledger.shouldDisableSleep)
+
+        let encoded = try JSONEncoder().encode(ledger.persistentSnapshot)
+        let restoredSnapshot = try JSONDecoder().decode(WakeRequestLedger.PersistentSnapshot.self, from: encoded)
+        var restored = WakeRequestLedger(persistentSnapshot: restoredSnapshot)
+
+        #expect(restored.activePersistentCount == 1)
+        #expect(restored.activeLeaseCount == 0)
+        #expect(restored.shouldDisableSleep)
+        let released = restored.releasePersistent(identifier: "manual")
+        #expect(released)
+        #expect(!restored.shouldDisableSleep)
+    }
+
+    @Test func expiringLeaseDoesNotReleasePersistentWake() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        var ledger = WakeRequestLedger()
+        ledger.activatePersistent(identifier: "ssh", reason: "SSH mode")
+        ledger.renew(identifier: "agent", reason: "Agent", duration: 10, now: now)
+
+        #expect(ledger.removeExpired(now: now.addingTimeInterval(11)) == 1)
+        #expect(ledger.activeLeaseCount == 0)
+        #expect(ledger.activePersistentCount == 1)
+        #expect(ledger.shouldDisableSleep)
     }
 
     @Test func sshModeStaysEnabledUntilTheModeChanges() {

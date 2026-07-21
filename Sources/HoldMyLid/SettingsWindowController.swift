@@ -91,17 +91,16 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            HStack {
-                Spacer()
-                Button("Apply") {
-                    state.updateSettings(draft)
-                }
-                .keyboardShortcut(.defaultAction)
-            }
         }
         .formStyle(.grouped)
         .padding(20)
         .frame(width: 520, height: 520)
+        .onChange(of: draft) { _, settings in
+            state.updateSettings(settings)
+        }
+        .onChange(of: state.settings) { _, settings in
+            if draft != settings { draft = settings }
+        }
     }
 
     private var reliableWakeDescription: String {
@@ -110,7 +109,7 @@ struct SettingsView: View {
         case .ready: "The reliable wake helper is ready."
         case .approvalRequired: "Approval is required in System Settings before reliable wake can run."
         case .failed(let message): "Reliable wake failed: \(message)"
-        default: "Enable the helper once so all modes can prevent sleep automatically."
+        default: "Wake My Mac registers its helper automatically. macOS requires one approval before it can prevent lid-close sleep."
         }
     }
 }

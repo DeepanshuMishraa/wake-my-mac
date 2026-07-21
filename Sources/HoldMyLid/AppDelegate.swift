@@ -1,5 +1,6 @@
 import AppKit
 import Carbon
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -22,12 +23,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupMainMenu()
 
         NotificationService.shared.requestAuthorization()
+        ensureLaunchAtLogin()
         state.start()
         IntegrationInstaller.presentConfigurationIfNeeded()
         if CommandLine.arguments.contains("--open-dashboard") {
             state.openDashboard()
         }
         showDebugLaunchNoticeIfNeeded()
+    }
+
+    private func ensureLaunchAtLogin() {
+        let service = SMAppService.mainApp
+        guard service.status == .notRegistered else { return }
+        try? service.register()
     }
 
     private func setupMainMenu() {
