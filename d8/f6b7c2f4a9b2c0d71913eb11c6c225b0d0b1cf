@@ -1,0 +1,21 @@
+web/app/page.tsx
+  s_647788d1b25e56::t_5dd89e15b79f1e 26-29,190
+web/app/globals.css
+  s_647788d1b25e56::t_5dd89e15b79f1e 165-168,447-571,573-574,578,603,606,610,614-616,623,635-637,641,643,647-648,650-651,662,669-674,676,680-787
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d8f6b7c2f4a9b2c0d71913eb11c6c225b0d0b1cf",
+  "prompts": {},
+  "sessions": {
+    "s_647788d1b25e56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9022-f812-7a71-b9c6-cd35d66d4f88",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
