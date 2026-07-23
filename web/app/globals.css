@@ -58,7 +58,18 @@ a {
   letter-spacing: -0.045em;
 }
 
+.brand-icon-link {
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+}
+
+.brand-name {
+  white-space: nowrap;
+}
+
 .brand-mark {
+  position: relative;
   width: 43px;
   aspect-ratio: 1;
   display: grid;
@@ -69,11 +80,51 @@ a {
   box-shadow: inset 0 0 0 2px var(--paper);
 }
 
-.brand-mark span {
+.brand-idle {
+  position: absolute;
   width: 17px;
   height: 5px;
   border-radius: 99px;
   background: var(--acid);
+}
+
+.brand-reveal {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.65);
+}
+
+.brand-reveal svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--acid);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-idle,
+.brand-reveal {
+  transition:
+    opacity 180ms ease,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-icon-link:hover .brand-idle,
+.brand-icon-link:focus-visible .brand-idle {
+  opacity: 0;
+  transform: scaleX(0.35);
+}
+
+.brand-icon-link:hover .brand-reveal,
+.brand-icon-link:focus-visible .brand-reveal {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .version {
@@ -309,13 +360,161 @@ h1 .hero-highlight::after {
   transform: translate(0, -50%);
 }
 
-.brand:focus-visible,
+.brand-icon-link:focus-visible,
+.brand-name:focus-visible,
 .nav-link:focus-visible,
 .nav-download:focus-visible,
 .download-button:focus-visible,
 .source-button:focus-visible {
   outline: 3px solid var(--acid);
   outline-offset: 4px;
+}
+
+.privacy-page {
+  --privacy-bg: #1c1917;
+  --privacy-surface: #272421;
+  --privacy-text: #fff0df;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--privacy-bg);
+  color: var(--privacy-text);
+}
+
+.privacy-nav {
+  width: min(1740px, calc(100% - 96px));
+  flex: 0 0 auto;
+  margin-inline: auto;
+}
+
+.privacy-page .brand-mark {
+  border-color: var(--privacy-text);
+  background: var(--privacy-text);
+  box-shadow: inset 0 0 0 2px var(--privacy-bg);
+}
+
+.privacy-page .brand-idle {
+  background: var(--privacy-bg);
+}
+
+.privacy-page .brand-reveal svg {
+  stroke: var(--privacy-bg);
+}
+
+.privacy-page .version {
+  border-color: rgba(255, 240, 223, 0.2);
+  color: rgba(255, 240, 223, 0.56);
+}
+
+.privacy-download {
+  background: var(--privacy-surface);
+  color: var(--privacy-text);
+}
+
+.privacy-download:hover {
+  background: #332f2b;
+}
+
+.privacy-content {
+  width: min(770px, calc(100% - 48px));
+  margin: clamp(70px, 10vh, 126px) auto 0;
+}
+
+.privacy-content h1 {
+  max-width: none;
+  margin: 0;
+  color: var(--privacy-text);
+  font-size: clamp(68px, 7vw, 108px);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+  text-align: left;
+}
+
+.privacy-statement {
+  margin: 44px 0 0;
+  color: rgba(255, 240, 223, 0.9);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: -0.02em;
+}
+
+.privacy-inline-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 0.38em;
+  vertical-align: -0.12em;
+  white-space: nowrap;
+}
+
+.privacy-inline-brand > span {
+  position: relative;
+  width: 1.08em;
+  height: 1.08em;
+  display: inline-block;
+  flex: 0 0 auto;
+  border-radius: 0.3em;
+  background: var(--ink);
+}
+
+.privacy-inline-brand > span::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44%;
+  height: 14%;
+  border-radius: 99px;
+  background: var(--acid);
+  transform: translate(-50%, -50%);
+}
+
+.privacy-questions {
+  margin-top: 62px;
+}
+
+.privacy-questions h2 {
+  margin: 0 0 13px;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.privacy-questions p {
+  max-width: 720px;
+  margin: 0;
+  color: rgba(255, 240, 223, 0.84);
+  font-size: 20px;
+  line-height: 1.65;
+  letter-spacing: -0.018em;
+}
+
+.privacy-questions a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.privacy-page > .social-links {
+  margin: auto auto 18px;
+}
+
+.privacy-page .social-links a {
+  background: var(--privacy-surface);
+  color: var(--privacy-text);
+}
+
+.privacy-page .social-links a:hover {
+  background: #332f2b;
+}
+
+.privacy-footer {
+  height: 170px;
+}
+
+.privacy-footer span {
+  color: rgba(255, 240, 223, 0.025);
 }
 
 .product-stage {
@@ -358,6 +557,51 @@ h1 .hero-highlight::after {
   font-size: 32px;
   line-height: 1.06;
   letter-spacing: -0.045em;
+}
+
+.search-intent {
+  width: min(1400px, calc(100% - 96px));
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.75fr);
+  gap: clamp(70px, 8vw, 150px);
+  margin: 50px auto 0;
+  padding: 112px 0 96px;
+  border-top: 1px solid var(--line);
+}
+
+.search-intent > div:first-child > p {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.search-intent h2 {
+  max-width: 760px;
+  margin: 0;
+  font-size: clamp(58px, 5vw, 90px);
+  font-weight: 780;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.search-intent-copy {
+  align-self: end;
+  padding-bottom: 4px;
+}
+
+.search-intent-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1.6;
+  letter-spacing: -0.022em;
+}
+
+.search-intent-copy p + p {
+  margin-top: 24px;
 }
 
 .closing {
@@ -491,6 +735,14 @@ h1 .hero-highlight::after {
     max-width: 210px;
     font-size: 27px;
   }
+
+  .search-intent {
+    width: calc(100% - 64px);
+  }
+
+  .privacy-nav {
+    width: calc(100% - 64px);
+  }
 }
 
 @media (max-width: 1023px) {
@@ -566,6 +818,30 @@ h1 .hero-highlight::after {
     max-width: 230px;
     font-size: 29px;
   }
+
+  .search-intent {
+    width: calc(100% - 56px);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.85fr);
+    gap: 56px;
+    margin-top: 28px;
+    padding: 88px 0 72px;
+  }
+
+  .search-intent h2 {
+    font-size: clamp(48px, 6.4vw, 66px);
+  }
+
+  .search-intent-copy p {
+    font-size: 18px;
+  }
+
+  .privacy-nav {
+    width: calc(100% - 48px);
+  }
+
+  .privacy-content {
+    margin-top: 76px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -588,9 +864,14 @@ h1 .hero-highlight::after {
     border-radius: 9px;
   }
 
-  .brand-mark span {
+  .brand-idle {
     width: 13px;
     height: 4px;
+  }
+
+  .brand-reveal {
+    width: 17px;
+    height: 17px;
   }
 
   .version,
@@ -662,6 +943,31 @@ h1 .hero-highlight::after {
     font-size: clamp(20px, 5.6vw, 24px);
   }
 
+  .search-intent {
+    width: calc(100% - 40px);
+    display: block;
+    margin-top: 18px;
+    padding: 70px 0 56px;
+  }
+
+  .search-intent > div:first-child > p {
+    margin-bottom: 18px;
+    font-size: 10px;
+  }
+
+  .search-intent h2 {
+    font-size: clamp(44px, 12vw, 62px);
+  }
+
+  .search-intent-copy {
+    margin-top: 36px;
+  }
+
+  .search-intent-copy p {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
   .closing {
     padding: 34px 20px 32px;
   }
@@ -678,6 +984,44 @@ h1 .hero-highlight::after {
 
   .footer span {
     font-size: 27vw;
+  }
+
+  .privacy-nav {
+    width: calc(100% - 32px);
+  }
+
+  .privacy-content {
+    width: calc(100% - 40px);
+    margin-top: 58px;
+  }
+
+  .privacy-content h1 {
+    font-size: clamp(52px, 15vw, 76px);
+  }
+
+  .privacy-statement {
+    margin-top: 27px;
+    font-size: 18px;
+  }
+
+  .privacy-questions {
+    margin-top: 42px;
+  }
+
+  .privacy-questions h2 {
+    font-size: 22px;
+  }
+
+  .privacy-questions p {
+    font-size: 17px;
+  }
+
+  .privacy-page > .social-links {
+    margin-bottom: 12px;
+  }
+
+  .privacy-footer {
+    height: 115px;
   }
 }
 
@@ -696,7 +1040,7 @@ h1 .hero-highlight::after {
     border-radius: 8px;
   }
 
-  .brand-mark span {
+  .brand-idle {
     width: 12px;
     height: 3px;
   }
@@ -737,6 +1081,10 @@ h1 .hero-highlight::after {
     gap: 52px 12px;
   }
 
+  .search-intent {
+    width: calc(100% - 32px);
+  }
+
   .feature svg {
     width: 50px;
     height: 50px;
@@ -750,6 +1098,19 @@ h1 .hero-highlight::after {
 
   .footer {
     height: 104px;
+  }
+
+  .privacy-nav {
+    width: calc(100% - 24px);
+  }
+
+  .privacy-content {
+    width: calc(100% - 32px);
+    margin-top: 44px;
+  }
+
+  .privacy-content h1 {
+    font-size: clamp(46px, 15vw, 58px);
   }
 }
 
@@ -811,6 +1172,11 @@ h1 .hero-highlight::after {
   .download-leading,
   .download-label,
   .download-trailing {
+    transition: none;
+  }
+
+  .brand-idle,
+  .brand-reveal {
     transition: none;
   }
 }

@@ -1,4 +1,9 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "./site";
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: "https://wakemymac.com/", lastModified: new Date(), changeFrequency: "monthly", priority: 1 }];
+  return [
+    { url: `${siteUrl}/`, lastModified: new Date("2026-07-24") },
+    { url: `${siteUrl}/privacy`, lastModified: new Date("2026-07-24") },
+  ];
 }

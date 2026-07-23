@@ -5,6 +5,7 @@
 - Reference: https://tryalcove.com/
 - Captured: 2026-07-23 via Firecrawl branding, image, page-content, and full-page screenshot scrapes
 - Local scrape evidence: `../.firecrawl/alcove-branding-fresh.json`, `../.firecrawl/alcove-screenshot-fresh.json`, `../.firecrawl/alcove-screenshot-fresh.png`
+- Privacy reference captured 2026-07-24: `../.firecrawl/alcove-privacy-branding.json`, `../.firecrawl/alcove-privacy-screenshot.json`, `../.firecrawl/alcove-privacy-screenshot.png`
 
 ## Reference screenshot
 
@@ -44,6 +45,8 @@ Use very short, concrete phrases. Lead with the result, not the mechanism. Keep 
 ## Page pattern
 
 Full page: compact header → oversized centered promise → one-line explanation → paired CTAs → large dashboard visual → spacious 4×2 capability grid → centered final download CTA → oversized faded wordmark footer.
+
+Privacy page: dark ink background → compact shared header → oversized left-aligned policy title → one plain privacy statement → short contact block → social links → faded wordmark footer. On the landing page, the brand square reveals a lock and links to privacy; on the privacy page it reveals a back arrow and returns home.
 
 ## Agent build instructions
 
