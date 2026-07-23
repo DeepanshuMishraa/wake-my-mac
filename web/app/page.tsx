@@ -23,7 +23,10 @@ function DownloadLink({ className }: { className: string }) {
   return (
     <a className={className} href={downloadUrl}>
       <span className="download-leading"><AppleIcon /></span>
-      <span className="download-label">Download for Mac</span>
+      <span className="download-label">
+        <span className="download-full">Download for Mac</span>
+        <span className="download-short">Download</span>
+      </span>
       <span className="download-trailing"><DownloadArrowIcon /></span>
     </a>
   );
@@ -184,7 +187,7 @@ export default function Home() {
             width={2428}
             height={1762}
             priority
-            sizes="(max-width: 720px) 132vw, (max-width: 1200px) 92vw, 1220px"
+            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 92vw, 1400px"
           />
         </div>
       </section>
