@@ -183,8 +183,8 @@ export default function Home() {
 
       <section className="search-intent" aria-labelledby="keep-awake-heading">
         <div>
-          <p>KeepingYouAwake alternative for Mac</p>
-          <h2 id="keep-awake-heading">A simpler way to keep your Mac awake.</h2>
+          <p><a href="/keepingyouawake-alternative">KeepingYouAwake alternative for Mac</a></p>
+          <h2 id="keep-awake-heading"><a href="/keep-mac-awake">A simpler way to keep your Mac awake.</a></h2>
         </div>
         <div className="search-intent-copy">
           <p>
@@ -192,9 +192,11 @@ export default function Home() {
             downloads, builds, backups, SSH sessions, and remote access.
           </p>
           <p>
-            If you are comparing KeepingYouAwake, Caffeine, or Amphetamine,
-            Wake My Mac adds closed-lid support, battery guardrails, activity
-            rules, and local history without requiring an account.
+            If you are comparing{" "}
+            <a href="/keepingyouawake-alternative">KeepingYouAwake</a>,
+            Caffeine, or Amphetamine, Wake My Mac adds closed-lid support,
+            battery guardrails, activity rules, and local history without
+            requiring an account.
           </p>
         </div>
       </section>

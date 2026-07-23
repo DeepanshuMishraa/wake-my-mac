@@ -1,5 +1,12 @@
+"use client";
+
+import { useId, useRef, useState } from "react";
+
 export const downloadUrl =
   "https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-0.0.3.dmg";
+
+const quarantineCommand =
+  'sudo xattr -rd com.apple.quarantine "/Applications/Wake My Mac.app"';
 
 export function AppleIcon() {
   return (
@@ -59,15 +66,108 @@ function LinkedInIcon() {
 }
 
 export function DownloadLink({ className }: { className: string }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
+    "idle",
+  );
+
+  function openDownloadDialog() {
+    setCopyState("idle");
+    dialogRef.current?.showModal();
+  }
+
+  function closeDownloadDialog() {
+    dialogRef.current?.close();
+  }
+
+  async function copyCommand() {
+    try {
+      await navigator.clipboard.writeText(quarantineCommand);
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    }
+  }
+
   return (
-    <a className={className} href={downloadUrl}>
-      <span className="download-leading"><AppleIcon /></span>
-      <span className="download-label">
-        <span className="download-full">Download for Mac</span>
-        <span className="download-short">Download</span>
-      </span>
-      <span className="download-trailing"><DownloadArrowIcon /></span>
-    </a>
+    <>
+      <a
+        className={className}
+        href={downloadUrl}
+        onClick={(event) => {
+          event.preventDefault();
+          openDownloadDialog();
+        }}
+      >
+        <span className="download-leading"><AppleIcon /></span>
+        <span className="download-label">
+          <span className="download-full">Download for Mac</span>
+          <span className="download-short">Download</span>
+        </span>
+        <span className="download-trailing"><DownloadArrowIcon /></span>
+      </a>
+
+      <dialog
+        className="download-dialog"
+        ref={dialogRef}
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            closeDownloadDialog();
+          }
+        }}
+        onClose={() => setCopyState("idle")}
+      >
+        <div className="download-dialog-panel">
+          <button
+            className="dialog-close"
+            type="button"
+            onClick={closeDownloadDialog}
+            aria-label="Close download dialog"
+          >
+            ×
+          </button>
+
+          <span className="dialog-icon" aria-hidden="true">
+            <AppleIcon />
+          </span>
+          <p className="dialog-kicker">Before you download</p>
+          <h2 id={titleId}>Wake My Mac isn’t signed by Apple yet.</h2>
+          <p className="dialog-copy" id={descriptionId}>
+            macOS may block the first launch. Download the app, move it to
+            Applications, then run this command in Terminal to remove the
+            quarantine flag.
+          </p>
+
+          <div className="command-copy">
+            <code>{quarantineCommand}</code>
+            <button type="button" onClick={copyCommand}>
+              {copyState === "copied"
+                ? "Copied"
+                : copyState === "error"
+                  ? "Copy failed"
+                  : "Copy"}
+            </button>
+          </div>
+
+          <p className="dialog-note">
+            Only run commands you understand. This command targets Wake My Mac
+            in your Applications folder.
+          </p>
+
+          <a
+            className="dialog-download"
+            href={downloadUrl}
+            onClick={closeDownloadDialog}
+          >
+            Download Wake My Mac <DownloadArrowIcon />
+          </a>
+        </div>
+      </dialog>
+    </>
   );
 }
 
