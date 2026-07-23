@@ -1,13 +1,31 @@
 import Image from "next/image";
 
 const downloadUrl =
-  "https://github.com/DeepanshuMishraa/wake-my-mac/releases/download/V0.0.1/Wake-My-Mac-0.0.1.dmg";
+  "https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-0.0.3.dmg";
 
 function AppleIcon() {
   return (
     <svg viewBox="0 0 814 1000" aria-hidden="true">
       <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57-155.5-127C46.7 790.7 0 663 0 541.8c0-194.4 126.4-297.5 250.8-297.5 66.1 0 121.2 43.4 162.7 43.4 39.5 0 101.1-46 176.3-46 28.5 0 130.9 2.6 198.3 99.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z" />
     </svg>
+  );
+}
+
+function DownloadArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v13m0 0 5-5m-5 5-5-5M5 21h14" />
+    </svg>
+  );
+}
+
+function DownloadLink({ className }: { className: string }) {
+  return (
+    <a className={className} href={downloadUrl}>
+      <span className="download-leading"><AppleIcon /></span>
+      <span className="download-label">Download for Mac</span>
+      <span className="download-trailing"><DownloadArrowIcon /></span>
+    </a>
   );
 }
 
@@ -121,7 +139,7 @@ export default function Home() {
           <a className="brand" href="#" aria-label="Wake My Mac home">
             <span className="brand-mark" aria-hidden="true"><span /></span>
             <span>Wake My Mac</span>
-            <span className="version">v0.0.2</span>
+            <span className="version">v0.0.3</span>
           </a>
 
           <div className="nav-side">
@@ -132,10 +150,7 @@ export default function Home() {
               <GitHubIcon />
               GitHub
             </a>
-            <a className="nav-download" href={downloadUrl}>
-              <AppleIcon />
-              Download for Mac
-            </a>
+            <DownloadLink className="nav-download" />
           </div>
         </nav>
 
@@ -151,10 +166,7 @@ export default function Home() {
           </p>
 
           <div className="actions">
-            <a className="download-button" href={downloadUrl}>
-              <AppleIcon />
-              Download for Mac
-            </a>
+            <DownloadLink className="download-button" />
             <a
               className="source-button"
               href="https://github.com/DeepanshuMishraa/wake-my-mac"
@@ -188,10 +200,7 @@ export default function Home() {
 
       <section className="closing">
         <p>Let your Mac finish downloading, building, and backing up.</p>
-        <a className="download-button" href={downloadUrl}>
-          <AppleIcon />
-          Download for Mac
-        </a>
+        <DownloadLink className="download-button" />
         <div className="social-links" aria-label="Project links">
           <a
             href="https://github.com/DeepanshuMishraa/wake-my-mac"

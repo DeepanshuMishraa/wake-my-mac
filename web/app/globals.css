@@ -111,19 +111,51 @@ a {
 
 .nav-download {
   min-height: 60px;
-  display: inline-flex;
+  display: inline-grid;
+  grid-template-columns: 18px auto 18px;
   align-items: center;
-  gap: 10px;
+  column-gap: 9px;
   padding: 0 23px;
   border-radius: 16px;
   background: var(--paper-action);
+  overflow: hidden;
 }
 
-.nav-download svg,
-.download-button svg {
+.download-leading,
+.download-trailing {
+  width: 18px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+}
+
+.download-leading svg {
   width: 15px;
   height: 18px;
   fill: currentColor;
+}
+
+.download-trailing {
+  opacity: 0;
+  transform: translateX(-9px);
+}
+
+.download-trailing svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.download-leading,
+.download-label,
+.download-trailing {
+  transition:
+    opacity 220ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-link,
@@ -205,10 +237,8 @@ h1 span::after {
 .download-button,
 .source-button {
   min-height: 61px;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
   padding: 0 24px;
   border-radius: 16px;
   font-size: 15px;
@@ -216,6 +246,10 @@ h1 span::after {
 }
 
 .download-button {
+  display: inline-grid;
+  grid-template-columns: 18px auto 18px;
+  column-gap: 9px;
+  overflow: hidden;
   background: var(--ink);
   color: var(--paper);
   box-shadow:
@@ -224,11 +258,32 @@ h1 span::after {
 }
 
 .source-button {
+  display: inline-flex;
+  gap: 10px;
   background: var(--paper-action);
 }
 
-.download-button:hover {
-  transform: translateY(-2px);
+.nav-download:hover .download-leading,
+.nav-download:focus-visible .download-leading,
+.download-button:hover .download-leading,
+.download-button:focus-visible .download-leading {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.92);
+}
+
+.nav-download:hover .download-label,
+.nav-download:focus-visible .download-label,
+.download-button:hover .download-label,
+.download-button:focus-visible .download-label {
+  transform: translateX(-3px);
+}
+
+.nav-download:hover .download-trailing,
+.nav-download:focus-visible .download-trailing,
+.download-button:hover .download-trailing,
+.download-button:focus-visible .download-trailing {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .brand:focus-visible,
@@ -488,6 +543,12 @@ h1 span::after {
   }
 
   .social-links a {
+    transition: none;
+  }
+
+  .download-leading,
+  .download-label,
+  .download-trailing {
     transition: none;
   }
 }
