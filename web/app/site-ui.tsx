@@ -1,9 +1,7 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-
-export const downloadUrl =
-  "https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-0.0.3.dmg";
+import { downloadUrl, releaseVersion } from "./release";
 
 const quarantineCommand =
   'sudo xattr -rd com.apple.quarantine "/Applications/Wake My Mac.app"';
@@ -189,7 +187,7 @@ export function Brand({ iconAction }: { iconAction: "home" | "privacy" }) {
         </span>
       </a>
       <a className="brand-name" href="/">Wake My Mac</a>
-      <span className="version">v0.0.3</span>
+      <span className="version">v{releaseVersion}</span>
     </div>
   );
 }

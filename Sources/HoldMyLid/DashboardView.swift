@@ -365,6 +365,7 @@ private enum AppVersion {
 
 private struct SettingsDashboard: View {
     @ObservedObject var state: AppState
+    @ObservedObject private var updater = UpdateService.shared
     @State private var draft: HoldSettings
 
     init(state: AppState) {
@@ -448,22 +449,62 @@ private struct SettingsDashboard: View {
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
                         }
                     }
-                        NativeCard {
-                            VStack(alignment: .leading, spacing: 18) {
-                                SettingsHeading(title: "Updates", subtitle: "Wake My Mac stays current through Sparkle.")
-                                Button("Check for Updates…") { UpdateService.shared.checkForUpdates(nil) }
-                                    .buttonStyle(.borderedProminent).tint(DashboardPalette.ink)
-                                HStack {
-                                    Text("Version")
-                                    Spacer()
-                                    Text("v\(AppVersion.display)")
-                                        .fontWeight(.semibold)
+                    NativeCard {
+                        VStack(alignment: .leading, spacing: 18) {
+                            SettingsHeading(
+                                title: "Updates",
+                                subtitle: "Signed releases arrive securely through Sparkle."
+                            )
+                            HStack(spacing: 10) {
+                                if updater.status == .checking {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else {
+                                    Image(systemName: updater.status.symbolName)
+                                        .foregroundStyle(updateStatusColor)
                                 }
-                                .font(.system(size: 13, weight: .medium, design: .rounded))
-                                .foregroundStyle(DashboardPalette.secondary)
-                                Text("macOS 14 Sonoma or later").font(.system(size: 12, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(updater.status.title)
+                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    Text(updater.status.detail)
+                                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                                        .foregroundStyle(DashboardPalette.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                Spacer(minLength: 8)
                             }
+                            SettingsToggle(
+                                title: "Check automatically",
+                                isOn: Binding(
+                                    get: { updater.automaticallyChecksForUpdates },
+                                    set: { enabled in
+                                        updater.setAutomaticallyChecksForUpdates(enabled)
+                                    }
+                                )
+                            )
+                            SettingsToggle(
+                                title: "Download automatically",
+                                isOn: Binding(
+                                    get: { updater.automaticallyDownloadsUpdates },
+                                    set: { enabled in
+                                        updater.setAutomaticallyDownloadsUpdates(enabled)
+                                    }
+                                )
+                            )
+                            Button("Check for Updates…") { updater.checkForUpdates(nil) }
+                                .buttonStyle(.borderedProminent)
+                                .tint(DashboardPalette.ink)
+                                .disabled(!updater.canCheckForUpdates)
+                            HStack {
+                                Text("Installed version")
+                                Spacer()
+                                Text("v\(AppVersion.display)")
+                                    .fontWeight(.semibold)
+                            }
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(DashboardPalette.secondary)
                         }
+                    }
                 }
 
                 HStack {
@@ -483,6 +524,19 @@ private struct SettingsDashboard: View {
         }
         .onChange(of: state.settings) { _, settings in
             if draft != settings { draft = settings }
+        }
+    }
+
+    private var updateStatusColor: Color {
+        switch updater.status {
+        case .available:
+            DashboardPalette.blue
+        case .current:
+            DashboardPalette.ink
+        case .failed, .unavailable:
+            .orange
+        case .ready, .checking:
+            DashboardPalette.secondary
         }
     }
 

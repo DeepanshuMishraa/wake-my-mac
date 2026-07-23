@@ -10,12 +10,7 @@ LEGACY_HELPER_ID="com.dipxsy.watchmymac.helper"
 BUNDLE_ID="com.dipxsy.watchmymac"
 VERSION_FILE="$ROOT/VERSION"
 APP_VERSION="${APP_VERSION:-$(<"$VERSION_FILE")}"
-if [[ ! "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "APP_VERSION must use semantic versioning (for example, 0.0.3); received: $APP_VERSION" >&2
-  exit 1
-fi
-IFS=. read -r MAJOR MINOR PATCH <<< "$APP_VERSION"
-EXPECTED_BUILD_NUMBER=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
+EXPECTED_BUILD_NUMBER="$("$ROOT/Scripts/version-build-number.sh" "$APP_VERSION")"
 if [[ -n "${BUILD_NUMBER:-}" && "$BUILD_NUMBER" != "$EXPECTED_BUILD_NUMBER" ]]; then
   echo "BUILD_NUMBER $BUILD_NUMBER does not match APP_VERSION $APP_VERSION (expected $EXPECTED_BUILD_NUMBER)" >&2
   exit 1
@@ -140,16 +135,20 @@ cat > "$CONTENTS/Info.plist" <<PLIST
   <string>$SPARKLE_PUBLIC_ED_KEY</string>
   <key>SUEnableAutomaticChecks</key>
   <true/>
+  <key>SUAutomaticallyUpdate</key>
+  <true/>
   <key>SUAllowsAutomaticUpdates</key>
   <true/>
+  <key>SUScheduledCheckInterval</key>
+  <integer>21600</integer>
   <key>NSHumanReadableCopyright</key>
   <string>Built locally.</string>
 </dict>
 </plist>
 PLIST
 
-# Local builds use ad-hoc signing. Releases provide a Developer ID identity and
-# hardened-runtime signatures so Service Management can trust the daemon.
+# Use an installed signing identity when explicitly supplied; otherwise create
+# an ad-hoc signature for the current unsigned distribution.
 SIGN_OPTIONS=(--force --sign "$CODE_SIGN_IDENTITY")
 if [[ "$CODE_SIGN_IDENTITY" != "-" ]]; then
   SIGN_OPTIONS+=(--options runtime --timestamp)

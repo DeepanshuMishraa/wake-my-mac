@@ -5,8 +5,8 @@ import {
   DownloadLink,
   GitHubIcon,
   SocialLinks,
-  downloadUrl,
 } from "./site-ui";
+import { downloadUrl, releaseVersion } from "./release";
 import { siteUrl } from "./site";
 
 type FeatureIconName =
@@ -84,7 +84,7 @@ export default function Home() {
         url: siteUrl,
         image: `${siteUrl}/og-image.png`,
         downloadUrl,
-        softwareVersion: "0.0.3",
+        softwareVersion: releaseVersion,
         operatingSystem: "macOS 14 Sonoma and later",
         applicationCategory: "UtilitiesApplication",
         applicationSubCategory: "Keep-awake utility",

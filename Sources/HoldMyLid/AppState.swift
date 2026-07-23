@@ -110,7 +110,7 @@ final class AppState: ObservableObject {
     }
 
     func openSettings() {
-        DashboardWindowController.shared.show(state: self, section: .overview)
+        DashboardWindowController.shared.show(state: self, section: .settings)
     }
 
     func openDashboard() {

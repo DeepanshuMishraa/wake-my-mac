@@ -77,7 +77,7 @@ struct SettingsView: View {
 
             Section("Updates") {
                 HStack {
-                    Text("Updates are delivered from GitHub Releases using Sparkle.")
+                    Text("Signed updates are delivered automatically through Sparkle.")
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Check Now…") { UpdateService.shared.checkForUpdates(nil) }

@@ -18,13 +18,29 @@ History stays on the Mac. Wake My Mac records timestamps, wake reasons, agent na
 
 ## Install
 
-Download the latest DMG from [Releases](https://github.com/DeepanshuMishraa/wake-my-mac/releases).
+Download the latest DMG from [wakemymac.dipxsy.app](https://wakemymac.dipxsy.app).
 
 ## Signing
 
-Release builds are gated on Developer ID signing and Apple notarization so macOS can safely register the privileged wake helper. Local builds use an installed Apple Development identity when available and otherwise fall back to ad-hoc signing for development only.
+Public builds are not Developer ID signed yet. Sparkle update archives are independently signed with EdDSA and verified before installation. Local and release builds use ad-hoc code signing unless a signing identity is supplied.
 
 On first use, macOS may require one explicit approval for the reliable-wake background item. Wake My Mac registers both itself and the helper automatically; it never asks you to copy files into system folders.
+
+## Updates
+
+Sparkle discovers the latest version from the `appcast.xml` attached to the newest GitHub release, then downloads the matching versioned DMG from:
+
+```text
+https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-{version}.dmg
+```
+
+The release workflow validates the tag and build number, signs the DMG with Sparkle, uploads it to R2, verifies the public URL, and publishes the appcast to GitHub. It requires these repository secrets:
+
+- `SPARKLE_PRIVATE_KEY`
+- `SPARKLE_PUBLIC_ED_KEY`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `R2_BUCKET_NAME`
 
 ## Build
 

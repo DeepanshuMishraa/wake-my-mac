@@ -8,28 +8,35 @@ permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: wake-my-mac-release
   cancel-in-progress: false
 
 jobs:
-  build-and-upload:
-    name: Build and attach macOS DMG
+  publish_release:
+    name: Build, verify, and publish
     runs-on: macos-15
     timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Validate release tag
         shell: bash
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          IS_PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            echo "Prereleases are not published to the stable Sparkle feed or website." >&2
+            exit 1
+          fi
           if [[ ! "$RELEASE_TAG" =~ ^V[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Release tag must use the format V0.0.1; received: $RELEASE_TAG" >&2
             exit 1
           fi
 
       - name: Check out release tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ github.event.release.tag_name }}
 
@@ -40,50 +47,30 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           VERSION="${RELEASE_TAG#V}"
-          IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION"
-          BUILD_NUMBER=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
+          SOURCE_VERSION="$(tr -d '\n' < VERSION)"
+          if [[ "$SOURCE_VERSION" != "$VERSION" ]]; then
+            echo "Release tag $RELEASE_TAG does not match VERSION ($SOURCE_VERSION)." >&2
+            exit 1
+          fi
+          BUILD_NUMBER="$(./Scripts/version-build-number.sh "$VERSION")"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
 
-      - name: Validate release signing configuration
+      - name: Validate updater publishing configuration
         shell: bash
         env:
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          DEVELOPER_ID_APPLICATION: ${{ secrets.DEVELOPER_ID_APPLICATION }}
-          DEVELOPER_ID_P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
-          DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
           SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
         run: |
-          for name in APPLE_APP_SPECIFIC_PASSWORD APPLE_ID APPLE_TEAM_ID DEVELOPER_ID_APPLICATION DEVELOPER_ID_P12_BASE64 DEVELOPER_ID_P12_PASSWORD SPARKLE_PRIVATE_KEY SPARKLE_PUBLIC_ED_KEY; do
+          for name in SPARKLE_PRIVATE_KEY SPARKLE_PUBLIC_ED_KEY CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID R2_BUCKET_NAME; do
             if [[ -z "${!name}" ]]; then
               echo "Configure the $name repository secret before publishing releases." >&2
               exit 1
             fi
           done
-
-      - name: Import Developer ID certificate
-        shell: bash
-        env:
-          DEVELOPER_ID_P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
-          DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.RELEASE_KEYCHAIN_PASSWORD }}
-        run: |
-          if [[ -z "$KEYCHAIN_PASSWORD" ]]; then
-            echo "Configure the RELEASE_KEYCHAIN_PASSWORD repository secret before publishing releases." >&2
-            exit 1
-          fi
-          CERTIFICATE_PATH="$RUNNER_TEMP/developer-id.p12"
-          KEYCHAIN_PATH="$RUNNER_TEMP/release-signing.keychain-db"
-          printf '%s' "$DEVELOPER_ID_P12_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERTIFICATE_PATH" -P "$DEVELOPER_ID_P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
       - name: Run tests
         run: swift test
@@ -92,24 +79,9 @@ jobs:
         env:
           APP_VERSION: ${{ steps.version.outputs.version }}
           BUILD_NUMBER: ${{ steps.version.outputs.build }}
-          CODE_SIGN_IDENTITY: ${{ secrets.DEVELOPER_ID_APPLICATION }}
           SPARKLE_FEED_URL: https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml
           SPARKLE_PUBLIC_ED_KEY: ${{ secrets.SPARKLE_PUBLIC_ED_KEY }}
         run: ./Scripts/build-app.sh
-
-      - name: Notarize and staple application
-        shell: bash
-        env:
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          APP_PATH="$GITHUB_WORKSPACE/build/Wake My Mac.app"
-          ARCHIVE_PATH="$RUNNER_TEMP/Wake-My-Mac.zip"
-          ditto -c -k --keepParent "$APP_PATH" "$ARCHIVE_PATH"
-          xcrun notarytool submit "$ARCHIVE_PATH" --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
-          xcrun stapler staple "$APP_PATH"
-          spctl --assess --type execute --verbose=4 "$APP_PATH"
 
       - name: Create DMG
         id: dmg
@@ -121,17 +93,13 @@ jobs:
           DMG_PATH="$(./Scripts/create-dmg.sh)"
           echo "path=$DMG_PATH" >> "$GITHUB_OUTPUT"
 
-      - name: Notarize and staple DMG
-        shell: bash
+      - name: Verify packaged application
         env:
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SPARKLE_FEED_URL: https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml
           DMG_PATH: ${{ steps.dmg.outputs.path }}
-        run: |
-          xcrun notarytool submit "$DMG_PATH" --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
-          xcrun stapler staple "$DMG_PATH"
-          spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+        run: ./Scripts/verify-release-dmg.sh "$DMG_PATH" "$VERSION" "$BUILD_NUMBER"
 
       - name: Sign update and create appcast
         id: appcast
@@ -155,11 +123,38 @@ jobs:
             echo "Sparkle signed length $SIGNED_FILE_LENGTH does not match DMG length $ACTUAL_FILE_LENGTH." >&2
             exit 1
           fi
-          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/Wake-My-Mac-${VERSION}.dmg"
+          DOWNLOAD_URL="https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-${VERSION}.dmg"
           chmod +x Scripts/create-appcast.sh
           APPCAST_PATH="$RUNNER_TEMP/appcast.xml"
           ./Scripts/create-appcast.sh "$VERSION" "$BUILD_NUMBER" "$DOWNLOAD_URL" "$SIGNATURE_OUTPUT" "$APPCAST_PATH"
+          xmllint --noout "$APPCAST_PATH"
+          grep -Fq "<sparkle:version>${BUILD_NUMBER}</sparkle:version>" "$APPCAST_PATH"
+          grep -Fq "$DOWNLOAD_URL" "$APPCAST_PATH"
           echo "path=$APPCAST_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Publish versioned DMG to R2
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          VERSION: ${{ steps.version.outputs.version }}
+          DMG_PATH: ${{ steps.dmg.outputs.path }}
+        run: |
+          OBJECT_NAME="Wake-My-Mac-${VERSION}.dmg"
+          PUBLIC_BASE_URL="https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev"
+          npx --yes wrangler@4.114.0 r2 object put "${R2_BUCKET_NAME}/${OBJECT_NAME}" \
+            --remote \
+            --file="$DMG_PATH" \
+            --content-type="application/x-apple-diskimage" \
+            --content-disposition="attachment; filename=${OBJECT_NAME}" \
+            --cache-control="public, max-age=300, must-revalidate"
+          REMOTE_DMG="$RUNNER_TEMP/$OBJECT_NAME"
+          curl --fail --silent --show-error --location \
+            --retry 5 --retry-all-errors \
+            "${PUBLIC_BASE_URL}/${OBJECT_NAME}?release-check=${GITHUB_RUN_ID}" \
+            --output "$REMOTE_DMG"
+          cmp "$DMG_PATH" "$REMOTE_DMG"
 
       - name: Upload updater assets to GitHub Release
         env:
@@ -167,4 +162,74 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           DMG_PATH: ${{ steps.dmg.outputs.path }}
           APPCAST_PATH: ${{ steps.appcast.outputs.path }}
-        run: gh release upload "$RELEASE_TAG" "$DMG_PATH" "$APPCAST_PATH" --clobber
+        run: |
+          gh release upload "$RELEASE_TAG" "$DMG_PATH" "$APPCAST_PATH" --clobber
+          REMOTE_APPCAST="$RUNNER_TEMP/published-appcast.xml"
+          curl --fail --silent --show-error --location \
+            --retry 5 --retry-all-errors \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/appcast.xml?release-check=${GITHUB_RUN_ID}" \
+            --output "$REMOTE_APPCAST"
+          cmp "$APPCAST_PATH" "$REMOTE_APPCAST"
+
+  update_website:
+    name: Update website download
+    needs: publish_release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Update website release
+        env:
+          VERSION: ${{ needs.publish_release.outputs.version }}
+        run: ./Scripts/set-web-release.sh "$VERSION"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Verify website build
+        working-directory: web
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Commit and push website release
+        id: website_commit
+        env:
+          VERSION: ${{ needs.publish_release.outputs.version }}
+        run: |
+          if git diff --quiet -- web/app/release.ts; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/app/release.ts
+          git commit -m "Update website download to v${VERSION}"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Vercel deployment
+        env:
+          VERSION: ${{ needs.publish_release.outputs.version }}
+        run: |
+          EXPECTED_FILE="Wake-My-Mac-${VERSION}.dmg"
+          for attempt in $(seq 1 36); do
+            if curl --fail --silent --show-error --location \
+              "https://wakemymac.dipxsy.app/?release-check=${GITHUB_RUN_ID}-${attempt}" |
+              grep -Fq "$EXPECTED_FILE"; then
+              echo "Vercel is serving $EXPECTED_FILE"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Vercel did not publish $EXPECTED_FILE within six minutes." >&2
+          exit 1
