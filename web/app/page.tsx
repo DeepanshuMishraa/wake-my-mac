@@ -14,7 +14,7 @@ function AppleIcon() {
 function DownloadArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3v13m0 0 5-5m-5 5-5-5M5 21h14" />
+      <path d="M4 12h16m0 0-6-6m6 6-6 6" />
     </svg>
   );
 }
@@ -83,7 +83,7 @@ function FeatureIcon({ name }: { name: FeatureIconName }) {
     "aria-hidden": true,
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 2.7,
+    strokeWidth: 3.8,
     strokeLinecap: "round",
     strokeLinejoin: "round",
   } as const;
@@ -156,9 +156,9 @@ export default function Home() {
 
         <div className="hero-copy">
           <h1>
-            Keep your Mac awake.
+            Keep your <span className="hero-mac"><AppleIcon />Mac</span> awake.
             <br />
-            Even with the <span>lid closed.</span>
+            Even with the <span className="hero-highlight">lid closed.</span>
           </h1>
 
           <p className="lede">
