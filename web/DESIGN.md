@@ -3,12 +3,18 @@
 ## Source
 
 - Reference: https://tryalcove.com/
-- Captured: 2026-07-13 via Firecrawl branding, image, and page-content scrapes
-- Local scrape evidence: `../.firecrawl/alcove-branding.json`, `../.firecrawl/alcove-screenshot.png`
+- Captured: 2026-07-23 via Firecrawl branding, image, page-content, and full-page screenshot scrapes
+- Local scrape evidence: `../.firecrawl/alcove-branding-fresh.json`, `../.firecrawl/alcove-screenshot-fresh.json`, `../.firecrawl/alcove-screenshot-fresh.png`
+
+## Reference screenshot
+
+![Full-page screenshot of Alcove](../.firecrawl/alcove-screenshot-fresh.png)
+
+Use this screenshot as the source of truth for hierarchy, density, and feel. Reuse the design language, not Alcove's copy, logo, imagery, or product-specific decoration.
 
 ## Design direction
 
-Refined minimalism for a native-feeling Mac utility: warm paper background, dark ink, one fluorescent lime accent for product state, large expressive typography, generous vertical rhythm, and a single dark product vignette. The site should feel calm, quietly playful, and conversion-focused.
+Refined, native-feeling Mac utility marketing: warm paper background, dark ink, compact navigation, an oversized centered two-line promise, paired actions, and one large rounded product visual. The site should feel direct, friendly, quietly playful, and conversion-focused.
 
 ## Tokens
 
@@ -18,14 +24,36 @@ Refined minimalism for a native-feeling Mac utility: warm paper background, dark
 - Peach action: `#F6E5D4`
 - Product accent: `#D8FF4F`
 - Borders: `rgba(41, 37, 36, .17)`
-- Body: DM Sans; display emphasis: Instrument Serif italic
-- Section container: 1180px max, 32px desktop gutters / 20px mobile gutters
-- Radius: 16px controls, 32px product stage
+- Body and display: rounded system sans stack; 700–800 weight for headings
+- Hero heading: approximately 96px at 1920px, tightly led and centered
+- Section container: approximately 1740px for navigation and 1220px for the product visual
+- Radius: 16px controls, 32–40px product visual
+- Shadow: only on the primary dark CTA; no generic card shadows
+
+## Components
+
+- Header: brand icon, wordmark and tiny version badge on the left; one plain link and one peach download button on the right
+- Hero: no eyebrow or card; one enormous centered statement with a single playful highlighted phrase
+- Actions: dark primary download button with Apple mark, light secondary source button
+- Product visual: the real application screenshot at large scale, directly on the paper background
+
+## Content style
+
+Use very short, concrete phrases. Lead with the result, not the mechanism. Keep supporting copy to one sentence and button labels literal.
 
 ## Page pattern
 
-Header → oversized promise hero → interactive dark product vignette → concise use-case introduction → feature list → lime testimonial panel → FAQs → final download CTA → compact footer.
+Full page: compact header → oversized centered promise → one-line explanation → paired CTAs → large dashboard visual → spacious 4×2 capability grid → centered final download CTA → oversized faded wordmark footer.
 
-## Build notes
+## Agent build instructions
 
 Keep copy short and specific. Use semantic sections, descriptive metadata, JSON-LD SoftwareApplication schema, sitemap, robots, responsive layout, keyboard-accessible controls, and reduced-motion support. Use original Wake My Mac copy and visuals; do not reuse Alcove branding, logo, or third-party imagery.
+
+## Rerun inputs
+
+```text
+workflow: firecrawl-website-design-clone
+source_url: https://tryalcove.com/
+target_stack: Next.js
+output: web/DESIGN.md
+```

@@ -1,0 +1,180 @@
+{
+  "branding": {
+    "colorScheme": "light",
+    "fonts": [
+      {
+        "family": "system-ui",
+        "count": 21
+      },
+      {
+        "family": "-apple-system",
+        "count": 21
+      },
+      {
+        "family": "sans-serif",
+        "count": 21
+      }
+    ],
+    "colors": {
+      "primary": "#FFF0DF",
+      "secondary": "#A28273",
+      "accent": "#F6E5D4",
+      "background": "#FFF0DF",
+      "textPrimary": "#292524",
+      "link": "#F6E5D4"
+    },
+    "typography": {
+      "fontFamilies": {
+        "primary": "system-ui",
+        "heading": "system-ui"
+      },
+      "fontStacks": {
+        "body": [
+          "system-ui",
+          "-apple-system",
+          "sans-serif"
+        ],
+        "heading": [
+          "system-ui",
+          "-apple-system",
+          "sans-serif"
+        ],
+        "paragraph": [
+          "system-ui",
+          "-apple-system",
+          "sans-serif"
+        ]
+      },
+      "fontSizes": {
+        "h1": "96px",
+        "h2": "30px",
+        "body": "16px"
+      }
+    },
+    "spacing": {
+      "baseUnit": 8,
+      "borderRadius": "0px"
+    },
+    "components": {
+      "buttonPrimary": {
+        "background": "#F6E5D4",
+        "textColor": "#292524",
+        "borderRadius": "16px",
+        "borderRadiusCorners": {
+          "topLeft": "16px",
+          "topRight": "16px",
+          "bottomRight": "16px",
+          "bottomLeft": "16px"
+        },
+        "shadow": "none"
+      },
+      "buttonSecondary": {
+        "background": "#292524",
+        "textColor": "#FFF0DF",
+        "borderRadius": "16px",
+        "borderRadiusCorners": {
+          "topLeft": "16px",
+          "topRight": "16px",
+          "bottomRight": "16px",
+          "bottomLeft": "16px"
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.266 0.0637018 0.0467235 / 0.25) 0px 20px 25px -5px, oklab(0.266 0.0637018 0.0467235 / 0.25) 0px 8px 10px -6px"
+      }
+    },
+    "images": {
+      "logo": "data:image/svg+xml;utf8,%3Csvg%20class%3D%22absolute%20-inset-%5B0.3125rem%5D%20size-%5B2.8125rem%5D%20fill-current%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2036%2036%22%20aria-hidden%3D%22true%22%20data-fc-idx%3D%220%22%3E%3Cpath%20class%3D%22ease%20absolute%20origin-right%20translate-x-0.5%20scale-50%20opacity-0%20blur-xs%20transition%20duration-300%20group-hover%3Atranslate-x-0%20group-hover%3Ascale-100%20group-hover%3Aopacity-100%20group-hover%3Ablur-none%20group-hover%3Adelay-50%22%20d%3D%22M18.032%2011.218a1%201%200%200%200-1.414%200l-6.075%206.075a1%201%200%200%200%200%201.414l6.075%206.075a1%201%200%200%200%201.414-1.414L13.664%2019H24.75a1%201%200%201%200%200-2H13.664l4.368-4.368a1%201%200%200%200%200-1.414Z%22%20style%3D%22fill%3A%20oklch(0.268%200.007%2034.298)%20!important%3B%20opacity%3A%200%20!important%3B%22%2F%3E%3C%2Fsvg%3E",
+      "favicon": "https://cdn.tryalcove.com/images/icon.png?v=2",
+      "ogImage": "https://cdn.tryalcove.com/images/meta.png",
+      "logoHref": "/"
+    },
+    "__llm_logo_reasoning": {
+      "selectedIndex": 0,
+      "reasoning": "Selected #0 because it is located in the header, is visible, and links to the homepage, which are strong indicators of a primary brand logo.",
+      "confidence": 0.9,
+      "source": "llm"
+    },
+    "__llm_button_reasoning": {
+      "primary": {
+        "index": 0,
+        "text": "Purchase $14.99",
+        "reasoning": "Button #0 'Purchase $14.99' is likely the primary CTA due to its action-oriented text and vibrant accent color, which aligns with typical primary CTA characteristics."
+      },
+      "secondary": {
+        "index": 2,
+        "text": "Download for Mac",
+        "reasoning": "Button #2 'Download for Mac' is selected as secondary because it has a different background color (#292524) and serves as an alternative action to the primary purchase button."
+      },
+      "confidence": 0.95
+    },
+    "personality": {
+      "tone": "modern",
+      "energy": "medium",
+      "targetAudience": "tech-savvy Mac users"
+    },
+    "designSystem": {
+      "framework": "tailwind",
+      "componentLibrary": ""
+    },
+    "confidence": {
+      "buttons": 0.95,
+      "colors": 0.9,
+      "overall": 0.925
+    },
+    "__llm_metadata": {
+      "logoSelection": {
+        "llmCalled": true,
+        "llmSucceeded": true,
+        "finalSource": "llm",
+        "rawLogoSelection": {
+          "selectedLogoIndex": 0,
+          "selectedLogoReasoning": "Selected #0 because it is located in the header, is visible, and links to the homepage, which are strong indicators of a primary brand logo.",
+          "confidence": 0.9
+        }
+      },
+      "buttonClassification": {
+        "llmCalled": true,
+        "llmSucceeded": true
+      }
+    }
+  },
+  "metadata": {
+    "og:site_name": "Alcove",
+    "og:image:height": "1260",
+    "title": "Alcove — Dynamic Island for your Mac",
+    "twitter:description": "An entirely new way to experience Mac",
+    "og:description": "An entirely new way to experience Mac",
+    "twitter:image:src": "https://cdn.tryalcove.com/images/meta.png",
+    "ogDescription": "An entirely new way to experience Mac",
+    "viewport": "width=device-width, initial-scale=1",
+    "description": "An entirely new way to experience Mac",
+    "og:url": "https://tryalcove.com/",
+    "ogTitle": "Alcove",
+    "og:title": "Alcove",
+    "ogImage": "https://cdn.tryalcove.com/images/meta.png",
+    "og:image:width": "2400",
+    "twitter:card": "summary_large_image",
+    "keywords": "macos, swift, macos app, app, dynamic, island, notch, media, controls, hud, interface",
+    "language": "en",
+    "ogUrl": "https://tryalcove.com/",
+    "og:image": "https://cdn.tryalcove.com/images/meta.png",
+    "twitter:title": "Alcove",
+    "ogSiteName": "Alcove",
+    "favicon": "https://cdn.tryalcove.com/images/icon.png?v=2",
+    "scrapeId": "019f9027-c503-7039-b659-4321a1fddaec",
+    "sourceURL": "https://tryalcove.com/",
+    "url": "https://tryalcove.com/",
+    "statusCode": 200,
+    "contentType": "text/html; charset=utf-8",
+    "timezone": "America/New_York",
+    "proxyUsed": "basic",
+    "indexId": "bc9b1e7c-d366-43dd-bb9c-ae59af4bfc79",
+    "creditsUsed": 1,
+    "concurrencyLimited": false
+  },
+  "images": [
+    "https://cdn.tryalcove.com/images/wallpaper.webp",
+    "https://cdn.tryalcove.com/images/wallpaper.jpg",
+    "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ee/5e/9b/ee5e9b85-e222-e5a0-15e5-880f5b165932/067003168366.png/168x168bb.jpg",
+    "https://cdn.tryalcove.com/images/wallpaper-alt.webp"
+  ]
+}
