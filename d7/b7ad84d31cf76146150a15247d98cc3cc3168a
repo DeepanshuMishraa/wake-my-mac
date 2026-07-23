@@ -1,0 +1,61 @@
+web/app/page.tsx
+  s_647788d1b25e56::t_816e861a960d6e 9,87
+web/app/release.ts
+  s_647788d1b25e56::t_4bbb02a49f2100 1-4
+Sources/HoldMyLid/AppState.swift
+  s_647788d1b25e56::t_409daf6102716c 113
+README.md
+  s_647788d1b25e56::t_8e48241ce92799 21
+  s_647788d1b25e56::t_0d00eb7052963f 25,29-43
+  s_647788d1b25e56::t_34fe847339c399 44
+VERSION
+  s_647788d1b25e56::t_58b93dc1f184a8 1
+Sources/HoldMyLid/DashboardView.swift
+  s_647788d1b25e56::t_4546427e9c98e5 480-482,489-491
+  s_647788d1b25e56::t_1b6940b32e123e 368,452-464,466-479,483-488,492-502,504-505,507,530-539
+  s_647788d1b25e56::t_b67e4ee1a4ca3e 540-542
+web/app/site-ui.tsx
+  s_647788d1b25e56::t_816e861a960d6e 4,190
+Sources/HoldMyLid/SettingsWindowController.swift
+  s_647788d1b25e56::t_0cb08fd1ccef27 80
+Sources/HoldMyLid/UpdateService.swift
+  s_647788d1b25e56::t_501de7fc0d116f 44-45,48
+  s_647788d1b25e56::t_1c4bc65bfff457 2,5-43,46-47,49-52,54,57-61,64-65,69-82,98,101-156
+Scripts/set-web-release.sh
+  s_647788d1b25e56::t_4bbb02a49f2100 1-22,24-31
+  s_647788d1b25e56::t_e9cbfb8450802d 23
+Scripts/version-build-number.sh
+  s_647788d1b25e56::t_4bbb02a49f2100 1-19
+Scripts/create-appcast.sh
+  s_647788d1b25e56::t_8e6d35ae22518a 9,31,40-45
+  s_647788d1b25e56::t_3e7d956174e6e2 10,12
+Scripts/build-app.sh
+  s_647788d1b25e56::t_3e7d956174e6e2 13
+  s_647788d1b25e56::t_495226ff517031 150-151
+  s_647788d1b25e56::t_6c0bec1cde5ca4 138-139,142-143
+.github/workflows/release.yml
+  s_647788d1b25e56::t_cefc1d56804420 59,68
+  s_647788d1b25e56::t_d37b89be33d229 135
+  s_647788d1b25e56::t_e91c5303bd2073 64-66,126,136-145,147-150,154
+  s_647788d1b25e56::t_309024ca3dd688 11,15-16,19-20,50-55,96,98,100-102,130-132,146,152-153,155-158,165-181,183-192,194-235
+  s_647788d1b25e56::t_8e48241ce92799 27,29-32,151
+  s_647788d1b25e56::t_6d3448b6e75c15 39,182,193
+Scripts/verify-release-dmg.sh
+  s_647788d1b25e56::t_4bbb02a49f2100 1-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d7b7ad84d31cf76146150a15247d98cc3cc3168a",
+  "prompts": {},
+  "sessions": {
+    "s_647788d1b25e56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9022-f812-7a71-b9c6-cd35d66d4f88",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
