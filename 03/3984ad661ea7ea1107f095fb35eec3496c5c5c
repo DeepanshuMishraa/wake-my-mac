@@ -1,0 +1,39 @@
+web/app/guide-shell.tsx
+  s_647788d1b25e56::t_8dfb5708cc1e7a 1-21
+web/app/icon.svg
+  s_647788d1b25e56::t_2c2fa027289a81 3-4
+web/app/keepingyouawake-alternative/page.tsx
+  s_647788d1b25e56::t_8dfb5708cc1e7a 1-204
+web/app/globals.css
+  s_647788d1b25e56::t_9575a6dc9bb132 1141,1199-1202,1302-1305,1487-1559,1649-1670,1728-1730
+  s_647788d1b25e56::t_b72d04c1c4373d 677-683,685-689,692-696,698,702-718,720,723-747,749-766,768-779,781,783-785,788-791,794-811,813-824,827-834,836-1116,1137-1140,1142
+  s_647788d1b25e56::t_9ad0b83df8ed99 17-22
+  s_647788d1b25e56::t_2fe5e0bbcbebb0 684,690-691,697,699-701,719,721-722,748,767,780,782,786-787,792-793,812,825-826,835
+  s_647788d1b25e56::t_3cd17655122a8e 1143
+  s_647788d1b25e56::t_846a39d9cb0f0d 1731
+web/app/site-ui.tsx
+  s_647788d1b25e56::t_f56683819f9d0b 3,70-71,115-116,138-139
+  s_647788d1b25e56::t_dd764faffbb476 1-2,4,8-10,69,72-93,95-114,117-137,140-170
+web/app/keep-mac-awake/page.tsx
+  s_647788d1b25e56::t_8dfb5708cc1e7a 1-199
+web/app/sitemap.ts
+  s_647788d1b25e56::t_8dfb5708cc1e7a 7-8
+web/app/page.tsx
+  s_647788d1b25e56::t_8dfb5708cc1e7a 186-187,195-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "033984ad661ea7ea1107f095fb35eec3496c5c5c",
+  "prompts": {},
+  "sessions": {
+    "s_647788d1b25e56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9022-f812-7a71-b9c6-cd35d66d4f88",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
