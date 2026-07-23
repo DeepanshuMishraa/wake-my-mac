@@ -1,0 +1,62 @@
+.firecrawl/wakemymac-home-seo.json
+  s_647788d1b25e56::t_f54061e812c8e4 1-54
+.firecrawl/serp-keep-mac-awake.json
+  s_647788d1b25e56::t_05909bb13789e5 1
+.firecrawl/serp-keepingyouawake.json
+  s_647788d1b25e56::t_05909bb13789e5 1
+web/app/globals.css
+  s_647788d1b25e56::t_d0040bf5a044f9 446-447
+  s_647788d1b25e56::t_82cde9caaa363d 61-70,72,83-84,91-129,363-364,373-434,436-438,440-445,449-452,456,460-461,474,476-489,491-517,738,743-745,828-829,838-844,867,872-875,988-1025,1043,1086,1102-1114,1177-1179,1181
+  s_647788d1b25e56::t_f0daa7c551a818 435,439,448,453-455,457-459,462-473,475,490
+  s_647788d1b25e56::t_ddf9830dd8001a 518,562-606,739-742,821-827,830-837,946-970,1084-1085
+  s_647788d1b25e56::t_7e31063012c679 519
+  s_647788d1b25e56::t_d23eb903816177 876
+  s_647788d1b25e56::t_c69d4a33733c40 1087
+  s_647788d1b25e56::t_c80f350f4fc5cc 1180
+web/app/privacy/page.tsx
+  s_647788d1b25e56::t_f0daa7c551a818 41
+  s_647788d1b25e56::t_ff6f6a5d3b7177 1-8,16-40,42-53
+  s_647788d1b25e56::t_ddf9830dd8001a 9-15
+web/DESIGN.md
+  s_647788d1b25e56::t_8cbfd2b73d7462 8,49
+  s_647788d1b25e56::t_a33508531057d8 50
+.firecrawl/wakemymac-privacy-seo.json
+  s_647788d1b25e56::t_f54061e812c8e4 1-52
+web/app/robots.ts
+  s_647788d1b25e56::t_0a840ff75e4113 2-10
+web/app/site.ts
+  s_647788d1b25e56::t_0a840ff75e4113 1
+web/app/sitemap.ts
+  s_647788d1b25e56::t_0a840ff75e4113 2-3,6-7
+  s_647788d1b25e56::t_ff6f6a5d3b7177 5,8
+.firecrawl/wakemymac-map.json
+  s_647788d1b25e56::t_f54061e812c8e4 1-12
+.firecrawl/alcove-privacy-branding.json
+  s_647788d1b25e56::t_1dee77cdb298d0 1-162
+web/app/page.tsx
+  s_647788d1b25e56::t_0a840ff75e4113 10,70-114,184-199
+  s_647788d1b25e56::t_ff6f6a5d3b7177 2-9,126,205
+  s_647788d1b25e56::t_077a9de6751f47 200-201
+web/app/layout.tsx
+  s_647788d1b25e56::t_0a840ff75e4113 3,6,9,12,15,21-23,28
+web/app/site-ui.tsx
+  s_647788d1b25e56::t_ff6f6a5d3b7177 1-117
+.firecrawl/alcove-privacy-screenshot.json
+  s_647788d1b25e56::t_1dee77cdb298d0 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "cfce97dd1d8c7f36acac1106e0905bcb65716f16",
+  "prompts": {},
+  "sessions": {
+    "s_647788d1b25e56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9022-f812-7a71-b9c6-cd35d66d4f88",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Deepanshu Mishra <d4deepanshu723@gmail.com>"
+    }
+  }
+}
