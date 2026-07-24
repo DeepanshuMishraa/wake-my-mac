@@ -557,6 +557,106 @@ h1 .hero-highlight::after {
   margin-bottom: 31px;
 }
 
+.feature-icon {
+  overflow: visible;
+  transition:
+    color 220ms cubic-bezier(0.25, 1, 0.5, 1),
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.feature-icon * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.icon-lid-screen,
+.icon-lid-status,
+.icon-rule-knob,
+.icon-battery-fill,
+.icon-remote-wave,
+.icon-remote-dot,
+.icon-history-arrow,
+.icon-history-ring,
+.icon-control-knob,
+.icon-privacy-shield,
+.icon-privacy-check,
+.icon-speed-bolt {
+  transition:
+    opacity 220ms cubic-bezier(0.25, 1, 0.5, 1),
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-battery-fill {
+  fill: currentColor;
+  opacity: 0.14;
+  transform-origin: left center;
+}
+
+@media (hover: hover) {
+  .feature:hover .feature-icon {
+    color: #718900;
+    transform: translateY(-5px) scale(1.04);
+  }
+
+  .feature:hover .icon-lid-screen {
+    transform: translateY(-3px);
+  }
+
+  .feature:hover .icon-lid-status {
+    transform: scaleX(1.45);
+  }
+
+  .feature:hover .icon-rule-knob-one {
+    transform: translateX(4px);
+  }
+
+  .feature:hover .icon-rule-knob-two {
+    transform: translateX(-4px);
+  }
+
+  .feature:hover .icon-rule-knob-three {
+    transform: translateX(3px);
+  }
+
+  .feature:hover .icon-battery-fill {
+    opacity: 0.32;
+    transform: scaleX(1.45);
+  }
+
+  .feature:hover .icon-remote-wave-outer {
+    transform: translateY(-2px);
+  }
+
+  .feature:hover .icon-remote-wave-inner {
+    transform: translateY(-1px) scale(1.08);
+  }
+
+  .feature:hover .icon-remote-dot {
+    transform: scale(1.65);
+  }
+
+  .feature:hover .icon-history-arrow,
+  .feature:hover .icon-history-ring {
+    transform: rotate(-16deg);
+  }
+
+  .feature:hover .icon-control-knob {
+    transform: translateX(-18px);
+  }
+
+  .feature:hover .icon-privacy-shield {
+    transform: scale(0.96);
+  }
+
+  .feature:hover .icon-privacy-check {
+    transform: translateY(-1px) scale(1.16);
+  }
+
+  .feature:hover .icon-speed-bolt {
+    transform: translateY(-2px) rotate(4deg) scale(1.08);
+  }
+}
+
 .feature h2 {
   max-width: 240px;
   margin: 0;
@@ -1738,5 +1838,12 @@ h1 .hero-highlight::after {
   .brand-idle,
   .brand-reveal {
     transition: none;
+  }
+
+  .feature-icon,
+  .feature-icon * {
+    animation: none;
+    transition: none;
+    transform: none;
   }
 }

@@ -37,6 +37,7 @@ function FeatureIcon({ name }: { name: FeatureIconName }) {
   const sharedProps = {
     viewBox: "0 0 48 48",
     "aria-hidden": true,
+    className: `feature-icon feature-icon-${name}`,
     fill: "none",
     stroke: "currentColor",
     strokeWidth: 3.8,
@@ -46,21 +47,21 @@ function FeatureIcon({ name }: { name: FeatureIconName }) {
 
   switch (name) {
     case "lid":
-      return <svg {...sharedProps}><rect x="7" y="8" width="34" height="26" rx="4" /><path d="M4 39h40M18 39h12" /><path d="M20 21h8" /></svg>;
+      return <svg {...sharedProps}><rect className="icon-lid-screen" x="7" y="8" width="34" height="26" rx="4" /><path className="icon-lid-base" d="M4 39h40M18 39h12" /><path className="icon-lid-status" d="M20 21h8" /></svg>;
     case "rules":
-      return <svg {...sharedProps}><path d="M8 13h19M35 13h5M8 24h5M21 24h19M8 35h15M31 35h9" /><circle cx="31" cy="13" r="4" /><circle cx="17" cy="24" r="4" /><circle cx="27" cy="35" r="4" /></svg>;
+      return <svg {...sharedProps}><path d="M8 13h19M35 13h5M8 24h5M21 24h19M8 35h15M31 35h9" /><circle className="icon-rule-knob icon-rule-knob-one" cx="31" cy="13" r="4" /><circle className="icon-rule-knob icon-rule-knob-two" cx="17" cy="24" r="4" /><circle className="icon-rule-knob icon-rule-knob-three" cx="27" cy="35" r="4" /></svg>;
     case "battery":
-      return <svg {...sharedProps}><rect x="5" y="13" width="35" height="22" rx="5" /><path d="M40 20h3v8h-3M11 19h16v10H11z" /></svg>;
+      return <svg {...sharedProps}><rect x="5" y="13" width="35" height="22" rx="5" /><path d="M40 20h3v8h-3" /><rect className="icon-battery-fill" x="11" y="19" width="16" height="10" /></svg>;
     case "remote":
-      return <svg {...sharedProps}><rect x="7" y="12" width="34" height="24" rx="4" /><path d="M3 41h42M18 41h12M18 25a9 9 0 0 1 12 0M21 28a5 5 0 0 1 6 0M24 32h.01" /></svg>;
+      return <svg {...sharedProps}><rect x="7" y="12" width="34" height="24" rx="4" /><path d="M3 41h42M18 41h12" /><path className="icon-remote-wave icon-remote-wave-outer" d="M18 25a9 9 0 0 1 12 0" /><path className="icon-remote-wave icon-remote-wave-inner" d="M21 28a5 5 0 0 1 6 0" /><path className="icon-remote-dot" d="M24 32h.01" /></svg>;
     case "history":
-      return <svg {...sharedProps}><path d="M10 14v9h9" /><path d="M11 22a15 15 0 1 1 2 13" /><path d="M25 16v9l6 4" /></svg>;
+      return <svg {...sharedProps}><path className="icon-history-arrow" d="M10 14v9h9" /><path className="icon-history-ring" d="M11 22a15 15 0 1 1 2 13" /><path d="M25 16v9l6 4" /></svg>;
     case "control":
-      return <svg {...sharedProps}><rect x="5" y="14" width="38" height="20" rx="10" /><circle cx="33" cy="24" r="6" /></svg>;
+      return <svg {...sharedProps}><rect x="5" y="14" width="38" height="20" rx="10" /><circle className="icon-control-knob" cx="33" cy="24" r="6" /></svg>;
     case "privacy":
-      return <svg {...sharedProps}><path d="M24 5 40 11v11c0 10-6.5 17-16 21-9.5-4-16-11-16-21V11l16-6Z" /><path d="m17 24 5 5 10-11" /></svg>;
+      return <svg {...sharedProps}><path className="icon-privacy-shield" d="M24 5 40 11v11c0 10-6.5 17-16 21-9.5-4-16-11-16-21V11l16-6Z" /><path className="icon-privacy-check" d="m17 24 5 5 10-11" /></svg>;
     case "speed":
-      return <svg {...sharedProps}><path d="M28 4 11 27h13l-4 17 17-24H24l4-16Z" /></svg>;
+      return <svg {...sharedProps}><path className="icon-speed-bolt" d="M28 4 11 27h13l-4 17 17-24H24l4-16Z" /></svg>;
   }
 }
 
