@@ -4,12 +4,12 @@ import { Brand, DownloadLink, SocialLinks } from "../site-ui";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Wake My Mac does not collect, transmit, or sell personal information.",
+    "StayRunning does not collect, transmit, or sell personal information.",
   alternates: { canonical: "/privacy" },
   openGraph: {
-    title: "Privacy Policy — Wake My Mac",
+    title: "Privacy Policy — StayRunning",
     description:
-      "Wake My Mac does not collect, transmit, or sell personal information.",
+      "StayRunning does not collect, transmit, or sell personal information.",
     url: "/privacy",
     type: "website",
   },
@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
           No data or personal information is collected by{" "}
           <span className="privacy-inline-brand">
             <span aria-hidden="true" />
-            Wake My Mac
+            StayRunning
           </span>.
         </p>
 
@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
       <SocialLinks />
 
       <footer className="footer privacy-footer">
-        <span>Wake My Mac</span>
+        <span>StayRunning</span>
       </footer>
     </main>
   );

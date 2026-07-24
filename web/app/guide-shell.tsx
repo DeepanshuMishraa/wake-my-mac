@@ -14,7 +14,7 @@ export function GuideShell({ children }: { children: ReactNode }) {
       <SocialLinks />
 
       <footer className="footer guide-footer">
-        <span>Wake My Mac</span>
+        <span>StayRunning</span>
       </footer>
     </main>
   );

@@ -1,4 +1,4 @@
-name: Build Wake My Mac release DMG
+name: Build StayRunning release DMG
 
 on:
   release:
@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: wake-my-mac-release
+  group: stayrunning-release
   cancel-in-progress: false
 
 jobs:
@@ -123,7 +123,7 @@ jobs:
             echo "Sparkle signed length $SIGNED_FILE_LENGTH does not match DMG length $ACTUAL_FILE_LENGTH." >&2
             exit 1
           fi
-          DOWNLOAD_URL="https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-${VERSION}.dmg"
+          DOWNLOAD_URL="https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/StayRunning-${VERSION}.dmg"
           chmod +x Scripts/create-appcast.sh
           APPCAST_PATH="$RUNNER_TEMP/appcast.xml"
           ./Scripts/create-appcast.sh "$VERSION" "$BUILD_NUMBER" "$DOWNLOAD_URL" "$SIGNATURE_OUTPUT" "$APPCAST_PATH"
@@ -141,7 +141,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
           DMG_PATH: ${{ steps.dmg.outputs.path }}
         run: |
-          OBJECT_NAME="Wake-My-Mac-${VERSION}.dmg"
+          OBJECT_NAME="StayRunning-${VERSION}.dmg"
           PUBLIC_BASE_URL="https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev"
           npx --yes wrangler@4.114.0 r2 object put "${R2_BUCKET_NAME}/${OBJECT_NAME}" \
             --remote \
@@ -221,10 +221,10 @@ jobs:
         env:
           VERSION: ${{ needs.publish_release.outputs.version }}
         run: |
-          EXPECTED_FILE="Wake-My-Mac-${VERSION}.dmg"
+          EXPECTED_FILE="StayRunning-${VERSION}.dmg"
           for attempt in $(seq 1 36); do
             if curl --fail --silent --show-error --location \
-              "https://wakemymac.dipxsy.app/?release-check=${GITHUB_RUN_ID}-${attempt}" |
+              "https://stayrunning.dipxsy.app/?release-check=${GITHUB_RUN_ID}-${attempt}" |
               grep -Fq "$EXPECTED_FILE"; then
               echo "Vercel is serving $EXPECTED_FILE"
               exit 0

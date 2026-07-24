@@ -20,7 +20,7 @@ final class SettingsWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "Wake My Mac Settings"
+        window.title = "StayRunning Settings"
         window.contentViewController = hosting
         window.center()
         window.isReleasedWhenClosed = false
@@ -85,7 +85,7 @@ struct SettingsView: View {
             }
 
             Section("Limits") {
-                Text("Wake My Mac keeps system and network activity awake while allowing the display to turn off. macOS may still enforce sleep because of hardware, thermal, battery, or enterprise safety policy.")
+                Text("StayRunning keeps system and network activity awake while allowing the display to turn off. macOS may still enforce sleep because of hardware, thermal, battery, or enterprise safety policy.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -109,7 +109,7 @@ struct SettingsView: View {
         case .ready: "The reliable wake helper is ready."
         case .approvalRequired: "Approval is required in System Settings before reliable wake can run."
         case .failed(let message): "Reliable wake failed: \(message)"
-        default: "Wake My Mac registers its helper automatically. macOS requires one approval before it can prevent lid-close sleep."
+        default: "StayRunning registers its helper automatically. macOS requires one approval before it can prevent lid-close sleep."
         }
     }
 }

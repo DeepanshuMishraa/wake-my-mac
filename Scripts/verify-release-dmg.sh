@@ -4,7 +4,7 @@ set -euo pipefail
 DMG_PATH="${1:?DMG path is required}"
 EXPECTED_VERSION="${2:?expected version is required}"
 EXPECTED_BUILD_NUMBER="${3:?expected build number is required}"
-EXPECTED_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/DeepanshuMishraa/wake-my-mac/releases/latest/download/appcast.xml}"
+EXPECTED_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/DeepanshuMishraa/stayrunning/releases/latest/download/appcast.xml}"
 
 if [[ ! -f "$DMG_PATH" ]]; then
   echo "Release verification failed: DMG not found at $DMG_PATH." >&2
@@ -17,7 +17,7 @@ if [[ "$EXPECTED_BUILD_NUMBER" != "$EXPECTED_FROM_VERSION" ]]; then
   exit 1
 fi
 
-WORK_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/wake-release-check.XXXXXX")"
+WORK_DIR="$(mktemp -d "${RUNNER_TEMP:-/tmp}/stayrunning-release-check.XXXXXX")"
 MOUNT_POINT="$WORK_DIR/mount"
 mkdir -p "$MOUNT_POINT"
 
@@ -32,10 +32,10 @@ trap cleanup EXIT
 hdiutil verify "$DMG_PATH" >/dev/null
 hdiutil attach -readonly -nobrowse -mountpoint "$MOUNT_POINT" "$DMG_PATH" >/dev/null
 
-APP_PATH="$MOUNT_POINT/Wake My Mac.app"
+APP_PATH="$MOUNT_POINT/StayRunning.app"
 INFO_PLIST="$APP_PATH/Contents/Info.plist"
 if [[ ! -d "$APP_PATH" || ! -f "$INFO_PLIST" ]]; then
-  echo "Release verification failed: Wake My Mac.app is missing from the DMG." >&2
+  echo "Release verification failed: StayRunning.app is missing from the DMG." >&2
   exit 1
 fi
 if [[ ! -L "$MOUNT_POINT/Applications" ]]; then
@@ -66,4 +66,4 @@ if [[ -z "$PUBLIC_KEY" ]]; then
 fi
 
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-echo "Verified Wake My Mac $EXPECTED_VERSION ($EXPECTED_BUILD_NUMBER) at $DMG_PATH"
+echo "Verified StayRunning $EXPECTED_VERSION ($EXPECTED_BUILD_NUMBER) at $DMG_PATH"

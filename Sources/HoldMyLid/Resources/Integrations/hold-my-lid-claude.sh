@@ -1,5 +1,5 @@
 #!/bin/sh
-# Managed by Wake My Mac. Claude Code passes hook JSON on stdin.
+# Managed by StayRunning. Claude Code passes hook JSON on stdin.
 set -eu
 dir="$HOME/Library/Application Support/Hold My Lid/Sessions"
 mkdir -p "$dir"

@@ -1,1 +1,1 @@
-export const siteUrl = "https://wakemymac.dipxsy.app";
+export const siteUrl = "https://stayrunning.dipxsy.app";

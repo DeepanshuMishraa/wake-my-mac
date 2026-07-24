@@ -21,9 +21,9 @@ const faqs = [
       "Run caffeinate -t 3600 in Terminal. The number is the duration in seconds. A graphical utility is easier when you need this repeatedly.",
   },
   {
-    question: "Can Wake My Mac keep working with the lid closed?",
+    question: "Can StayRunning keep working with the lid closed?",
     answer:
-      "Wake My Mac includes a closed-lid mode for downloads, builds, backups, SSH, and remote-access workflows, with battery guardrails you control.",
+      "StayRunning includes a closed-lid mode for downloads, builds, backups, SSH, and remote-access workflows, with battery guardrails you control.",
   },
 ];
 
@@ -50,7 +50,7 @@ export default function KeepMacAwakeGuide() {
         "@id": `${pageUrl}/#article`,
         headline: "How to Keep Your Mac Awake",
         description:
-          "A practical guide to macOS settings, the caffeinate command, and Wake My Mac.",
+          "A practical guide to macOS settings, the caffeinate command, and StayRunning.",
         url: pageUrl,
         mainEntityOfPage: pageUrl,
         datePublished: "2026-07-24",
@@ -66,7 +66,7 @@ export default function KeepMacAwakeGuide() {
         },
         publisher: {
           "@type": "Organization",
-          name: "Wake My Mac",
+          name: "StayRunning",
           url: siteUrl,
         },
         image: `${siteUrl}/og-image.png`,
@@ -77,7 +77,7 @@ export default function KeepMacAwakeGuide() {
           {
             "@type": "ListItem",
             position: 1,
-            name: "Wake My Mac",
+            name: "StayRunning",
             item: siteUrl,
           },
           {
@@ -111,13 +111,13 @@ export default function KeepMacAwakeGuide() {
         <h1>How to keep your Mac awake</h1>
         <p className="guide-summary">
           Use macOS settings for everyday behavior, Terminal’s{" "}
-          <code>caffeinate</code> command for a quick session, or Wake My Mac
+          <code>caffeinate</code> command for a quick session, or StayRunning
           when you need repeatable rules, battery limits, and closed-lid work.
         </p>
         <p className="guide-byline">
           Written by{" "}
           <a href="https://linkedin.com/in/deepanshum">Deepanshu Mishra</a>,
-          creator of Wake My Mac · Updated July 24, 2026
+          creator of StayRunning · Updated July 24, 2026
         </p>
       </header>
 
@@ -163,16 +163,16 @@ export default function KeepMacAwakeGuide() {
         </div>
       </section>
 
-      <section aria-labelledby="wake-my-mac-option">
+      <section aria-labelledby="stayrunning-option">
         <p className="guide-step">Option 03</p>
-        <h2 id="wake-my-mac-option">Use Wake My Mac for repeatable work</h2>
+        <h2 id="stayrunning-option">Use StayRunning for repeatable work</h2>
         <p>
-          Wake My Mac packages the same job into a native interface with
+          StayRunning packages the same job into a native interface with
           one-click control, activity rules, battery guardrails, closed-lid
           mode, and local history. It is designed for work you repeat: long
           downloads, builds, backups, renders, SSH, and remote sessions.
         </p>
-        <a className="guide-cta" href="/">See Wake My Mac and download it free <span>→</span></a>
+        <a className="guide-cta" href="/">See StayRunning and download it free <span>→</span></a>
       </section>
 
       <section className="guide-faq" aria-labelledby="keep-awake-faq">
@@ -190,8 +190,8 @@ export default function KeepMacAwakeGuide() {
         <h2>Sources and further reading</h2>
         <ul>
           <li><a href="https://support.apple.com/guide/mac-help/set-sleep-and-wake-settings-mchle41a6ccd/mac">Apple: Set sleep and wake settings for your Mac</a></li>
-          <li><a href="https://github.com/DeepanshuMishraa/wake-my-mac">Wake My Mac source code and releases</a></li>
-          <li><a href="/keepingyouawake-alternative">Compare Wake My Mac with KeepingYouAwake</a></li>
+          <li><a href="https://github.com/DeepanshuMishraa/stayrunning">StayRunning source code and releases</a></li>
+          <li><a href="/keepingyouawake-alternative">Compare StayRunning with KeepingYouAwake</a></li>
         </ul>
       </footer>
     </GuideShell>

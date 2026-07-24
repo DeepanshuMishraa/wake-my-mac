@@ -27,7 +27,7 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
         popover.delegate = self
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "laptopcomputer", accessibilityDescription: "Wake My Mac")
+            button.image = NSImage(systemSymbolName: "laptopcomputer", accessibilityDescription: "StayRunning")
             button.imagePosition = .imageOnly
             button.target = self
             button.action = #selector(togglePopover(_:))
@@ -50,7 +50,7 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
         let symbol = wakeFailed ? "exclamationmark.triangle.fill" : (isReliablyAwake ? "bolt.fill" : "laptopcomputer")
         let color: NSColor = (hasBlocked || wakeFailed) ? .systemOrange : (isReliablyAwake ? .systemGreen : .labelColor)
         let configuration = NSImage.SymbolConfiguration(paletteColors: [color])
-        let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Wake My Mac")?
+        let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "StayRunning")?
             .withSymbolConfiguration(configuration)
         image?.isTemplate = false
         button.image = image

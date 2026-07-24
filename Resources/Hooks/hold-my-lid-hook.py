@@ -15,7 +15,7 @@ AGENTS = {
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Report an agent lifecycle state to Wake My Mac.")
+    parser = argparse.ArgumentParser(description="Report an agent lifecycle state to StayRunning.")
     parser.add_argument("--agent", required=True, choices=sorted(AGENTS.keys()))
     parser.add_argument("--session", default=os.environ.get("HOLD_MY_LID_SESSION") or os.environ.get("PWD") or "default")
     parser.add_argument("--status", required=True, choices=["working", "idle"])

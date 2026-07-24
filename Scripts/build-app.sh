@@ -2,8 +2,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP_NAME="Wake My Mac"
-EXECUTABLE_NAME="WatchMyMac"
+APP_NAME="StayRunning"
+BUILD_EXECUTABLE_NAME="WatchMyMac"
+EXECUTABLE_NAME="StayRunning"
 HELPER_NAME="WakeMyMacHelper"
 HELPER_ID="com.dipxsy.watchmymac.helper.v2"
 LEGACY_HELPER_ID="com.dipxsy.watchmymac.helper"
@@ -16,7 +17,7 @@ if [[ -n "${BUILD_NUMBER:-}" && "$BUILD_NUMBER" != "$EXPECTED_BUILD_NUMBER" ]]; 
   exit 1
 fi
 BUILD_NUMBER="$EXPECTED_BUILD_NUMBER"
-SPARKLE_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/DeepanshuMishraa/wake-my-mac/releases/latest/download/appcast.xml}"
+SPARKLE_FEED_URL="${SPARKLE_FEED_URL:-https://github.com/DeepanshuMishraa/stayrunning/releases/latest/download/appcast.xml}"
 SPARKLE_PUBLIC_ED_KEY="${SPARKLE_PUBLIC_ED_KEY:-Co9AWWnH9corrdbp+CB3kMHaiYYprk5tw/o9rGsRiVQ=}"
 if [[ -z "${CODE_SIGN_IDENTITY:-}" ]]; then
   CODE_SIGN_IDENTITY="$(security find-identity -v -p codesigning 2>/dev/null | awk -F'"' '/Apple Development:/{print $2; exit}')"
@@ -34,7 +35,7 @@ swift build -c release
 
 rm -rf "$APP_DIR" "$ASSET_OUTPUT"
 mkdir -p "$MACOS" "$RESOURCES" "$LAUNCH_DAEMONS"
-cp "$ROOT/.build/release/$EXECUTABLE_NAME" "$MACOS/$EXECUTABLE_NAME"
+cp "$ROOT/.build/release/$BUILD_EXECUTABLE_NAME" "$MACOS/$EXECUTABLE_NAME"
 cp "$ROOT/.build/release/$HELPER_NAME" "$RESOURCES/$HELPER_NAME"
 HELPER_BUILD_ID="$(shasum -a 256 "$RESOURCES/$HELPER_NAME" | awk '{print $1}')"
 cp -R "$ROOT/.build/release/WatchMyMac_WatchMyMac.bundle" "$RESOURCES/"

@@ -21,7 +21,7 @@ final class DashboardWindowController: NSObject, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Wake My Mac"
+        window.title = "StayRunning"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.toolbarStyle = .unified

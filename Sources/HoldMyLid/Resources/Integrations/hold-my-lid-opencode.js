@@ -1,4 +1,4 @@
-// managed by Wake My Mac; local changes will be replaced on version upgrades.
+// managed by StayRunning; local changes will be replaced on version upgrades.
 // HOLD_MY_LID_INTEGRATION=opencode:1
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Managed Antigravity hook adapter for Wake My Mac."""
+"""Managed Antigravity hook adapter for StayRunning."""
 import json
 import os
 import sys

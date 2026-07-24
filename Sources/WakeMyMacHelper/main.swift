@@ -16,6 +16,7 @@ private final class PowerOverrideController {
     }
 
     private static let pmsetDeadline: TimeInterval = 5
+    // Preserve the original storage path so upgrades can restore owned power policy safely.
     private let stateDirectory = URL(fileURLWithPath: "/Library/Application Support/Wake My Mac", isDirectory: true)
     private var ownershipMarker: URL {
         stateDirectory.appendingPathComponent("helper-owned-sleep-override")
@@ -56,7 +57,7 @@ private final class PowerOverrideController {
             }
 
             guard let ownershipRecord else {
-                // Another tool may own SleepDisabled. Releasing Wake My Mac's
+                // Another tool may own SleepDisabled. Releasing StayRunning's
                 // request must not overwrite that external policy.
                 return .success(true)
             }
@@ -164,6 +165,7 @@ private final class PowerOverrideController {
 }
 
 private final class PersistentWakeStore {
+    // Preserve the original storage path so existing persistent requests survive the rebrand.
     private let stateDirectory = URL(fileURLWithPath: "/Library/Application Support/Wake My Mac", isDirectory: true)
     private var stateFile: URL { stateDirectory.appendingPathComponent("persistent-wake-requests.json") }
 
@@ -200,7 +202,7 @@ private enum HelperError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingOwnershipRecord:
-            "Wake My Mac lost ownership state while enabling the sleep override. The previous power policy is preserved; retry enabling wake protection."
+            "StayRunning lost ownership state while enabling the sleep override. The previous power policy is preserved; retry enabling wake protection."
         case .invalidPMSetOutput:
             "Could not read the current macOS sleep policy."
         case .verificationFailed:
@@ -342,7 +344,7 @@ private final class WakeHelperService: NSObject, WakeHelperXPCProtocol, NSXPCLis
                 leaseCount,
                 persistentCount,
                 WakeHelperConstants.protocolVersion,
-                "Could not read saved wake intent: \(loadError). The existing sleep override was preserved; explicitly enable or disable Wake My Mac to repair it."
+                "Could not read saved wake intent: \(loadError). The existing sleep override was preserved; explicitly enable or disable StayRunning to repair it."
             )
         }
         switch result {

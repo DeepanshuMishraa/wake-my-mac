@@ -70,9 +70,9 @@ final class AppState: ObservableObject {
             idleBeganAt = nil
             heldSince = nil
             powerManager.release()
-            notify(title: "Wake My Mac off", body: "Wake assertions released.")
+            notify(title: "StayRunning off", body: "Wake assertions released.")
         } else {
-            notify(title: "Wake My Mac on", body: settings.mode.explanation)
+            notify(title: "StayRunning on", body: settings.mode.explanation)
             if !reliableWakeState.isHelperReady {
                 powerManager.registerHelper()
             }
@@ -89,7 +89,7 @@ final class AppState: ObservableObject {
         powerManager.release()
         heldSince = nil
         idleBeganAt = nil
-        notify(title: "Wake My Mac paused", body: "Wake assertions are paused temporarily.")
+        notify(title: "StayRunning paused", body: "Wake assertions are paused temporarily.")
         refresh()
     }
 
@@ -204,7 +204,7 @@ final class AppState: ObservableObject {
             phase = .holding
             if heldSince == nil {
                 heldSince = Date()
-                notify(title: "Wake My Mac engaged", body: "A wake rule is active, so sleep is being held.")
+                notify(title: "StayRunning engaged", body: "A wake rule is active, so sleep is being held.")
             }
             powerManager.hold(reason: holdReason, kind: settings.mode.wakeRequestKind)
             wasHolding = true
@@ -224,7 +224,7 @@ final class AppState: ObservableObject {
 
         if secondsLeft > 0 {
             phase = .idleCountdown(secondsLeft: secondsLeft)
-            powerManager.hold(reason: "Wake My Mac: waiting for idle grace period", kind: .leased)
+            powerManager.hold(reason: "StayRunning: waiting for idle grace period", kind: .leased)
         } else {
             phase = .guarded("Agents have been idle for 30 seconds.")
             heldSince = nil
@@ -262,9 +262,9 @@ final class AppState: ObservableObject {
 
     private var holdReason: String {
         switch settings.mode {
-        case .agents: "Wake My Mac: automation is active"
-        case .ssh: "Wake My Mac: SSH mode"
-        case .manual: "Wake My Mac: manual mode"
+        case .agents: "StayRunning: automation is active"
+        case .ssh: "StayRunning: SSH mode"
+        case .manual: "StayRunning: manual mode"
         }
     }
 

@@ -6,7 +6,7 @@ BUILD_NUMBER="${2:?build number is required}"
 DOWNLOAD_URL="${3:?download URL is required}"
 SIGNATURE_OUTPUT="${4:?Sparkle signature output is required}"
 OUTPUT_PATH="${5:-appcast.xml}"
-PRODUCT_URL="${PRODUCT_URL:-https://wakemymac.dipxsy.app}"
+PRODUCT_URL="${PRODUCT_URL:-https://stayrunning.dipxsy.app}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 EXPECTED_BUILD_NUMBER="$("$ROOT/Scripts/version-build-number.sh" "$VERSION")"
@@ -27,20 +27,20 @@ cat > "$OUTPUT_PATH" <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
-    <title>Wake My Mac Updates</title>
+    <title>StayRunning Updates</title>
     <link>$PRODUCT_URL</link>
-    <description>Wake My Mac release updates</description>
+    <description>StayRunning release updates</description>
     <language>en</language>
     <item>
-      <title>Wake My Mac $VERSION</title>
+      <title>StayRunning $VERSION</title>
       <pubDate>$(LC_ALL=C date -R)</pubDate>
       <sparkle:version>$BUILD_NUMBER</sparkle:version>
       <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
       <description sparkle:descriptionFormat="plain-text"><![CDATA[
-Wake My Mac $VERSION is ready.
+StayRunning $VERSION is ready.
 
-This release includes the latest reliability, performance, and interface improvements. The update is signed by Wake My Mac and verified by Sparkle before installation.
+This release includes the latest reliability, performance, and interface improvements. The update is signed by StayRunning and verified by Sparkle before installation.
       ]]></description>
       <enclosure url="$DOWNLOAD_URL" length="$FILE_LENGTH" type="application/x-apple-diskimage" sparkle:edSignature="$ED_SIGNATURE" />
     </item>

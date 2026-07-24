@@ -4,7 +4,7 @@ import { useId, useRef, useState } from "react";
 import { downloadUrl, releaseVersion } from "./release";
 
 const quarantineCommand =
-  'sudo xattr -rd com.apple.quarantine "/Applications/Wake My Mac.app"';
+  'sudo xattr -rd com.apple.quarantine "/Applications/StayRunning.app"';
 
 export function AppleIcon() {
   return (
@@ -133,7 +133,7 @@ export function DownloadLink({ className }: { className: string }) {
             <AppleIcon />
           </span>
           <p className="dialog-kicker">Before you download</p>
-          <h2 id={titleId}>Wake My Mac isn’t signed by Apple yet.</h2>
+          <h2 id={titleId}>StayRunning isn’t signed by Apple yet.</h2>
           <p className="dialog-copy" id={descriptionId}>
             macOS may block the first launch. Download the app, move it to
             Applications, then run this command in Terminal to remove the
@@ -152,7 +152,7 @@ export function DownloadLink({ className }: { className: string }) {
           </div>
 
           <p className="dialog-note">
-            Only run commands you understand. This command targets Wake My Mac
+            Only run commands you understand. This command targets StayRunning
             in your Applications folder.
           </p>
 
@@ -161,7 +161,7 @@ export function DownloadLink({ className }: { className: string }) {
             href={downloadUrl}
             onClick={closeDownloadDialog}
           >
-            Download Wake My Mac <DownloadArrowIcon />
+            Download StayRunning <DownloadArrowIcon />
           </a>
         </div>
       </dialog>
@@ -177,7 +177,7 @@ export function Brand({ iconAction }: { iconAction: "home" | "privacy" }) {
       <a
         className="brand-icon-link"
         href={linksToPrivacy ? "/privacy" : "/"}
-        aria-label={linksToPrivacy ? "Read our privacy policy" : "Back to Wake My Mac"}
+        aria-label={linksToPrivacy ? "Read our privacy policy" : "Back to StayRunning"}
       >
         <span className="brand-mark" aria-hidden="true">
           <span className="brand-idle" />
@@ -186,7 +186,7 @@ export function Brand({ iconAction }: { iconAction: "home" | "privacy" }) {
           </span>
         </span>
       </a>
-      <a className="brand-name" href="/">Wake My Mac</a>
+      <a className="brand-name" href="/">StayRunning</a>
       <span className="version">v{releaseVersion}</span>
     </div>
   );
@@ -196,8 +196,8 @@ export function SocialLinks() {
   return (
     <div className="social-links" aria-label="Project links">
       <a
-        href="https://github.com/DeepanshuMishraa/wake-my-mac"
-        aria-label="Wake My Mac on GitHub"
+        href="https://github.com/DeepanshuMishraa/stayrunning"
+        aria-label="StayRunning on GitHub"
       >
         <GitHubIcon />
       </a>

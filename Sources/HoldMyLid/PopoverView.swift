@@ -55,7 +55,7 @@ struct PopoverView: View {
     private var header: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Wake My Mac")
+                Text("StayRunning")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.primary)
 
@@ -193,7 +193,7 @@ struct PopoverView: View {
     private var footer: some View {
         VStack(spacing: 2) {
             MenuRow(title: "Settings…", shortcut: "⌘,") { state.openSettings() }
-            MenuRow(title: "Quit Wake My Mac", shortcut: "⌘Q") { NSApp.terminate(nil) }
+            MenuRow(title: "Quit StayRunning", shortcut: "⌘Q") { NSApp.terminate(nil) }
         }
         .padding(.bottom, 4)
     }

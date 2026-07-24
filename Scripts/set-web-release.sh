@@ -25,7 +25,7 @@ cat > "$TEMP_FILE" <<EOF
 export const releaseVersion = "$VERSION";
 
 export const downloadUrl =
-  \`https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/Wake-My-Mac-\${releaseVersion}.dmg\`;
+  \`https://pub-0f452c90e334438d8e4a54f9b977a5ea.r2.dev/StayRunning-\${releaseVersion}.dmg\`;
 EOF
 mv "$TEMP_FILE" "$RELEASE_FILE"
 trap - EXIT

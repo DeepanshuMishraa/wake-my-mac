@@ -16,7 +16,7 @@ enum UpdateStatus: Equatable {
         case .ready: "Ready to check"
         case .checking: "Checking for updates…"
         case .available(let version): "Version \(version) is available"
-        case .current: "Wake My Mac is up to date"
+        case .current: "StayRunning is up to date"
         case .failed: "Couldn’t check for updates"
         }
     }
@@ -90,7 +90,7 @@ final class UpdateService: NSObject, ObservableObject, SPUUpdaterDelegate, NSMen
         guard let controller else {
             let alert = NSAlert()
             alert.messageText = "Updates are unavailable in this build"
-            alert.informativeText = "Install a published Wake My Mac release to receive updates from GitHub Releases."
+            alert.informativeText = "Install a published StayRunning release to receive updates from GitHub Releases."
             alert.alertStyle = .informational
             alert.runModal()
             return

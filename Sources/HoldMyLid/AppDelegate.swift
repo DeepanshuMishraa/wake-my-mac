@@ -41,7 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupMainMenu() {
         let mainMenu = NSMenu()
         let appItem = NSMenuItem()
-        let appMenu = NSMenu(title: "Wake My Mac")
+        let appMenu = NSMenu(title: "StayRunning")
         appItem.submenu = appMenu
         appMenu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         appMenu.addItem(withTitle: "Configure Agent Integrations…", action: #selector(configureIntegrations), keyEquivalent: "")
@@ -49,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let updateItem = appMenu.addItem(withTitle: "Check for Updates…", action: #selector(UpdateService.checkForUpdates(_:)), keyEquivalent: "")
         updateItem.target = UpdateService.shared
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Quit Wake My Mac", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: "Quit StayRunning", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         mainMenu.addItem(appItem)
 
         let windowItem = NSMenuItem()
@@ -74,8 +74,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard Bundle.main.bundleURL.pathExtension != "app" else { return }
 
         let alert = NSAlert()
-        alert.messageText = "Wake My Mac is running outside an app bundle"
-        alert.informativeText = "Xcode is launching the SwiftPM executable directly, so macOS notifications are disabled for this debug run. Use `make app` and open `build/Wake My Mac.app` for the real menu bar app behavior."
+        alert.messageText = "StayRunning is running outside an app bundle"
+        alert.informativeText = "Xcode is launching the SwiftPM executable directly, so macOS notifications are disabled for this debug run. Use `make app` and open `build/StayRunning.app` for the real menu bar app behavior."
         alert.alertStyle = .informational
         alert.addButton(withTitle: "OK")
         alert.runModal()

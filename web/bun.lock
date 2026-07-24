@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "hold-my-lid-web",
+      "name": "stayrunning-web",
       "dependencies": {
         "next": "^15.4.1",
         "react": "^19.1.0",

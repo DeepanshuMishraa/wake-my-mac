@@ -76,7 +76,7 @@ enum IntegrationInstaller {
         case .antigravity: return home.appendingPathComponent(".gemini/config/plugins/hold-my-lid-antigravity", isDirectory: true)
         case .claude: return home.appendingPathComponent(".claude/settings.json")
         case .cursor: return home.appendingPathComponent(".cursor/rules/wake-my-mac.mdc")
-        case .codex: return home.appendingPathComponent("Library/Application Support/Wake My Mac/Codex integration")
+        case .codex: return home.appendingPathComponent("Library/Application Support/StayRunning/Codex integration")
         case .croc: return home.appendingPathComponent(".config/wake-my-mac/croc (detection only)")
         }
     }
@@ -127,8 +127,8 @@ enum IntegrationInstaller {
     private static func configureCursorRule() {
         let file = destination(for: .cursor)
         let contents = """
-        # Wake My Mac integration
-        # This rule is informational only; Wake My Mac detects cursor-agent through PATH and process state.
+        # StayRunning integration
+        # This rule is informational only; StayRunning detects cursor-agent through PATH and process state.
         Keep long-running work visible while Cursor Agent is active. Do not terminate the agent process just because a turn is waiting for input.
         """
         do {
@@ -196,7 +196,7 @@ private struct IntegrationSetupView: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text(isFirstRun ? "Set up agent integrations" : "Agent integrations")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
-                Text("Wake My Mac only watches tools you already have installed. Nothing is downloaded or installed here.")
+                Text("StayRunning only watches tools you already have installed. Nothing is downloaded or installed here.")
                     .foregroundStyle(.secondary)
             }
             ScrollView {

@@ -1,4 +1,4 @@
-# Wake My Mac web design
+# StayRunning web design
 
 ## Source
 
@@ -50,7 +50,7 @@ Privacy page: dark ink background → compact shared header → oversized left-a
 
 ## Agent build instructions
 
-Keep copy short and specific. Use semantic sections, descriptive metadata, JSON-LD SoftwareApplication schema, sitemap, robots, responsive layout, keyboard-accessible controls, and reduced-motion support. Use original Wake My Mac copy and visuals; do not reuse Alcove branding, logo, or third-party imagery.
+Keep copy short and specific. Use semantic sections, descriptive metadata, JSON-LD SoftwareApplication schema, sitemap, robots, responsive layout, keyboard-accessible controls, and reduced-motion support. Use original StayRunning copy and visuals; do not reuse Alcove branding, logo, or third-party imagery.
 
 ## Rerun inputs
 

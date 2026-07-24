@@ -72,15 +72,16 @@ export default function Home() {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         url: siteUrl,
-        name: "Wake My Mac",
-        description: "A free macOS utility that keeps your Mac awake.",
+        name: "StayRunning",
+        alternateName: "Wake My Mac",
+        description: "A free macOS utility that keeps your Mac running with the lid closed.",
         inLanguage: "en-US",
       },
       {
         "@type": "SoftwareApplication",
         "@id": `${siteUrl}/#software`,
-        name: "Wake My Mac",
-        alternateName: "Hold My Lid",
+        name: "StayRunning",
+        alternateName: "Wake My Mac",
         url: siteUrl,
         image: `${siteUrl}/og-image.png`,
         downloadUrl,
@@ -100,7 +101,7 @@ export default function Home() {
           "Local activity history",
         ],
         sameAs: [
-          "https://github.com/DeepanshuMishraa/wake-my-mac",
+          "https://github.com/DeepanshuMishraa/stayrunning",
           "https://x.com/dipxsyy",
           "https://linkedin.com/in/deepanshum",
         ],
@@ -128,7 +129,7 @@ export default function Home() {
           <div className="nav-side">
             <a
               className="nav-link"
-              href="https://github.com/DeepanshuMishraa/wake-my-mac"
+              href="https://github.com/DeepanshuMishraa/stayrunning"
             >
               <GitHubIcon />
               GitHub
@@ -139,7 +140,7 @@ export default function Home() {
 
         <div className="hero-copy">
           <h1>
-            Keep your <span className="hero-mac"><AppleIcon />Mac</span> awake.
+            Keep your <span className="hero-mac"><AppleIcon />Mac</span> running.
             <br />
             Even with the <span className="hero-highlight">lid closed.</span>
           </h1>
@@ -152,7 +153,7 @@ export default function Home() {
             <DownloadLink className="download-button" />
             <a
               className="source-button"
-              href="https://github.com/DeepanshuMishraa/wake-my-mac"
+              href="https://github.com/DeepanshuMishraa/stayrunning"
             >
               <GitHubIcon />
               View source
@@ -163,7 +164,7 @@ export default function Home() {
         <div className="product-stage">
           <Image
             src="/dashboard-preview.png"
-            alt="Wake My Mac dashboard showing the Mac is currently being kept awake"
+            alt="StayRunning dashboard showing the Mac is currently being kept awake"
             width={2428}
             height={1762}
             priority
@@ -172,7 +173,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="features" aria-label="Wake My Mac features">
+      <section className="features" aria-label="StayRunning features">
         {features.map((feature) => (
           <article className="feature" key={feature.title}>
             <FeatureIcon name={feature.icon} />
@@ -184,17 +185,17 @@ export default function Home() {
       <section className="search-intent" aria-labelledby="keep-awake-heading">
         <div>
           <p><a href="/keepingyouawake-alternative">KeepingYouAwake alternative for Mac</a></p>
-          <h2 id="keep-awake-heading"><a href="/keep-mac-awake">A simpler way to keep your Mac awake.</a></h2>
+          <h2 id="keep-awake-heading"><a href="/keep-mac-running-lid-closed">Keep your Mac running with the lid closed.</a></h2>
         </div>
         <div className="search-intent-copy">
           <p>
-            Wake My Mac is a free, native macOS keep-awake app for long
+            StayRunning is a free, native macOS keep-awake app for long
             downloads, builds, backups, SSH sessions, and remote access.
           </p>
           <p>
             If you are comparing{" "}
             <a href="/keepingyouawake-alternative">KeepingYouAwake</a>,
-            Caffeine, or Amphetamine, Wake My Mac adds closed-lid support,
+            Caffeine, or Amphetamine, StayRunning adds closed-lid support,
             battery guardrails, activity rules, and local history without
             requiring an account.
           </p>
@@ -208,7 +209,7 @@ export default function Home() {
       </section>
 
       <footer className="footer">
-        <span>Wake My Mac</span>
+        <span>StayRunning</span>
       </footer>
     </main>
   );

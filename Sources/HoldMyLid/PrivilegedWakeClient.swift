@@ -334,7 +334,7 @@ final class PrivilegedWakeClient {
         Task { @MainActor [weak self] in
             guard let self, self.generation == generation, self.desiredRequest == nil else { return }
             guard success else {
-                self.state = .failed(message ?? "Wake My Mac could not restore its previous sleep policy. Retry turning it off; the ownership record was preserved for recovery.")
+                self.state = .failed(message ?? "StayRunning could not restore its previous sleep policy. Retry turning it off; the ownership record was preserved for recovery.")
                 return
             }
             self.verifyReleasedStatus(generation: generation)
@@ -343,7 +343,7 @@ final class PrivilegedWakeClient {
 
     private func verifyReleasedStatus(generation: Int) {
         guard let proxy = remoteProxy() else {
-            state = .failed("Wake My Mac released protection, but could not verify the restored policy. Retry turning it off.")
+            state = .failed("StayRunning released protection, but could not verify the restored policy. Retry turning it off.")
             return
         }
         proxy.status { [weak self] _, leaseCount, persistentCount, protocolVersion, message in
@@ -355,7 +355,7 @@ final class PrivilegedWakeClient {
                 }
                 self.state = leaseCount == 0 && persistentCount == 0
                     ? .ready
-                    : .failed(message ?? "The helper still reports active Wake My Mac requests. Retry turning protection off; the previous power policy remains recorded.")
+                    : .failed(message ?? "The helper still reports active StayRunning requests. Retry turning protection off; the previous power policy remains recorded.")
             }
         }
     }

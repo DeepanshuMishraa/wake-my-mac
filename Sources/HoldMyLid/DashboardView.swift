@@ -72,7 +72,7 @@ private struct DashboardSidebar: View {
                     .overlay {
                         Capsule().fill(DashboardPalette.lime).frame(width: 20, height: 6)
                     }
-                Text("Wake My Mac").font(.system(size: 19, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
+                Text("StayRunning").font(.system(size: 19, weight: .bold, design: .rounded)).foregroundStyle(DashboardPalette.ink)
             }
             .padding(.horizontal, 23)
             .padding(.top, 28)
@@ -378,13 +378,13 @@ private struct SettingsDashboard: View {
             VStack(alignment: .leading, spacing: 18) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Settings").font(.system(size: 42, weight: .bold, design: .rounded)).tracking(-1.8).foregroundStyle(DashboardPalette.ink)
-                    Text("Tune how Wake My Mac behaves on your Mac.").font(.system(size: 16, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
+                    Text("Tune how StayRunning behaves on your Mac.").font(.system(size: 16, weight: .medium, design: .rounded)).foregroundStyle(DashboardPalette.secondary)
                 }
                 .padding(.bottom, 12)
 
                 NativeCard {
                     VStack(alignment: .leading, spacing: 18) {
-                        SettingsHeading(title: "Operating mode", subtitle: "Choose when Wake My Mac should keep your Mac reachable.")
+                        SettingsHeading(title: "Operating mode", subtitle: "Choose when StayRunning should keep your Mac reachable.")
                         HStack(spacing: 8) {
                             ForEach(HoldMode.allCases) { mode in
                                 Button { draft.mode = mode } label: {
@@ -555,7 +555,7 @@ private struct SettingsDashboard: View {
     private var reliableWakeDetail: String {
         switch state.reliableWakeState {
         case .setupRequired: "macOS will ask for administrator approval once."
-        case .approvalRequired: "Allow Wake My Mac under Login Items in System Settings."
+        case .approvalRequired: "Allow StayRunning under Login Items in System Settings."
         case .active: "The privileged wake lease is verified and active."
         case .failed(let message): message
         default: "Passwords are handled by macOS and are never stored by the app."

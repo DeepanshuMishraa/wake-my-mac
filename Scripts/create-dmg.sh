@@ -2,13 +2,13 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP_NAME="Wake My Mac"
+APP_NAME="StayRunning"
 VERSION_FILE="$ROOT/VERSION"
 VERSION="${APP_VERSION:-$(<"$VERSION_FILE")}"
 APP_PATH="$ROOT/build/$APP_NAME.app"
 STAGING_DIR="$ROOT/build/dmg-root"
-DMG_PATH="$ROOT/build/Wake-My-Mac-$VERSION.dmg"
-LATEST_DMG_PATH="$ROOT/build/Wake-My-Mac.dmg"
+DMG_PATH="$ROOT/build/StayRunning-$VERSION.dmg"
+LATEST_DMG_PATH="$ROOT/build/StayRunning.dmg"
 
 if [[ ! -d "$APP_PATH" ]]; then
   echo "Missing app bundle: $APP_PATH" >&2
